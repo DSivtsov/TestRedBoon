@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Game.Gameplay.Player
 {
-    public class ItemPanel : MonoBehaviour
+    public sealed class ItemPanel : MonoBehaviour
     {
         [SerializeField] UnityEngine.UI.Text _itemTextObj;
 

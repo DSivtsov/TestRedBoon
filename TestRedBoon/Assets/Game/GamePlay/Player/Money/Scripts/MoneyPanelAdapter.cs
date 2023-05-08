@@ -3,10 +3,16 @@ using Zenject;
 
 namespace Game.Gameplay.Player
 {
-    public class MoneyPanelAdapter : MonoBehaviour
+    public class MoneyPanelAdapter
     {
         private MoneyStorage _moneyStorage;
-        [SerializeField] ItemPanel _moneyPanel;
+        private ItemPanel _moneyPanel;
+
+        public MoneyPanelAdapter(MoneyStorage itemStorage, ItemPanel itemPanel)
+        {
+            _moneyStorage = itemStorage;
+            _moneyPanel = itemPanel;
+        }
 
         [Inject]
         public void Construct(MoneyStorage moneyStorage)
@@ -14,13 +20,13 @@ namespace Game.Gameplay.Player
             _moneyStorage = moneyStorage;
         }
 
-        private void OnEnable()
+        public void Enable()
         {
             _moneyStorage.OnMoneyChanged += OnMoneyChanged;
             _moneyStorage.OnMoneySet += OnMoneySet;
             _moneyPanel.SetupMoney(_moneyStorage.Money.ToString());
         }
-        private void OnDisable()
+        public void Disable()
         {
             _moneyStorage.OnMoneyChanged -= OnMoneyChanged;
             _moneyStorage.OnMoneySet -= OnMoneySet;

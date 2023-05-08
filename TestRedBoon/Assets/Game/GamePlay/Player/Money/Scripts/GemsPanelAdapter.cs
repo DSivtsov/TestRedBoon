@@ -3,24 +3,24 @@ using Zenject;
 
 namespace Game.Gameplay.Player
 {
-    public class GemsPanelAdapter : MonoBehaviour
+    public sealed class GemsPanelAdapter
     {
         private GemsStorage _gemsStorage;
-        [SerializeField] ItemPanel _gemsPanel;
+        ItemPanel _gemsPanel;
 
-        [Inject]
-        public void Construct(GemsStorage moneyStorage)
+        public GemsPanelAdapter(GemsStorage itemStorage, ItemPanel itemPanel)
         {
-            _gemsStorage = moneyStorage;
+            _gemsStorage = itemStorage;
+            _gemsPanel = itemPanel;
         }
 
-        private void OnEnable()
+        public void Enable()
         {
             _gemsStorage.OnMoneyChanged += OnMoneyChanged;
             _gemsStorage.OnMoneySet += OnMoneySet;
             _gemsPanel.SetupMoney(_gemsStorage.Gems.ToString());
         }
-        private void OnDisable()
+        public void Disable()
         {
             _gemsStorage.OnMoneyChanged -= OnMoneyChanged;
             _gemsStorage.OnMoneySet -= OnMoneySet;
