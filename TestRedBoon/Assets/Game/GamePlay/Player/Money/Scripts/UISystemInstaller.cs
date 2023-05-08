@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 
@@ -9,9 +7,6 @@ namespace Game.Gameplay.Player
     {
         [SerializeField] private ItemPanel _moneyPanel;
         [SerializeField] private ItemPanel _gemsPanel;
-
-        private GemsStorage _gemsStorage;
-        private MoneyStorage _moneyStorage;
 
         private GemsPanelAdapter _gemsPanelAdapter;
         private MoneyPanelAdapter _moneyPanelAdapter;
