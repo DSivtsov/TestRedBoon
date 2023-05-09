@@ -1,0 +1,34 @@
+{
+    "name": "GameControl",
+    "maps": [
+        {
+            "name": "Inventory",
+            "id": "e7ef70bc-a6c2-4082-a6ab-20c62766cf76",
+            "actions": [
+                {
+                    "name": "BeginDrag",
+                    "type": "Button",
+                    "id": "9d926b84-8fc4-49ee-ace3-2dceb87d87f0",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "d4ff0519-cd5b-4dfc-b11f-b6668fd2af61",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "",
+                    "action": "BeginDrag",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
