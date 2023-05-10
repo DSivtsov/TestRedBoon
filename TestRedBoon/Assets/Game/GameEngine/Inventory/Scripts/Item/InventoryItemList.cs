@@ -4,8 +4,8 @@ using UnityEngine;
 namespace Game.GameEngine.Inventory
 {
     [CreateAssetMenu(
-        fileName = "InventoryItemCatalog",
-        menuName = "GameEngine/Inventory/New InventoryItemCatalog"
+        fileName = "InventoryItemList",
+        menuName = "GameEngine/Inventory/New InventoryItemList"
     )]
     public sealed class InventoryItemList : ScriptableObject
     {

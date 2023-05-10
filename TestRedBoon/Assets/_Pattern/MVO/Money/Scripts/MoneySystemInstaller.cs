@@ -11,7 +11,7 @@ namespace Pattern.MVO
 
         public override void InstallBindings()
         {
-            //_moneyStorage = new MoneyStorage(1999);
+            _moneyStorage = new MoneyStorage(999);
             this.Container.Bind<MoneyStorage>().FromInstance(_moneyStorage).AsSingle();
             //Container.Bind<MoneyStorage>().FromNew().AsSingle()
             //    .WithArguments(400);

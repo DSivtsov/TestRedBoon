@@ -16,6 +16,10 @@ namespace Game.GameEngine.Inventory
 
         public InventoryItem Prototype => this.origin;
 
+        public int SalesPrice => this.origin.SalesPrice;
+
+        public int PuchasePrice => this.origin.PuchasePrice;
+
         [OdinSerialize]
         private InventoryItem origin = new InventoryItem();
 
