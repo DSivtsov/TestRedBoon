@@ -2,7 +2,7 @@ using System;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace Game.GameEngine.Inventory
+namespace GameEngine.Inventory
 {
     [Serializable]
     public sealed class InventoryItemMetadata

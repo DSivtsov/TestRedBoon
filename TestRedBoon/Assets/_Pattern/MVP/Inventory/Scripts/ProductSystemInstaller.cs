@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 using Pattern.MVO;
-using Game.GameEngine.Inventory;
+using GameEngine.Inventory;
 using System;
 
 namespace Pattern.MVP

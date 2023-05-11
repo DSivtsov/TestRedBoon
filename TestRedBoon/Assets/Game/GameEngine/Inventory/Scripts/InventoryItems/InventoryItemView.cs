@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace Game.GameEngine.Inventory
+namespace GameEngine.Inventory
 {
     public sealed class InventoryItemView : MonoBehaviour
     {

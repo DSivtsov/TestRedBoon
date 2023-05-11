@@ -1,6 +1,6 @@
 using System;
 
-namespace Game.GameEngine.Inventory
+namespace GameEngine.Inventory
 {
     [Flags]
     public enum InventoryItemFlags

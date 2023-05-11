@@ -2,7 +2,7 @@ using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using UnityEngine;
 
-namespace Game.GameEngine.Inventory
+namespace GameEngine.Inventory
 {
     [CreateAssetMenu(
         fileName = "InventoryItemSO",

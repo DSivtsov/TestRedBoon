@@ -1,5 +1,4 @@
-using Game.GameEngine;
-using Game.GameEngine.Inventory;
+using GameEngine.Inventory;
 
 namespace Game.Meta
 {

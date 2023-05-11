@@ -2,12 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
-using Game.GameEngine.Inventory;
+using GameEngine.Inventory;
 
 public class StubInputSystem : MonoBehaviour
 {
     [Inject]
-    private InventoryManager _inventoryManager;
+    private InventorySystem _inventoryManager;
 
     private void Start()
     {

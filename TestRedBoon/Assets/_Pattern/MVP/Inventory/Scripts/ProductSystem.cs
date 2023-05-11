@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Game.GameEngine.Inventory;
+using GameEngine.Inventory;
 using Pattern.MVO;
 using Sirenix.OdinInspector;
 

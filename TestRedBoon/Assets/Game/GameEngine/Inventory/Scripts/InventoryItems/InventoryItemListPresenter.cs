@@ -1,10 +1,7 @@
 using System.Collections.Generic;
-using Game.GameEngine;
-//using GameSystem;
-//using Windows;
 using UnityEngine;
 
-namespace Game.GameEngine.Inventory
+namespace GameEngine.Inventory
 {
     public sealed class InventoryItemListPresenter
     {

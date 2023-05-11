@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace Game.GameEngine.Inventory
+namespace GameEngine.Inventory
 {
     [Serializable]
     public sealed class InventoryItem

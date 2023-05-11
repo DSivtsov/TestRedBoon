@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Game.GameEngine.Inventory
+namespace GameEngine.Inventory
 {
     [CreateAssetMenu(
         fileName = "InventoryItemList",
