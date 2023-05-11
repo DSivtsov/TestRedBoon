@@ -13,7 +13,7 @@ namespace Game
 
         private void Start()
         {
-            _inventoryManager.OpenInventory();
+            _inventoryManager.OpenTraderTable();
         }
 
     } 

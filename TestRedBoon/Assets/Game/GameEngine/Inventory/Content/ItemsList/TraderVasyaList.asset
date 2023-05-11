@@ -12,8 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 985eed768ca74ca79eb3c4ad7369ac25, type: 3}
   m_Name: TraderVasyaList
   m_EditorClassIdentifier: 
-  itemsList:
-  - {fileID: 11400000, guid: 2e99aedc44ac54d5bbdc833a500f3573, type: 2}
+  _itemsList:
+  - {fileID: 11400000, guid: 156f9185153c14fa895e109bb5298af4, type: 2}
+  - {fileID: 11400000, guid: 9e9dacde644d748d6acbcea6837a7dc3, type: 2}
   - {fileID: 11400000, guid: a9b8243cdd04d4979a4c7c75e7509548, type: 2}
-  - {fileID: 11400000, guid: 586809a08631144d09453a2a5ec8972f, type: 2}
-  - {fileID: 11400000, guid: cde2dcfbb0d9f4729bcd5fff8cf5c948, type: 2}

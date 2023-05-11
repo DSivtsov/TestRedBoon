@@ -1,4 +1,4 @@
-//using Game.UI;
+using Game.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -8,11 +8,6 @@ namespace GameEngine.Inventory
 {
     public sealed class InventoryItemView : MonoBehaviour
     {
-        //public StackView Stack
-        //{
-        //    get { return this.stackView; }
-        //}
-
         [SerializeField]
         private TextMeshProUGUI titleText;
 
@@ -21,9 +16,12 @@ namespace GameEngine.Inventory
 
         [SerializeField]
         private Button button;
-
-        //[SerializeField]
-        //private StackView stackView;
+        
+        public void LinkVisulItemWithSO(InventoryItemSO itemSO)
+        {
+            SetTitle(AmmountFormatter.GetAmmount(itemSO.PuchasePrice));
+            SetIcon(itemSO.Metadata.icon);
+        }
 
         public void SetTitle(string title)
         {
@@ -35,14 +33,14 @@ namespace GameEngine.Inventory
             this.iconImage.sprite = icon;
         }
 
-        public void AddClickListener(UnityAction action)
-        {
-            this.button.onClick.AddListener(action);
-        }
+        //public void AddClickListener(UnityAction action)
+        //{
+        //    this.button.onClick.AddListener(action);
+        //}
 
-        public void RemoveClickListener(UnityAction action)
-        {
-            this.button.onClick.RemoveListener(action);
-        }
+        //public void RemoveClickListener(UnityAction action)
+        //{
+        //    this.button.onClick.RemoveListener(action);
+        //}
     }
 }

@@ -24,7 +24,7 @@ MonoBehaviour:
     SerializationNodes:
     - Name: origin
       Entry: 7
-      Data: 0|Game.GameEngine.Inventory.InventoryItem, Inventory
+      Data: 0|GameEngine.Inventory.InventoryItem, GameEngine.Inventory
     - Name: name
       Entry: 1
       Data: arcane_stone
@@ -36,7 +36,7 @@ MonoBehaviour:
       Data: 81
     - Name: metadata
       Entry: 7
-      Data: 1|Game.GameEngine.Inventory.InventoryItemMetadata, Inventory
+      Data: 1|GameEngine.Inventory.InventoryItemMetadata, GameEngine.Inventory
     - Name: icon
       Entry: 10
       Data: 0

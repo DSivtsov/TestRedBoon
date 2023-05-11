@@ -31,5 +31,10 @@ namespace GameEngine.Inventory
             if (this.origin.PuchasePrice < this.origin.SalesPrice)
                 this.origin.UpdatePurchasePrice();
         }
+
+        public override string ToString()
+        {
+            return $"Name[{ItemName}] SalesPrice[{SalesPrice}] PuchasePrice[{PuchasePrice}]]";
+        }
     }
 }

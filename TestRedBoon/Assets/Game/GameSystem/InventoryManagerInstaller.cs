@@ -4,13 +4,14 @@ using UnityEngine;
 using Zenject;
 using Sirenix.OdinInspector;
 using GameEngine.Character;
+using GameEngine.Inventory;
 
 
 namespace GameSystem
 {
     public class InventoryManagerInstaller : MonoInstaller
     {
-        [SerializeField] private InventoryView _inventoryView;
+        [SerializeField] private TraderTableView _inventoryView;
         [ShowInInspector] private InventoryManager _inventoryManager;
 
         [Inject]

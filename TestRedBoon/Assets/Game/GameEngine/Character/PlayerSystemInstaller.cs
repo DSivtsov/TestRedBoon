@@ -17,7 +17,8 @@ namespace GameEngine.Character
         {
             _walletStorage = new WalletStorage(_initialMoney);
             _player = new Player(_inventoryItemList, _walletStorage);
-            Container.Bind<WalletStorage>().WithId("PlayerWallet").FromInstance(_walletStorage);
+            Container.Bind<WalletStorage>().WithId("Player").FromInstance(_walletStorage);
+            Container.Bind<InventoryItemList>().WithId("Player").FromInstance(_inventoryItemList);
             Container.Bind<Player>().FromInstance(_player).AsSingle();
             Container.Bind<VendorList>().AsSingle().OnInstantiated<VendorList>((_, it) => _vendorList = it).NonLazy();
         }

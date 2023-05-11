@@ -10,7 +10,7 @@ namespace GameEngine.Inventory
     public sealed class InventoryItemList : ScriptableObject
     {
         [SerializeField]
-        private List<InventoryItemSO> itemsList;
+        private List<InventoryItemSO> _itemsList;
 
         //public InventoryItemConfig FindItem(string name)
         //{
@@ -26,9 +26,8 @@ namespace GameEngine.Inventory
         //    throw new Exception($"Item {name} is not found!");
         //}
 
-        public List<InventoryItemSO> GetAllItems()
-        {
-            return this.itemsList;
-        }
+        public List<InventoryItemSO> ListInventoryItemSO => _itemsList;
+
+        public override string ToString() => _itemsList.Count.ToString();
     }
 }

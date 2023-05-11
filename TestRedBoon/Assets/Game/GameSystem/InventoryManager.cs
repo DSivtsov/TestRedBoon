@@ -13,35 +13,35 @@ namespace GameSystem
         [ValueDropdown("_vendorList"), SerializeField]
         private Vendor _selectedVendor;
 
-        private readonly InventoryView _inventoryView;
+        private readonly TraderTableView _traderTableView;
         private readonly List<Vendor> _vendorList;
 
-        public InventoryManager(InventoryView inventoryView, VendorList vendorList)
+        public InventoryManager(TraderTableView inventoryView, VendorList vendorList)
         {
-            _inventoryView = inventoryView;
+            _traderTableView = inventoryView;
             _vendorList = vendorList.GetListVendors();
         }
 
         [Button]
-        public void OpenInventory()
+        public void OpenTraderTable()
         {
             if (_selectedVendor != null)
             {
-                Debug.Log($"OpenInventory(): _selectedVendor[{_selectedVendor}]");
+                Debug.Log($"OpenTraderTable(): _selectedVendor[{_selectedVendor}]");
 
             }
             else
             {
-                Debug.LogWarning($"OpenInventory(): Vendor must selected before open Inventory");
+                Debug.LogWarning($"OpenTraderTable(): Vendor must selected before open Inventory");
                 return;
             }
-            _inventoryView.Show();
+            _traderTableView.Show(_selectedVendor.WalletStorage,_selectedVendor.InventoryItemList);
         }
 
         [Button]
-        public void CloseInventory()
+        public void CloseTraderTable()
         {
-            _inventoryView.Hide();
+            _traderTableView.Hide();
         }
 
     } 

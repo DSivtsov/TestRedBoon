@@ -12,7 +12,7 @@ namespace GameEngine.Inventory
 
         private MoneyPanelAdapter _moneyPanelAdapter;
 
-        [Inject(Id = "PlayerWallet")]
+        [Inject(Id = "Player")]
         private WalletStorage _moneyStorage;
 
         private void Awake()
