@@ -27,5 +27,7 @@ namespace GameEngine.Character
         public WalletStorage WalletStorage => _walletStorage;
 
         public string Name => _name;
+
+        public override string ToString() => _name;
     }
 }

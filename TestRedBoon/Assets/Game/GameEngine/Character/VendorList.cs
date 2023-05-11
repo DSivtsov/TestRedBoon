@@ -1,5 +1,5 @@
 using System;
-using System.Collections;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -14,5 +14,9 @@ namespace GameEngine.Character
         {
             _listVendors.Add(vendor);
         }
+
+        public List<Vendor> GetListVendors() => _listVendors;
+
+        public override string ToString() => _listVendors.Count.ToString();
     } 
 }

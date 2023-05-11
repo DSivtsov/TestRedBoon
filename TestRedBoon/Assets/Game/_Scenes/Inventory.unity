@@ -2170,10 +2170,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1055393015}
+  - component: {fileID: 1055393018}
   - component: {fileID: 1055393016}
   - component: {fileID: 1055393014}
   - component: {fileID: 1055393013}
   - component: {fileID: 1055393012}
+  - component: {fileID: 1055393017}
   m_Layer: 5
   m_Name: CanvasInventory
   m_TagString: Untagged
@@ -2278,6 +2280,32 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _moneyPanel: {fileID: 8955049100656813648}
+--- !u!114 &1055393017
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1055393011}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d7a4208054d11c4cb96b5ee252b4fef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _canvasInventory: {fileID: 0}
+--- !u!114 &1055393018
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1055393011}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d7a4208054d11c4cb96b5ee252b4fef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _canvasInventory: {fileID: 1055393014}
 --- !u!224 &1084400017 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4416680476463731449, guid: 0642a172f33d01048ba8b441e410f836, type: 3}
@@ -3090,7 +3118,7 @@ GameObject:
   - component: {fileID: 1626968796}
   - component: {fileID: 1626968797}
   m_Layer: 0
-  m_Name: InventorySystem
+  m_Name: InventoryManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3122,7 +3150,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52fba8bbbf6ea5043b83e7cf9aeb22f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _canvasInventory: {fileID: 1055393014}
+  _inventoryView: {fileID: 1055393018}
 --- !u!1001 &1648942498
 PrefabInstance:
   m_ObjectHideFlags: 0

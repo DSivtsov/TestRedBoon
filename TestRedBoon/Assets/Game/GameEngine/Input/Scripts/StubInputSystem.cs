@@ -2,16 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
-using GameEngine.Inventory;
+using GameSystem;
 
-public class StubInputSystem : MonoBehaviour
+namespace Game
 {
-    [Inject]
-    private InventorySystem _inventoryManager;
-
-    private void Start()
+    public class StubInputSystem : MonoBehaviour
     {
-        _inventoryManager.OpenInventory();
-    }
+        [Inject]
+        private InventoryManager _inventoryManager;
 
+        private void Start()
+        {
+            _inventoryManager.OpenInventory();
+        }
+
+    } 
 }
