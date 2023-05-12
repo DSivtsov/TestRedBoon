@@ -13,6 +13,10 @@ MonoBehaviour:
   m_Name: PlayerItemList
   m_EditorClassIdentifier: 
   _itemsList:
-  - {fileID: 11400000, guid: 7ea2a41da77b34ef1af52ddf7cfd7e8b, type: 2}
-  - {fileID: 11400000, guid: 9e9dacde644d748d6acbcea6837a7dc3, type: 2}
+  - {fileID: 11400000, guid: a9b8243cdd04d4979a4c7c75e7509548, type: 2}
   - {fileID: 11400000, guid: cde2dcfbb0d9f4729bcd5fff8cf5c948, type: 2}
+  - {fileID: 11400000, guid: 586809a08631144d09453a2a5ec8972f, type: 2}
+  - {fileID: 11400000, guid: 9e9dacde644d748d6acbcea6837a7dc3, type: 2}
+  - {fileID: 11400000, guid: 6083dde8582fb43d3adb27b4b6e44d75, type: 2}
+  - {fileID: 11400000, guid: a9b8243cdd04d4979a4c7c75e7509548, type: 2}
+  - {fileID: 11400000, guid: 7ea2a41da77b34ef1af52ddf7cfd7e8b, type: 2}

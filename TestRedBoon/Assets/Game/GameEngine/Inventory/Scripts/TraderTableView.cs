@@ -42,8 +42,8 @@ namespace GameEngine.Inventory
 
             _traderWalletStorage = currentVendorWalletStorage;
 
-            _playerInventory = new Inventory(this, _playerItemsView, _playerInventoryItemList.ListInventoryItemSO, isPlayerInventory: true, _traderWalletStorage);
-            _traderInventory = new Inventory(this, _traderItemsView, currentVendorInventoryItemList.ListInventoryItemSO, isPlayerInventory: false, _playerWalletStorage);
+            _playerInventory = new Inventory(this, _playerItemsView, _playerInventoryItemList.ListInventoryItemSO, isPlayerInventory: true, _playerWalletStorage);
+            _traderInventory = new Inventory(this, _traderItemsView, currentVendorInventoryItemList.ListInventoryItemSO, isPlayerInventory: false, _traderWalletStorage);
 
             _playerInventory.LinkWithVisualInventoryView(_playerTopLeftrect);
             _traderInventory.LinkWithVisualInventoryView(_traderTopLeftrect);
@@ -80,7 +80,7 @@ namespace GameEngine.Inventory
             private List<InventoryItemSO> listItemSO;
             private InventoryItemView[] itemsView;
             private bool isPlayerInventory;
-            private WalletStorage purchaser;
+            private WalletStorage purchaserForThisInventory;
 
             /// <param name="traderTableView"></param>
             /// <param name="itemsView">Visual representation Items in the Inventory</param>
@@ -94,7 +94,7 @@ namespace GameEngine.Inventory
                 this.listItemSO = listItemSO;
                 this.itemsView = itemsView;
                 this.isPlayerInventory = isPlayerInventory;
-                this.purchaser = purchaser;
+                this.purchaserForThisInventory = purchaser;
             }
 
             /// <summary>
@@ -106,7 +106,6 @@ namespace GameEngine.Inventory
                 for (; i < listItemSO.Count; i++)
                 {
                     InventoryItemSO inventoryItemSO = listItemSO[i];
-                    //Debug.Log($"[{i}] [{inventoryItemSO.ItemName}]");
                     //The cast ushort supported by limitation of Array size (see comment at it creation)
                     itemsView[i].LinkVisulItemWithSO(inventoryItemSO, this, (ushort)i, GetItemSellingPrice(inventoryItemSO));
                 }
@@ -156,12 +155,13 @@ namespace GameEngine.Inventory
             public bool TrySell(ushort positionInIventorySellingItem, Inventory inventoryToSell)
             {
                 InventoryItemSO sellingnventoryItemSO = listItemSO[positionInIventorySellingItem];
-                Debug.Log($"TrySell Item[{sellingnventoryItemSO.ItemName}] to Inventory[{inventoryToSell}]" +
-                    $" by [{GetItemSellingPrice(sellingnventoryItemSO)}] price");
+                int sellinPrice = GetItemSellingPrice(sellingnventoryItemSO);
+                //Debug.Log($"TrySell Item[{sellingnventoryItemSO.ItemName}] to Inventory[{inventoryToSell}]" +
+                //    $" by [{sellinPrice}] price");
 
-                if (inventoryToSell.TryToPuchaseItem(sellingnventoryItemSO))
+                if (inventoryToSell.TryToPuchaseItem(sellingnventoryItemSO, sellinPrice))
                 {
-                    RemoveItemFromInventory(positionInIventorySellingItem);
+                    SoldItemFromInventory(positionInIventorySellingItem, sellinPrice);
                     return true;
                 }
                 return false;
@@ -172,12 +172,12 @@ namespace GameEngine.Inventory
             /// </summary>
             /// <param name="itemPurchased"></param>
             /// <returns>true item was purchased</returns>
-            public bool TryToPuchaseItem(InventoryItemSO itemPurchased)
+            public bool TryToPuchaseItem(InventoryItemSO itemPurchased, int sellinPrice)
             {
-                int purchasePrice = GetItemPurchasingPrice(itemPurchased);
-                if (purchaser.CanSpendMoney(purchasePrice))
+                //int purchasePrice = GetItemPurchasingPrice(itemPurchased);
+                if (purchaserForThisInventory.CanSpendMoney(sellinPrice))
                 {
-                    purchaser.SpendMoney(purchasePrice);
+                    purchaserForThisInventory.SpendMoney(sellinPrice);
                     AddItemToInventory(itemPurchased);
                     return true;
                 }
@@ -188,14 +188,13 @@ namespace GameEngine.Inventory
             public void AddItemToInventory(InventoryItemSO itemPurchased)
             {
                 listItemSO.Add(itemPurchased);
-                Debug.Log("RedrawInventory. From AddItemToInventory()");
                 RedrawInventory();
             }
 
-            private void RemoveItemFromInventory(ushort positionInInventory)
+            private void SoldItemFromInventory(ushort positionInInventory, int sellinPrice)
             {
+                purchaserForThisInventory.EarnMoney(sellinPrice);
                 listItemSO.RemoveAt(positionInInventory);
-                Debug.Log("RedrawInventory. From AddItemToInventory()");
                 RedrawInventory();
             }
 

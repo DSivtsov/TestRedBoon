@@ -13,6 +13,5 @@ MonoBehaviour:
   m_Name: TraderPeterList
   m_EditorClassIdentifier: 
   _itemsList:
-  - {fileID: 11400000, guid: 586809a08631144d09453a2a5ec8972f, type: 2}
-  - {fileID: 11400000, guid: a9b8243cdd04d4979a4c7c75e7509548, type: 2}
-  - {fileID: 11400000, guid: a9b8243cdd04d4979a4c7c75e7509548, type: 2}
+  - {fileID: 11400000, guid: b832ee5b5ed304fcd802aea6203430ff, type: 2}
+  - {fileID: 11400000, guid: 156f9185153c14fa895e109bb5298af4, type: 2}

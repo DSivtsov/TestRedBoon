@@ -95,7 +95,6 @@ namespace GameEngine.Inventory
 
         void IBeginDragHandler.OnBeginDrag(PointerEventData eventData)
         {
-            //Debug.Log("OnBeginDrag");
             _initialPositionItem = _rectTransform.anchoredPosition;
             _canvasGroup.alpha = .6f;
             _canvasGroup.blocksRaycasts = false;
@@ -103,19 +102,17 @@ namespace GameEngine.Inventory
 
         void IEndDragHandler.OnEndDrag(PointerEventData eventData)
         {
-            Debug.Log("OnEndDrag");
             RestoreInitialItemPositionAndSettings();
         }
 
         void IDragHandler.OnDrag(PointerEventData eventData)
         {
-            //Debug.Log("OnDrag");
             _rectTransform.anchoredPosition += eventData.delta / _canvasScaleFactor;
         }
 
         public void WasDroppedOnInventory(TraderTableView.Inventory inventory)
         {
-            Debug.Log($"Item[{_itemName}] dropped on Inventory[{inventory}]");
+            //Debug.Log($"Item[{_itemName}] dropped on Inventory[{inventory}]");
             if (_myInventory != inventory)
             {
                 HideItem();

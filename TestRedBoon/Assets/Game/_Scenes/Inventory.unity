@@ -253,7 +253,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a104ceaf8f0a524fa7b7427159fb782, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _initialMoney: 45678
+  _initialMoney: 200
   _inventoryItemList: {fileID: 11400000, guid: 179cdf7191e10cc41b462044aa5d9fc7, type: 2}
 --- !u!4 &82223659
 Transform:
@@ -2666,7 +2666,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _name: Peter
-  _initialMoney: 333
+  _initialMoney: 200
   _isMoneyInfinity: 0
   _inventoryItemList: {fileID: 11400000, guid: 69e2adf77773ccb46961eef42f698fb9, type: 2}
 --- !u!4 &1293456794
