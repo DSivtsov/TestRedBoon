@@ -9,7 +9,7 @@ namespace GameEngine.Inventory
         fileName = "FieldSize",
         menuName = "GameEngine/Inventory/New FieldSize"
     )]
-    public class FieldSize : ScriptableObject
+    public class FieldSizeSO : ScriptableObject
     {
         //To exclude from stupid values and to more safety to use USHORT for store index in class GameEngine.Inventory.InventoryItemView
         private const int MAXINVENTORY = System.UInt16.MaxValue;

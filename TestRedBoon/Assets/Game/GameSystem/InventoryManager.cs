@@ -22,6 +22,14 @@ namespace GameSystem
             _vendorList = vendorList.GetListVendors();
         }
 
+        //Only for Debug
+        public void EmulateSelectionOfVendorAndOpenTraderTable()
+        {
+            Debug.LogWarning("DEBUG: Emulate Selection of Vendor and Open Trader Table");
+            _selectedVendor = _vendorList[0];
+            OpenTraderTable();
+        }
+
         [Button]
         public void OpenTraderTable()
         {

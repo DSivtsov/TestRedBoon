@@ -14,8 +14,8 @@ namespace GameEngine.Inventory
     /// </summary>
     public class TraderTableView : MonoBehaviour
     {
-        [SerializeField] private Canvas _traderTable;
-        [SerializeField] private FieldSize _fieldSize;
+        [SerializeField] private Canvas _traderTableCanvas;
+        [SerializeField] private FieldSizeSO _fieldSizeSO;
         [SerializeField] private RectTransform _playerTopLeftrect;
         [SerializeField] private RectTransform _traderTopLeftrect;
         [SerializeField] private RectTransform _prefabItem;
@@ -45,15 +45,18 @@ namespace GameEngine.Inventory
             _playerInventory = new Inventory(this, _playerItemsView, _playerInventoryItemList.ListInventoryItemSO);
             _traderInventory = new Inventory(this, _traderItemsView, currentVendorInventoryItemList.ListInventoryItemSO);
 
+            _playerInventory.LinkWithVisualInventoryView(_playerTopLeftrect);
+            _traderInventory.LinkWithVisualInventoryView(_traderTopLeftrect);
+
             _playerInventory.LoadOnScreenInventory();
             _traderInventory.LoadOnScreenInventory();
 
-            _traderTable.gameObject.SetActive(true);
+            _traderTableCanvas.gameObject.SetActive(true);
         }
 
         private void InstantiateVisualInventories()
         {
-            InstantiateInventoryItems instantiateInventory = new InstantiateInventoryItems(_fieldSize, _prefabItem);
+            InstantiateInventoryItems instantiateInventory = new InstantiateInventoryItems(_fieldSizeSO, _prefabItem, _traderTableCanvas);
             instantiateInventory.ClearFields(_playerTopLeftrect);
             instantiateInventory.ClearFields(_traderTopLeftrect);
             _playerItemsView = instantiateInventory.BuildField(_playerTopLeftrect);
@@ -62,7 +65,7 @@ namespace GameEngine.Inventory
 
         public void Hide()
         {
-            _traderTable.gameObject.SetActive(false);
+            _traderTableCanvas.gameObject.SetActive(false);
         }
 
         public override string ToString()
@@ -95,7 +98,7 @@ namespace GameEngine.Inventory
                 for (; i < listItemSO.Count; i++)
                 {
                     //The cast ushort supported by limitation of Array size (see comment at it creation)
-                    itemsView[i].LinkVisulItemWithSO(listItemSO[i], (ushort)i);
+                    itemsView[i].LinkVisulItemWithSO(listItemSO[i], this, (ushort)i);
                 }
                 TunOffNotUsedVisualItem(i);
             }
@@ -112,6 +115,58 @@ namespace GameEngine.Inventory
                     itemsView[i].gameObject.SetActive(false);
                 }
             }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="positionInIventory"></param>
+            /// <param name="inventoryTryToSell"></param>
+            /// <returns>false if can't sell</returns>
+            public bool TrySell(ushort positionInIventory, Inventory inventoryTryToSell)
+            {
+                Debug.Log($"TrySell Item[{listItemSO[positionInIventory].ItemName}] to Inventory[{inventoryTryToSell}]");
+                return false;
+            }
+
+
+            public void ItemPurchased(InventoryItemSO itemPurchased)
+            {
+                Debug.Log("listItemSO.Add(itemPurchased);");
+                
+                RedrawInventory();
+            }
+
+            private void ItemSelled(int positionInInventory)
+            {
+                Debug.Log("listItemSO.RemoveAt(positionInInventory);");
+                RedrawInventory();
+            }
+            private void RedrawInventory()
+            {
+                Debug.Log("RedrawInventory()");
+                //LoadOnScreenInventory();
+            }
+
+            public void LinkWithVisualInventoryView(RectTransform playerTopLeftrect)
+            {
+                if (playerTopLeftrect != null)
+                {
+                    InventoryView inventoryView = playerTopLeftrect.GetComponent<InventoryView>();
+                    if (inventoryView != null)
+                    {
+                        inventoryView.SetCorespondenInventory(this);
+                    }
+                    else
+                        Debug.LogError($"{this}: In {playerTopLeftrect} absent the component {typeof(InventoryView)}");
+                }
+                else
+                    Debug.LogError("{this}: Not correctly Initialized");
+            }
+
+            public override string ToString()
+            {
+                return $"I have {listItemSO.Count} items, the first Item[{listItemSO[0].ItemName}]";
+            }
         }
 
         public struct InstantiateInventoryItems
@@ -121,8 +176,9 @@ namespace GameEngine.Inventory
             private readonly int wSizeItem, hSizeItem;
             private readonly RectTransform prefabItem;
             private Transform parentTransform;
+            private Canvas traderTableCanvas;
 
-            public InstantiateInventoryItems(FieldSize _fieldSize, RectTransform _prefabItem)
+            public InstantiateInventoryItems(FieldSizeSO _fieldSize, RectTransform _prefabItem, Canvas _traderTableCanvas)
             {
                 _fieldSize.CalculateSpacing();
                 (wSpace, hSpace) = _fieldSize.TupleSpacing;
@@ -130,6 +186,7 @@ namespace GameEngine.Inventory
                 (wSizeItem, hSizeItem) = _fieldSize.SizeItems;
                 prefabItem = _prefabItem;
                 parentTransform = null;
+                traderTableCanvas = _traderTableCanvas;
             }
 
             /// <summary>
@@ -164,6 +221,8 @@ namespace GameEngine.Inventory
                 rectTransform.anchoredPosition = vector2;
                 rectTransform.name = name;
                 //return rectTransform.gameObject.GetComponent<InventoryItemView>();
+                InventoryItemView inventoryItemView = rectTransform.GetComponent<InventoryItemView>();
+                inventoryItemView.SetCanvas(traderTableCanvas.scaleFactor);
                 return rectTransform.GetComponent<InventoryItemView>();
             }
 

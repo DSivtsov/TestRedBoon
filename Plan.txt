@@ -1,4 +1,5 @@
 ??public struct InstantiateInventoryItems convert to static class
+change in InventoryItemView the codetype from this. _.
 
 Add to MoneyStoragere that IsMoneyInfinity = false
 
