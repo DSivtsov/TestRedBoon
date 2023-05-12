@@ -17,7 +17,7 @@ namespace GameEngine.Inventory
                 InventoryItemView inventoryItemView = eventData.pointerDrag.GetComponent<InventoryItemView>();
                 if (inventoryItemView != null)
                 {
-                    inventoryItemView.WasDroppedOn(_inventory);
+                    inventoryItemView.WasDroppedOnInventory(_inventory);
                 }
             }
             else

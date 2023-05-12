@@ -47,7 +47,6 @@ namespace GameEngine.Inventory
         private CanvasGroup _canvasGroup;
 
         private Vector2 _initialPositionItem;
-        private bool _isItemInProcessSelling;
 
         //Curently used only for debug
         private string _itemName;
@@ -57,13 +56,21 @@ namespace GameEngine.Inventory
             _rectTransform = GetComponent<RectTransform>();
             _canvasGroup = GetComponent<CanvasGroup>();
         }
-        public void LinkVisulItemWithSO(InventoryItemSO itemSO, TraderTableView.Inventory inventory, ushort positionInIventory)
+        /// <summary>
+        /// Syncronize the Visual representation of Item on screen with inventory of player or current vendor
+        /// </summary>
+        /// <param name="itemSO"></param>
+        /// <param name="inventory"></param>
+        /// <param name="positionInIventory"></param>
+        /// <param name="priceForThisInventory">price based on whome the owner of this Inventory</param>
+        public void LinkVisulItemWithSO(InventoryItemSO itemSO, TraderTableView.Inventory inventory, ushort positionInIventory, int priceForThisInventory)
         {
-            SetPrice(AmmountFormatter.GetAmmount(itemSO.PuchasePrice));
+            SetPrice(AmmountFormatter.GetAmmount(priceForThisInventory));
             SetIcon(itemSO.Metadata.icon);
             SetItemName(itemSO.ItemName);
             _positionInIventory = positionInIventory;
             _myInventory = inventory;
+            UnHideItem();
         }
 
         public void SetItemName(string itemName)
@@ -96,11 +103,8 @@ namespace GameEngine.Inventory
 
         void IEndDragHandler.OnEndDrag(PointerEventData eventData)
         {
-            //Debug.Log("OnEndDrag");
-            _canvasGroup.alpha = 1f;
-            _canvasGroup.blocksRaycasts = true;
-            if (!_isItemInProcessSelling)
-                RestoreInitialItemPosition();
+            Debug.Log("OnEndDrag");
+            RestoreInitialItemPositionAndSettings();
         }
 
         void IDragHandler.OnDrag(PointerEventData eventData)
@@ -109,30 +113,26 @@ namespace GameEngine.Inventory
             _rectTransform.anchoredPosition += eventData.delta / _canvasScaleFactor;
         }
 
-        public void WasDroppedOn(TraderTableView.Inventory inventory)
+        public void WasDroppedOnInventory(TraderTableView.Inventory inventory)
         {
-            //Debug.Log($"Item[{_itemName}] dropped on Inventory[{inventory}]");
-            HideItem();
+            Debug.Log($"Item[{_itemName}] dropped on Inventory[{inventory}]");
             if (_myInventory != inventory)
             {
-                _isItemInProcessSelling = true;
-                if (!inventory.TrySell(_positionInIventory, inventory))
+                HideItem();
+                RestoreInitialItemPositionAndSettings();
+                if (!_myInventory.TrySell(_positionInIventory, inventory))
                 {
-                    Debug.Log("TrySell[false]");
-                    RestoreInitialItemPosition(); 
+                    Debug.LogWarning("TrySell[false]");
+                    UnHideItem();
                 }
-                _isItemInProcessSelling = false;
-            }
-            else
-            {
-                RestoreInitialItemPosition();
             }
         }
 
-        private void RestoreInitialItemPosition()
+        private void RestoreInitialItemPositionAndSettings()
         {
+            _canvasGroup.alpha = 1f;
+            _canvasGroup.blocksRaycasts = true;
             _rectTransform.anchoredPosition = _initialPositionItem;
-            UnHideItem();
         }
 
         private void HideItem() => gameObject.SetActive(false);

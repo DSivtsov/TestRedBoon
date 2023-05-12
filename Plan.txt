@@ -1,3 +1,5 @@
+Add default icon to ItemPrefab (for debuging)
+
 ??public struct InstantiateInventoryItems convert to static class
 change in InventoryItemView the codetype from this. _.
 

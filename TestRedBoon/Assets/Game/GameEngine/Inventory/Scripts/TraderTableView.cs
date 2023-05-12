@@ -42,8 +42,8 @@ namespace GameEngine.Inventory
 
             _traderWalletStorage = currentVendorWalletStorage;
 
-            _playerInventory = new Inventory(this, _playerItemsView, _playerInventoryItemList.ListInventoryItemSO);
-            _traderInventory = new Inventory(this, _traderItemsView, currentVendorInventoryItemList.ListInventoryItemSO);
+            _playerInventory = new Inventory(this, _playerItemsView, _playerInventoryItemList.ListInventoryItemSO, isPlayerInventory: true, _traderWalletStorage);
+            _traderInventory = new Inventory(this, _traderItemsView, currentVendorInventoryItemList.ListInventoryItemSO, isPlayerInventory: false, _playerWalletStorage);
 
             _playerInventory.LinkWithVisualInventoryView(_playerTopLeftrect);
             _traderInventory.LinkWithVisualInventoryView(_traderTopLeftrect);
@@ -79,30 +79,39 @@ namespace GameEngine.Inventory
             private TraderTableView traderTableView;
             private List<InventoryItemSO> listItemSO;
             private InventoryItemView[] itemsView;
+            private bool isPlayerInventory;
+            private WalletStorage purchaser;
 
-            public Inventory(TraderTableView traderTableView, InventoryItemView[] _playerItemsView, List<InventoryItemSO> listItemSO)
+            /// <param name="traderTableView"></param>
+            /// <param name="itemsView">Visual representation Items in the Inventory</param>
+            /// <param name="listItemSO">inventory of player or current vendor</param>
+            /// <param name="isPlayerInventory"></param>
+            /// <param name="purchaser">Wallet of contractor who will purchase items from this Inventory</param>
+            public Inventory(TraderTableView traderTableView, InventoryItemView[] itemsView, List<InventoryItemSO> listItemSO,
+                bool isPlayerInventory, WalletStorage purchaser)
             {
                 this.traderTableView = traderTableView;
                 this.listItemSO = listItemSO;
-                this.itemsView = _playerItemsView;
+                this.itemsView = itemsView;
+                this.isPlayerInventory = isPlayerInventory;
+                this.purchaser = purchaser;
             }
 
             /// <summary>
-            /// Syncronize the Visual representation of Item on screen with inventory of player or current vendor
+            /// Syncronize the Visual representation of All Items in the Inventory on screen with inventory of player or current vendor
             /// </summary>
-            /// <param name="itemsView"></param>
-            /// <para
             public void LoadOnScreenInventory()
             {
                 int i = 0;
                 for (; i < listItemSO.Count; i++)
                 {
+                    InventoryItemSO inventoryItemSO = listItemSO[i];
+                    //Debug.Log($"[{i}] [{inventoryItemSO.ItemName}]");
                     //The cast ushort supported by limitation of Array size (see comment at it creation)
-                    itemsView[i].LinkVisulItemWithSO(listItemSO[i], this, (ushort)i);
+                    itemsView[i].LinkVisulItemWithSO(inventoryItemSO, this, (ushort)i, GetItemSellingPrice(inventoryItemSO));
                 }
                 TunOffNotUsedVisualItem(i);
             }
-
             /// <summary>
             /// Visual not used position in inventories will be turn off
             /// </summary>
@@ -117,34 +126,82 @@ namespace GameEngine.Inventory
             }
 
             /// <summary>
-            /// 
+            /// Get Salling Price if current Inventory of Player and Purchasing Price if current Inventory of Vendor
             /// </summary>
-            /// <param name="positionInIventory"></param>
-            /// <param name="inventoryTryToSell"></param>
-            /// <returns>false if can't sell</returns>
-            public bool TrySell(ushort positionInIventory, Inventory inventoryTryToSell)
+            /// <param name="itemSO"></param>
+            /// <returns></returns>
+            private int GetItemSellingPrice(InventoryItemSO itemSO)
             {
-                Debug.Log($"TrySell Item[{listItemSO[positionInIventory].ItemName}] to Inventory[{inventoryTryToSell}]");
+                if (isPlayerInventory)
+                    return itemSO.SalesPrice;
+                else
+                    return itemSO.PuchasePrice;
+            }
+            private int GetItemPurchasingPrice(InventoryItemSO itemSO)
+            {
+                if (isPlayerInventory)
+                    return itemSO.SalesPrice;
+                else
+                    return itemSO.PuchasePrice;
+            }
+
+
+
+            /// <summary>
+            /// Item from current Inventory trying to Sell
+            /// </summary>
+            /// <param name="positionInIventorySellingItem">position selling Item in current Inventory</param>
+            /// <param name="inventoryToSell"></param>
+            /// <returns>false if can't sell</returns>
+            public bool TrySell(ushort positionInIventorySellingItem, Inventory inventoryToSell)
+            {
+                InventoryItemSO sellingnventoryItemSO = listItemSO[positionInIventorySellingItem];
+                Debug.Log($"TrySell Item[{sellingnventoryItemSO.ItemName}] to Inventory[{inventoryToSell}]" +
+                    $" by [{GetItemSellingPrice(sellingnventoryItemSO)}] price");
+
+                if (inventoryToSell.TryToPuchaseItem(sellingnventoryItemSO))
+                {
+                    RemoveItemFromInventory(positionInIventorySellingItem);
+                    return true;
+                }
                 return false;
             }
 
-
-            public void ItemPurchased(InventoryItemSO itemPurchased)
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="itemPurchased"></param>
+            /// <returns>true item was purchased</returns>
+            public bool TryToPuchaseItem(InventoryItemSO itemPurchased)
             {
-                Debug.Log("listItemSO.Add(itemPurchased);");
-                
+                int purchasePrice = GetItemPurchasingPrice(itemPurchased);
+                if (purchaser.CanSpendMoney(purchasePrice))
+                {
+                    purchaser.SpendMoney(purchasePrice);
+                    AddItemToInventory(itemPurchased);
+                    return true;
+                }
+                else
+                    return false;
+            }
+
+            public void AddItemToInventory(InventoryItemSO itemPurchased)
+            {
+                listItemSO.Add(itemPurchased);
+                Debug.Log("RedrawInventory. From AddItemToInventory()");
                 RedrawInventory();
             }
 
-            private void ItemSelled(int positionInInventory)
+            private void RemoveItemFromInventory(ushort positionInInventory)
             {
-                Debug.Log("listItemSO.RemoveAt(positionInInventory);");
+                listItemSO.RemoveAt(positionInInventory);
+                Debug.Log("RedrawInventory. From AddItemToInventory()");
                 RedrawInventory();
             }
+
             private void RedrawInventory()
             {
-                Debug.Log("RedrawInventory()");
-                //LoadOnScreenInventory();
+                LoadOnScreenInventory();
             }
 
             public void LinkWithVisualInventoryView(RectTransform playerTopLeftrect)
@@ -165,7 +222,10 @@ namespace GameEngine.Inventory
 
             public override string ToString()
             {
-                return $"I have {listItemSO.Count} items, the first Item[{listItemSO[0].ItemName}]";
+                if (listItemSO.Count == 0)
+                    return $"I'm EMPTY";
+                else
+                    return $"I have {listItemSO.Count} items, the first Item[{listItemSO[0].ItemName}]";
             }
         }
 
