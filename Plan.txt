@@ -1,3 +1,5 @@
+??public struct InstantiateInventoryItems convert to static class
+
 Add to MoneyStoragere that IsMoneyInfinity = false
 
 Item {Active View}
@@ -7,16 +9,36 @@ InventoryListItem {Model}
 
 ??property Trade.IsItemInSellProcess blocked most activity in inventory
 
-TraderTable (Left Always Player Inventory)
-	Current Vendor (InventoryList, Wallet(MonewStorage))
+TraderTable (Left Always Player Inventory) called by "Current Vendor (InventoryList, Wallet(MonewStorage))"
+	....
+	LoadOnScreenInventory(_playerItemsView("Item"),_playerListItemSO);
+	Item.LinkVisulItemWithSO(InventoryItemSO,Inventory)
 	
-
-Item [DInv]
+class Inventory
+	TraderTableView traderTableView
+	List<InventoryItemSO> listItemSO
+	LoadOnScreenInventory()
+		Item.LinkVisulItemWithSO(ItemSO, (ushort)positionInInventory);
+		
+	ItemPurchased(positionInInventory)
+		RemoveFromListItemSO()
+		RedrawInventory()	Every Changed
+		
+	ItemSelled(positionInInventory)
+		AddToListItemSO()
+		RedrawInventory()	Every Changed
+		
+	RedrawInventory()
+		LoadOnScreenInventory()
+	
+class Item{InventoryItemView} [DInv]
 	Remove button componet
 		[common] Inventory class
 			MyInventory
 			OtherInventory (linked Wallet)
 	Add class DragInventoryItem
+		add (ushort)positionInInventory
+		
 		Implement interface: IDragItem, IBeginDragItem, IEdnDragItem
 		ActivatePlaceHolder()
 		[Inject] script PlaceHolderOfDragedItem
@@ -33,8 +55,8 @@ Item [DInv]
 				else ItemNotPurchased()
 		ItemPurchased()
 			Wallet(other Inventory).SpendMoney()
-			Inventory(other Inventory).ItemPurchased()
-			Inventory(my Inventory).ItemSelled()
+			Inventory(other Inventory).ItemPurchased(positionInInventory)
+			Inventory(my Inventory).ItemSelled(positionInInventory)
 		ItemNotPurchased()
 			PlaceHolderOfDragedItem.Hide()
 			ItemUnHideAtInitPos()
@@ -48,7 +70,7 @@ Add Object PlaceHolderOfDragedItem [Oph] (common for all Inventory/TraderTable)
 
 Made PlaceDragedItem as SingleTon(throught Injection)
 
-TraderInventory (on Trader Plane [Idr])
+GameObject TraderInventory (on Trader Plane [Idr])
 	Add class DropInventoryItem
 		Implement interface: IDrop
 		DropedObject()
@@ -58,7 +80,7 @@ TraderInventory (on Trader Plane [Idr])
 
 			
 
-PlayerInventory (on Player Plane [InvPlayer])
+GameObject PlayerInventory (on Player Plane [InvPlayer])
 	Add class DropInventoryItem
 
 

@@ -16,11 +16,14 @@ namespace GameEngine.Inventory
 
         [SerializeField]
         private Button button;
-        
-        public void LinkVisulItemWithSO(InventoryItemSO itemSO)
+
+        private ushort _positionInIventory;
+
+        public void LinkVisulItemWithSO(InventoryItemSO itemSO, ushort positionInIventory)
         {
             SetTitle(AmmountFormatter.GetAmmount(itemSO.PuchasePrice));
             SetIcon(itemSO.Metadata.icon);
+            _positionInIventory = positionInIventory;
         }
 
         public void SetTitle(string title)

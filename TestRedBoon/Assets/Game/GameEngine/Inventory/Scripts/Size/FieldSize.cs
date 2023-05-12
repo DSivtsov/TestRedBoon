@@ -11,8 +11,8 @@ namespace GameEngine.Inventory
     )]
     public class FieldSize : ScriptableObject
     {
-        //To exclude from stupid values
-        private const int MAXINVENTORY = 500;
+        //To exclude from stupid values and to more safety to use USHORT for store index in class GameEngine.Inventory.InventoryItemView
+        private const int MAXINVENTORY = System.UInt16.MaxValue;
 
         [SerializeField] private int _wSizePanel;
         [SerializeField] private int _hSizePanel;

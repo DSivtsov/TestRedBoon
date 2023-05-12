@@ -29,30 +29,26 @@ namespace GameEngine.Inventory
         private WalletStorage _traderWalletStorage;
         private InventoryItemList _traderInventoryItemList;
 
-        private List<InventoryItemSO> _playerListItemSO;
-        private List<InventoryItemSO> _traderListItemSO;
         private InventoryItemView[] _playerItemsView;
         private InventoryItemView[] _traderItemsView;
+
+        private Inventory _playerInventory;
+        private Inventory _traderInventory;
 
         public void Show(WalletStorage currentVendorWalletStorage, InventoryItemList currentVendorInventoryItemList)
 
         {
-            InitTraderTableView(currentVendorWalletStorage, currentVendorInventoryItemList);
-
-            _traderTable.gameObject.SetActive(true);
-
             InstantiateVisualInventories();
 
-            LoadOnScreenInventory(_playerItemsView,_playerListItemSO);
-            LoadOnScreenInventory(_traderItemsView,_traderListItemSO);
-        }
-
-        private void InitTraderTableView(WalletStorage currentVendorWalletStorage, InventoryItemList currentVendorInventoryItemList)
-        {
             _traderWalletStorage = currentVendorWalletStorage;
-            _traderListItemSO = currentVendorInventoryItemList.ListInventoryItemSO;
 
-            _playerListItemSO = _playerInventoryItemList.ListInventoryItemSO;
+            _playerInventory = new Inventory(this, _playerItemsView, _playerInventoryItemList.ListInventoryItemSO);
+            _traderInventory = new Inventory(this, _traderItemsView, currentVendorInventoryItemList.ListInventoryItemSO);
+
+            _playerInventory.LoadOnScreenInventory();
+            _traderInventory.LoadOnScreenInventory();
+
+            _traderTable.gameObject.SetActive(true);
         }
 
         private void InstantiateVisualInventories()
@@ -69,41 +65,54 @@ namespace GameEngine.Inventory
             _traderTable.gameObject.SetActive(false);
         }
 
-        /// <summary>
-        /// Syncronize the Visual representation of Item on screen with inventory of player or current vendor
-        /// </summary>
-        /// <param name="itemsView"></param>
-        /// <param name="listItemSO"></param>
-        private void LoadOnScreenInventory(InventoryItemView[] itemsView, List<InventoryItemSO> listItemSO)
-        {
-            int i = 0;
-            for (; i < listItemSO.Count; i++)
-            {
-                itemsView[i].LinkVisulItemWithSO(listItemSO[i]);
-            }
-            TunOffNotUsedVisualItem(itemsView, i);
-
-        }
-        /// <summary>
-        /// Visual not used position in inventories will be turn off
-        /// </summary>
-        /// <param name="itemsGO"></param>
-        /// <param name="idxFirstEmpty"></param>
-        private void TunOffNotUsedVisualItem(InventoryItemView[] itemsGO, int idxFirstEmpty)
-        {
-            for (int i = idxFirstEmpty; i < itemsGO.Length; i++)
-            {
-                itemsGO[i].gameObject.SetActive(false);
-            }
-        }
-
         public override string ToString()
         {
             return $"Player have {_playerInventoryItemList} items and {_playerWalletStorage.Money} money." +
                 $" Trader have {_traderInventoryItemList} items and {_traderWalletStorage.Money} money";
         }
 
+        public class Inventory
+        {
+            private TraderTableView traderTableView;
+            private List<InventoryItemSO> listItemSO;
+            private InventoryItemView[] itemsView;
 
+            public Inventory(TraderTableView traderTableView, InventoryItemView[] _playerItemsView, List<InventoryItemSO> listItemSO)
+            {
+                this.traderTableView = traderTableView;
+                this.listItemSO = listItemSO;
+                this.itemsView = _playerItemsView;
+            }
+
+            /// <summary>
+            /// Syncronize the Visual representation of Item on screen with inventory of player or current vendor
+            /// </summary>
+            /// <param name="itemsView"></param>
+            /// <para
+            public void LoadOnScreenInventory()
+            {
+                int i = 0;
+                for (; i < listItemSO.Count; i++)
+                {
+                    //The cast ushort supported by limitation of Array size (see comment at it creation)
+                    itemsView[i].LinkVisulItemWithSO(listItemSO[i], (ushort)i);
+                }
+                TunOffNotUsedVisualItem(i);
+            }
+
+            /// <summary>
+            /// Visual not used position in inventories will be turn off
+            /// </summary>
+            /// <param name="itemsGO"></param>
+            /// <param name="idxFirstEmpty"></param>
+            private void TunOffNotUsedVisualItem(int idxFirstEmpty)
+            {
+                for (int i = idxFirstEmpty; i < itemsView.Length; i++)
+                {
+                    itemsView[i].gameObject.SetActive(false);
+                }
+            }
+        }
 
         public struct InstantiateInventoryItems
         {
@@ -129,6 +138,7 @@ namespace GameEngine.Inventory
             /// <param name="_begTopLeftrect"></param>
             public InventoryItemView[] BuildField(RectTransform _begTopLeftrect)
             {
+                //The Array size is limmited by possible value of [rows * columns] in class GameEngine.Inventory.FieldSize 
                 InventoryItemView[] itemsView = new InventoryItemView[rows * columns];
                 int idx = 0;
                 parentTransform = _begTopLeftrect.transform;
