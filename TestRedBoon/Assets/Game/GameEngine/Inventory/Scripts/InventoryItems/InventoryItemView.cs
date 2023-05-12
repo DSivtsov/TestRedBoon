@@ -8,27 +8,6 @@ using System;
 
 namespace GameEngine.Inventory
 {
-    /*
-		[common] Inventory class
-			MyInventory
-			OtherInventory (linked Wallet)
-
-	Add class DropInventoryItemOnInventory
-		WasDropped(OnthisInventory)
-			HideItem()
-			If (OnthisInventory == OtherInventory) TrySell()
-				else DragItemEnd()
-		TrySell()
-			If (Wallet(other Inventory).CanSpend(ItemCurrentPrice)) ItemPurchased()
-				else ItemNotPurchased()
-		ItemPurchased()
-			Wallet(other Inventory).SpendMoney()
-			Inventory(other Inventory).ItemPurchased(positionInInventory)
-			Inventory(my Inventory).ItemSelled(positionInInventory)
-		ItemNotPurchased()
-			PlaceHolderOfDragedItem.Hide()
-			ItemUnHideAtInitPos()
-     */
     public sealed class InventoryItemView : MonoBehaviour, IBeginDragHandler, IEndDragHandler, IDragHandler
     {
         [SerializeField]
@@ -112,7 +91,6 @@ namespace GameEngine.Inventory
 
         public void WasDroppedOnInventory(TraderTableView.Inventory inventory)
         {
-            //Debug.Log($"Item[{_itemName}] dropped on Inventory[{inventory}]");
             if (_myInventory != inventory)
             {
                 HideItem();

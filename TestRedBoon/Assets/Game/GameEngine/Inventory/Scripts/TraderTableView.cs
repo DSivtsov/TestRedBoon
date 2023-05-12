@@ -136,15 +136,6 @@ namespace GameEngine.Inventory
                 else
                     return itemSO.PuchasePrice;
             }
-            private int GetItemPurchasingPrice(InventoryItemSO itemSO)
-            {
-                if (isPlayerInventory)
-                    return itemSO.SalesPrice;
-                else
-                    return itemSO.PuchasePrice;
-            }
-
-
 
             /// <summary>
             /// Item from current Inventory trying to Sell
@@ -156,8 +147,6 @@ namespace GameEngine.Inventory
             {
                 InventoryItemSO sellingnventoryItemSO = listItemSO[positionInIventorySellingItem];
                 int sellinPrice = GetItemSellingPrice(sellingnventoryItemSO);
-                //Debug.Log($"TrySell Item[{sellingnventoryItemSO.ItemName}] to Inventory[{inventoryToSell}]" +
-                //    $" by [{sellinPrice}] price");
 
                 if (inventoryToSell.TryToPuchaseItem(sellingnventoryItemSO, sellinPrice))
                 {
@@ -174,7 +163,6 @@ namespace GameEngine.Inventory
             /// <returns>true item was purchased</returns>
             public bool TryToPuchaseItem(InventoryItemSO itemPurchased, int sellinPrice)
             {
-                //int purchasePrice = GetItemPurchasingPrice(itemPurchased);
                 if (purchaserForThisInventory.CanSpendMoney(sellinPrice))
                 {
                     purchaserForThisInventory.SpendMoney(sellinPrice);
@@ -279,7 +267,6 @@ namespace GameEngine.Inventory
                 RectTransform rectTransform = Instantiate<RectTransform>(prefabItem, parentTransform);
                 rectTransform.anchoredPosition = vector2;
                 rectTransform.name = name;
-                //return rectTransform.gameObject.GetComponent<InventoryItemView>();
                 InventoryItemView inventoryItemView = rectTransform.GetComponent<InventoryItemView>();
                 inventoryItemView.SetCanvas(traderTableCanvas.scaleFactor);
                 return rectTransform.GetComponent<InventoryItemView>();

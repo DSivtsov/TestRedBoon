@@ -253,7 +253,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a104ceaf8f0a524fa7b7427159fb782, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _initialMoney: 200
+  _initialMoney: 150
   _inventoryItemList: {fileID: 11400000, guid: 179cdf7191e10cc41b462044aa5d9fc7, type: 2}
 --- !u!4 &82223659
 Transform:
@@ -299,7 +299,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _name: Vasya
-  _initialMoney: 666
+  _initialMoney: 200
   _isMoneyInfinity: 0
   _inventoryItemList: {fileID: 11400000, guid: a64573411f5170647a30ff462a125c3f, type: 2}
 --- !u!4 &120483710
@@ -2666,7 +2666,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _name: Peter
-  _initialMoney: 200
+  _initialMoney: 250
   _isMoneyInfinity: 0
   _inventoryItemList: {fileID: 11400000, guid: 69e2adf77773ccb46961eef42f698fb9, type: 2}
 --- !u!4 &1293456794
@@ -3254,7 +3254,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1626968796}
   - component: {fileID: 1626968797}
-  - component: {fileID: 1626968798}
   m_Layer: 0
   m_Name: InventoryManager
   m_TagString: Untagged
@@ -3289,18 +3288,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _inventoryView: {fileID: 1055393018}
---- !u!114 &1626968798
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1626968795}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c6e257f9168691d48a537d392aed2964, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &1648942498
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3654,6 +3641,49 @@ Transform:
   - {fileID: 1565385475}
   m_Father: {fileID: 0}
   m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1734702024
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1734702026}
+  - component: {fileID: 1734702025}
+  m_Layer: 0
+  m_Name: 'DEBUG: Emulate Selection of Vendor'
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &1734702025
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1734702024}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6e257f9168691d48a537d392aed2964, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1734702026
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1734702024}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.3009973, y: -49.71047, z: 768.4942}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1789977426
 GameObject:
