@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -44,6 +45,7 @@ namespace GameEngine.Environment
         private const int NUMEANGLE = 4;
         private int NumEdge;
 
+        private NormalizedRectangle FirstRect;
 
 
         private void Injection()
@@ -81,31 +83,20 @@ namespace GameEngine.Environment
             Debug.Log($"Field {_widthHalfField} {_heightHalfField}");
             GetMaximumHeightWidthForRectangle();
 
-            NormalizedRectangle initialRec = CreateInitialRec();
+            FirstRect = CreateInitialRec();
 
-            initialRec.Draw();
+            FirstRect.Draw();
 
-            _pathFinderData._startPointFindPath = GetStartPointFindPath(initialRec);
-            /*
-             * 	GetStartPointFindPath(NormolizedReact)
-		            TypeEdge=SelectAnyTypeEdge()
-		            SelectPointOnEdge(TypeEdge,NormolizedRect)
-	            FirstRect,PevTypeEdge= NormolizedReact
-             */
+            _pathFinderData.StartPointFindPath = GetStartPointFindPath(FirstRect);
 
             NumEdge = 0;
-        }
-
-        private Vector3 GetStartPointFindPath(NormalizedRectangle initialRec)
-        {
-            return Vector3.one;
         }
 
         [Button]
         private NormalizedRectangle CreateInitialRec()
         {
             _isOutFromFieldLimit = false;
-            _prevEdgeType =  EdgeType.Nothing;
+            _prevEdgeType = EdgeType.Nothing;
             Vector2 basePoint = new Vector2(_fieldSetting.CenterX, _fieldSetting.CenterY);
 
             BasePointAngleType selectedBasePointAngleType = SelectAnyAngleTypeBasePoint();
@@ -116,21 +107,59 @@ namespace GameEngine.Environment
             return newNormalizedRectangle;
         }
 
+        private Vector2 GetStartPointFindPath(NormalizedRectangle initialRec)
+        {
+            EdgeType edgeTypeWhereWasStartPoint = SelectEdgeType();
+            Debug.Log($"First Random edgeType[{edgeTypeWhereWasStartPoint}]");
+            Vector2 RandomPointOnEdge = SelectPointOnEdge(edgeTypeWhereWasStartPoint,initialRec);
+            return RandomPointOnEdge;
+        }
+
+        private Vector2 SelectPointOnEdge(EdgeType edgeTypeWhereWasStartPoint, NormalizedRectangle rec)
+        {
+            float randomPointOnHorizontal = rec.BottomLeftAngel.x + _random.Next(0, (int)rec.SizeXY.x);
+            float randomPointOnVertical = rec.BottomLeftAngel.y + _random.Next(0, (int)rec.SizeXY.y);
+            switch (edgeTypeWhereWasStartPoint)
+            {
+                case EdgeType.Top:
+                    return new Vector2(randomPointOnHorizontal, rec.BottomLeftAngel.y + rec.SizeXY.y);
+
+                case EdgeType.Right:
+                    return new Vector2(rec.BottomLeftAngel.x + (int)rec.SizeXY.x, randomPointOnVertical);
+
+                case EdgeType.Bottom:
+                    return new Vector2(randomPointOnHorizontal, rec.BottomLeftAngel.y);
+
+                case EdgeType.Left:
+                    return new Vector2(rec.BottomLeftAngel.x, randomPointOnVertical);
+
+                case EdgeType.Nothing:
+                default:
+                    throw new NotSupportedException($"Wrong value [{edgeTypeWhereWasStartPoint}]");
+            }
+        }
+
+
+
         private BasePointAngleType SelectAnyAngleTypeBasePoint()
         {
             return (BasePointAngleType)_random.Next(0, NUMEANGLE);
         }
 
-        private EdgeType SelectEdgeTypeForNewRect()
+        private EdgeType SelectEdgeType()
         {
-            if (_prevEdgeType != EdgeType.Nothing)
+            if (_prevEdgeType == EdgeType.Nothing)
             {
                 return (EdgeType)_random.Next(0, NUMEDGES);
             }
             else
             {
-                EdgeType randomEdgeType = (EdgeType)_random.Next(0, NUMEDGES);
-                return(EdgeType)_random.Next(0, NUMEDGES);
+                // Get list of indexes of EdgeType exclude the index _prevEdgeType and EdgeType.Nothing
+                IEnumerable<int> modlistIdx = Enumerable.Range(0, NUMEDGES).Where((edge) => edge != (int)_prevEdgeType);
+                // Get from this list a random position, and get corespondent value at this position and convert to EdgeType
+                int rndPositionInList = _random.Next(0, modlistIdx.Count());
+                int valueRNDPosition = modlistIdx.ElementAt(rndPositionInList);
+                return (EdgeType)valueRNDPosition;
             }
         }
 

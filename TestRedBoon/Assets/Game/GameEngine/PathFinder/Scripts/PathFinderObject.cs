@@ -10,17 +10,23 @@ namespace GameEngine.PathFinder
     public class PathFinderObject : MonoBehaviour, IPathFinder
     {
         [ReadOnly, ShowInInspector] private PathFinderData _pathFinderData = new PathFinderData();
-
         [ReadOnly, ShowInInspector] private List<Vector2> _pathFounded;
+        [SerializeField] private Transform _findPathStartPoint;
+        [SerializeField] private Transform _findPathEndPoint;
 
         public PathFinderData PathFinderData => _pathFinderData;
         public List<Vector2> PathFounded => _pathFounded;
+
+        private void Awake()
+        {
+            _pathFinderData.Init(_findPathStartPoint, _findPathEndPoint);
+        }
 
         [Button]
         public void CallGetPath()
         {
             CheckData();
-            _pathFounded = GetPath(_pathFinderData._startPointFindPath, _pathFinderData._endPointFindPath, _pathFinderData._listEdges).ToList();
+            _pathFounded = GetPath(_pathFinderData.StartPointFindPath, _pathFinderData.EndPointFindPath, _pathFinderData._listEdges).ToList();
             ShowPath();
         }
 
@@ -50,7 +56,7 @@ namespace GameEngine.PathFinder
         [Button]
         private void CheckData()
         {
-            if (_pathFinderData == null || _pathFinderData._startPointFindPath == null || _pathFinderData._endPointFindPath == null
+            if (_pathFinderData == null || _pathFinderData.StartPointFindPath == null || _pathFinderData.EndPointFindPath == null
                 || _pathFinderData._listEdges == null)
             {
                 throw new NotImplementedException("Initial Data not intialized");
@@ -71,16 +77,50 @@ namespace GameEngine.PathFinder
 
         public override string ToString()
         {
-            return $"startPointFindPath{_pathFinderData._startPointFindPath} {_pathFinderData._endPointFindPath} _listEdges.Count[{_pathFinderData._listEdges.Count}]";
+            return $"startPointFindPath{_pathFinderData.StartPointFindPath} {_pathFinderData.EndPointFindPath} _listEdges.Count[{_pathFinderData._listEdges.Count}]";
         }
     }
 
     [Serializable]
     public class PathFinderData
     {
-        [ReadOnly] public Vector2 _startPointFindPath;
-        [ReadOnly] public Vector2 _endPointFindPath;
+        [ReadOnly] private Vector2 _startPointFindPath;
+        [ReadOnly] private Vector2 _endPointFindPath;
         [ReadOnly] public List<Edge> _listEdges;
+        private Transform _findPathStartPoint;
+        private Transform _findPathEndPoint;
+
+        public Vector2 StartPointFindPath
+        {
+            get => _startPointFindPath;
+            set
+            {
+                _startPointFindPath = value;
+                SetAndActivate(_findPathStartPoint,value);
+            }
+        }
+
+        public Vector2 EndPointFindPath
+        {
+            get => _endPointFindPath;
+            set
+            {
+                _startPointFindPath = value;
+                SetAndActivate(_findPathEndPoint, value);
+            }
+        }
+
+        private void SetAndActivate(Transform findPathPoint, Vector2 pointPosition)
+        {
+            findPathPoint.position = pointPosition;
+            findPathPoint.gameObject.SetActive(true);
+        }
+
+        public void Init(Transform findPathStartPoint, Transform findPathEndPoint)
+        {
+            _findPathStartPoint = findPathStartPoint;
+            _findPathEndPoint = findPathEndPoint;
+        }
     }
 
     public struct Rectangle
