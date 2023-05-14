@@ -15,9 +15,9 @@ namespace GameEngine.Environment
         public int WidthField = 1920;
         public int HeightField = 1080;
         public int MinNumberEdges = 2;
-        //if IsNoUseFullField = true the MaxNumberEdges = MinNumberEdges
-        public bool IsNotUseFullField = true;
-        [ShowIf("IsNotUseFullField")]
+        //if IsLimitedMaxNumberEdge = true the MaxNumberEdges = MinNumberEdges
+        public bool IsLimitedMaxNumberEdge = true;
+        [ShowIf("IsLimitedMaxNumberEdge")]
         public int MaxNumberEdges = 2;
         public int MinWidthRectangle = 150;
         public int MinHeightRectangle = 150;
@@ -26,7 +26,7 @@ namespace GameEngine.Environment
 
         private void OnValidate()
         {
-            if (IsNotUseFullField && MaxNumberEdges < MinNumberEdges)
+            if (IsLimitedMaxNumberEdge && MaxNumberEdges < MinNumberEdges)
             {
                 MaxNumberEdges = MinNumberEdges + 1;
             }

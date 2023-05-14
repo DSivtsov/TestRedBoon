@@ -13,11 +13,13 @@ MonoBehaviour:
   m_Name: First
   m_EditorClassIdentifier: 
   CurrentSeed: 123456
+  CenterX: 0
+  CenterY: 0
   WidthField: 1920
   HeightField: 1080
-  MinNumberEdges: 3
-  IsNotUseFullField: 1
-  MaxNumberEdges: 11
+  MinNumberEdges: 1
+  IsLimitedMaxNumberEdge: 1
+  MaxNumberEdges: 2
   MinWidthRectangle: 100
   MinHeightRectangle: 100
   MinPercentEdge: 10
