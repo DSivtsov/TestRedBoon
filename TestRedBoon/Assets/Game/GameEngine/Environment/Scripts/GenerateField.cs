@@ -6,8 +6,7 @@ using System;
 
 namespace GameEngine.PathFinder
 {
-
-    public enum BasePointRectangle
+    public enum BasePointAngleType
     {
         TopLeft = 0,
         TopRight = 1,
@@ -15,9 +14,20 @@ namespace GameEngine.PathFinder
         BottomLeft = 3,
     }
 
+    public enum EdgeType
+    {
+        Top = 0,
+        Right = 1,
+        Bottom = 2,
+        Left = 3,
+        Nothing = 4,
+    }
+
     public class GenerateField : MonoBehaviour
     {
         [SerializeField] private FieldSettingSO _fieldSetting;
+        [SerializeField] private DrawRectangle _drawRectangle;
+        [SerializeField] private bool _useSeedFromFieldSettingSO = true;
 
         private System.Random _random;
         private int _widthHalfField;
@@ -25,109 +35,116 @@ namespace GameEngine.PathFinder
         //To Pass Minimum number of Edges
         private int _maxWidthRectangle;
         private int _maxHeightRectangle;
+        private EdgeType _prevEdgeType;
+        private bool _isOutFromFieldLimit;
+        private const int NUMEDGES = 4;
+        private const int NUMEANGLE = 4;
 
-        private DrawRectangle _drawRectangle;
         private void Injection()
         {
-            _drawRectangle = GetComponent<DrawRectangle>();
+            Debug.LogWarning("Injection()");
+            if (!_drawRectangle)
+            {
+                _drawRectangle = gameObject.GetComponent<DrawRectangle>();
+                if (!_drawRectangle)
+                    throw new NotImplementedException("GenerateField:  Not linked to DrawRectangle");
+            }
         }
 
         public void Awake()
         {
             Injection();
+            InitRandom();
+            CreateField();
+        }
 
-            _random = new System.Random(_fieldSetting.CurrentSeed);
+        private void InitRandom()
+        {
+            if (_useSeedFromFieldSettingSO)
+                _random = new System.Random(_fieldSetting.CurrentSeed);
+            else
+                _random = new System.Random();
+        }
+
+        private void CreateField()
+        {
             _widthHalfField = _fieldSetting.WidthField / 2;
             _heightHalfField = _fieldSetting.HeightField / 2;
-
             Debug.Log($"Field {_widthHalfField} {_heightHalfField}");
-            int PosX = _fieldSetting.CenterX;
-            int PosY = _fieldSetting.CenterY;
             GetMaximumHeightWidthForRectangle();
-            CreateRectanagle(PosX, PosY, BasePointRectangle.TopRight);
+
+            CreateInitialRec();
         }
 
         [Button]
-        private void CreateRectanagle(int PosX, int PosY, BasePointRectangle _selectedBasePoint)
+        private void CreateInitialRec()
         {
-            Vector2 start = new Vector2(PosX, PosY);
-            Debug.Log($"{start} {_selectedBasePoint}");
-            for (int i = 0; i < _fieldSetting.MinNumberEdges; i++)
+            _isOutFromFieldLimit = false;
+            _prevEdgeType =  EdgeType.Nothing;
+            Vector2 basePoint = new Vector2(_fieldSetting.CenterX, _fieldSetting.CenterY);
+
+            BasePointAngleType selectedBasePointAngleType = SelectAnyAngleTypeBasePoint();
+
+            Debug.Log($"basePoint={basePoint} AngleType[{selectedBasePointAngleType}]");
+            NormalizedRectangle newNormalizedRectangle = GetNewNormalizedRectangle(basePoint, selectedBasePointAngleType);
+
+            Debug.Log(newNormalizedRectangle);
+            newNormalizedRectangle.Draw();
+        }
+
+        private BasePointAngleType SelectAnyAngleTypeBasePoint()
+        {
+            return (BasePointAngleType)_random.Next(0, NUMEANGLE);
+        }
+
+        private EdgeType SelectEdgeTypeForNewRect()
+        {
+            if (_prevEdgeType != EdgeType.Nothing)
             {
-                (Vector2 bottomLeft, Vector2 widthHeight) = GetNewNormalizedRectangle(start, _selectedBasePoint);
-                Debug.Log($"bottomLeft[{bottomLeft}] widthHeight[{widthHeight}]");
-                _drawRectangle.Draw(bottomLeft, widthHeight);
+                return (EdgeType)_random.Next(0, NUMEDGES);
+            }
+            else
+            {
+                EdgeType randomEdgeType = (EdgeType)_random.Next(0, NUMEDGES);
+                return(EdgeType)_random.Next(0, NUMEDGES);
             }
         }
 
         /// <summary>
         /// Get Normalized Rectangle
         /// </summary>
-        /// <returns> (Vector2 bottomLeftAngle, Vector2 topRightAngle)</returns>
-        private (Vector2 bottomLeftAngel, Vector2 widthHeight) GetNewNormalizedRectangle(Vector2 initialBasePoint, BasePointRectangle currentTypeAngle)
+        /// <param name="basePoint"></param>
+        /// <param name="selectedBasePointAngleType"></param>
+        /// <returns></returns>
+        private NormalizedRectangle GetNewNormalizedRectangle(Vector2 basePoint, BasePointAngleType selectedBasePointAngleType)
         {
-            Vector2 shiftToOtherAngleRectangel = GetShiftToOtherAngleRectangle(currentTypeAngle);
-            Debug.Log($"initialBasePoint: [{currentTypeAngle}]{initialBasePoint} shift:{shiftToOtherAngleRectangel}");
-            (Vector2 shiftedBottomLeftAngel, Vector2 widthHeight) = GetNormalizedRectangle(initialBasePoint, shiftToOtherAngleRectangel);
-            return (initialBasePoint + shiftedBottomLeftAngel, widthHeight);
+            Vector2 shiftToOtherAngleRectangel = GetShiftToOtherAngleRectangle(selectedBasePointAngleType);
+            Debug.Log($"initialBasePoint: [{selectedBasePointAngleType}]{basePoint} shift:{shiftToOtherAngleRectangel}");
+            NormalizedRectangle newNormalizedRectangle = new NormalizedRectangle(basePoint, shiftToOtherAngleRectangel,_drawRectangle);
+            return newNormalizedRectangle;
         }
 
-        private (Vector2 shiftedBottomLeftAngel, Vector2 widthHeight) GetNormalizedRectangle(Vector2 initialBasePoint, Vector2 shift)
-        {
-            float shiftBottomLeftX = Math.Min(initialBasePoint.x, shift.x);
-            float shiftBottomLeftY = Math.Min(initialBasePoint.y, shift.y);
-            float width = Math.Max(initialBasePoint.x, shift.x) - shiftBottomLeftX;
-            float height = Math.Max(initialBasePoint.y, shift.y) - shiftBottomLeftY;
-
-            return (new Vector2(shiftBottomLeftX, shiftBottomLeftY), new Vector2(width, height));
-        }
-
-        /* 
-         * Get the Shifted angle of Rectange and after that NormalizedAnglesRectangle
-         * final return will give a Rec with Initial Point and TopRight point
-         * this not useful for DrawRectangle.Draw() which based on widthHeight by Scaling GameObject
-         * 
-         * Vector2 shiftToOtherAngleRectangel = GetShiftToOtherAngleRectangle(currentTypeAngle);
-         *  Debug.Log($"{initialBasePoint} {initialBasePoint + shiftToOtherAngleRectangel}");
-         *   return NormalizedAnglesRectangle(initialBasePoint, initialBasePoint + shiftToOtherAngleRectangel);
-         */
-        /// <summary>
-        /// NormalizedAngleRectangle
-        /// </summary>
-        /// <param name="angleRectangel1"></param>
-        /// <param name="angleRectangel2"></param>
-        /// <returns>(Vector2 bottomLeftAngel, Vector2 topRightAngel) </returns>
-        private (Vector2 bottomLeftAngel, Vector2 topRightAngel) NormalizedAnglesRectangle(Vector2 angleRectangel1, Vector2 angleRectangel2)
-        {
-            float bottomLeftX = Math.Min(angleRectangel1.x, angleRectangel2.x);
-            float bottomLeftY = Math.Min(angleRectangel1.y, angleRectangel2.y);
-            float topRightX = Math.Max(angleRectangel1.x, angleRectangel2.x);
-            float topRightY = Math.Max(angleRectangel1.y, angleRectangel2.y);
-
-            return (new Vector2(bottomLeftX, bottomLeftY), new Vector2(topRightX, topRightY));
-        }
-
-        private Vector2 GetShiftToOtherAngleRectangle(BasePointRectangle currentTypeAngle)
+        private Vector2 GetShiftToOtherAngleRectangle(BasePointAngleType basePointAngleType)
         {
             int widthRectangle = _random.Next(_fieldSetting.MinWidthRectangle, (_maxWidthRectangle + 1));
             int heightRectangle = _random.Next(_fieldSetting.MinHeightRectangle, (_maxHeightRectangle + 1));
-            return new Vector2(widthRectangle, heightRectangle) * GetVector2ToOtherAngleRectangle(currentTypeAngle);
+            return new Vector2(widthRectangle, heightRectangle) * GetDirectionShiftToOtherAngleRectangle(basePointAngleType);
         }
 
-        private Vector2 GetVector2ToOtherAngleRectangle(BasePointRectangle basePointRectangle)
+        private Vector2 GetDirectionShiftToOtherAngleRectangle(BasePointAngleType basePointAngleType)
         {
-            switch (basePointRectangle)
+            switch (basePointAngleType)
             {
-                case BasePointRectangle.TopLeft:
+                case BasePointAngleType.TopLeft:
                     return new Vector2(1, -1);
-                case BasePointRectangle.TopRight:
+                case BasePointAngleType.TopRight:
                     return new Vector2(-1, -1);
-                case BasePointRectangle.BottomRight:
+                case BasePointAngleType.BottomRight:
                     return new Vector2(-1, 1);
-                case BasePointRectangle.BottomLeft:
+                case BasePointAngleType.BottomLeft:
                     return new Vector2(1, 1);
                 default:
-                    throw new System.NotSupportedException($"Wrong value [{basePointRectangle}]");
+                    throw new System.NotSupportedException($"Wrong value [{basePointAngleType}]");
             }
         }    
 
@@ -154,15 +171,7 @@ namespace GameEngine.PathFinder
             }
         }
 
-        private BasePointRectangle GetRanomBasePointRectangle()
-        {
-            return (BasePointRectangle)_random.Next(0, Enum.GetValues(typeof(BasePointRectangle)).Length);
-        }
 
-        private (Vector2, Vector2) GetEdgeStartEnd(Vector2 Start)
-        {
-            return (new Vector2(), new Vector2());
-        }
     }
 
     public struct Rectangle
