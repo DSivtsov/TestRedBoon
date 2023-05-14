@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System;
 
-namespace GameEngine.PathFinder
+namespace GameEngine.Environment
 {
     [Serializable]
     public class NormalizedRectangle

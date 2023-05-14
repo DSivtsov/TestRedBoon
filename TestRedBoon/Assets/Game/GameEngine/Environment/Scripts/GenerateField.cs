@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
 using System;
+using GameEngine.PathFinder;
 
-namespace GameEngine.PathFinder
+namespace GameEngine.Environment
 {
     public enum BasePointAngleType
     {
@@ -25,10 +26,12 @@ namespace GameEngine.PathFinder
 
     public class GenerateField : MonoBehaviour
     {
+        [SerializeField] private PathFinderObject _pathFinder;
         [SerializeField] private FieldSettingSO _fieldSetting;
         [SerializeField] private DrawRectangle _drawRectangle;
         [SerializeField] private bool _useSeedFromFieldSettingSO = true;
 
+        private PathFinderData _pathFinderData;
         private System.Random _random;
         private int _widthHalfField;
         private int _heightHalfField;
@@ -39,6 +42,9 @@ namespace GameEngine.PathFinder
         private bool _isOutFromFieldLimit;
         private const int NUMEDGES = 4;
         private const int NUMEANGLE = 4;
+        private int NumEdge;
+
+
 
         private void Injection()
         {
@@ -49,6 +55,7 @@ namespace GameEngine.PathFinder
                 if (!_drawRectangle)
                     throw new NotImplementedException("GenerateField:  Not linked to DrawRectangle");
             }
+            _pathFinderData = _pathFinder.PathFinderData;
         }
 
         public void Awake()
@@ -66,6 +73,7 @@ namespace GameEngine.PathFinder
                 _random = new System.Random();
         }
 
+        [Button]
         private void CreateField()
         {
             _widthHalfField = _fieldSetting.WidthField / 2;
@@ -73,11 +81,28 @@ namespace GameEngine.PathFinder
             Debug.Log($"Field {_widthHalfField} {_heightHalfField}");
             GetMaximumHeightWidthForRectangle();
 
-            CreateInitialRec();
+            NormalizedRectangle initialRec = CreateInitialRec();
+
+            initialRec.Draw();
+
+            _pathFinderData._startPointFindPath = GetStartPointFindPath(initialRec);
+            /*
+             * 	GetStartPointFindPath(NormolizedReact)
+		            TypeEdge=SelectAnyTypeEdge()
+		            SelectPointOnEdge(TypeEdge,NormolizedRect)
+	            FirstRect,PevTypeEdge= NormolizedReact
+             */
+
+            NumEdge = 0;
+        }
+
+        private Vector3 GetStartPointFindPath(NormalizedRectangle initialRec)
+        {
+            return Vector3.one;
         }
 
         [Button]
-        private void CreateInitialRec()
+        private NormalizedRectangle CreateInitialRec()
         {
             _isOutFromFieldLimit = false;
             _prevEdgeType =  EdgeType.Nothing;
@@ -87,9 +112,8 @@ namespace GameEngine.PathFinder
 
             Debug.Log($"basePoint={basePoint} AngleType[{selectedBasePointAngleType}]");
             NormalizedRectangle newNormalizedRectangle = GetNewNormalizedRectangle(basePoint, selectedBasePointAngleType);
-
             Debug.Log(newNormalizedRectangle);
-            newNormalizedRectangle.Draw();
+            return newNormalizedRectangle;
         }
 
         private BasePointAngleType SelectAnyAngleTypeBasePoint()
@@ -170,24 +194,5 @@ namespace GameEngine.PathFinder
                 calculatedRectangleSize = minRectangleSize;
             }
         }
-
-
     }
-
-    public struct Rectangle
-    {
-        public Vector2 Min;
-        public Vector2 Max;
-    }
-    public struct Edge
-    {
-        public Rectangle First;
-        public Rectangle Second;
-        public Vector2 Start;
-        public Vector2 End;
-    }
-    public interface IPathFinder
-    {
-        IEnumerable<Vector2> GetPath(Vector2 A, Vector2 C, IEnumerable<Edge> edges);
-    } 
 }

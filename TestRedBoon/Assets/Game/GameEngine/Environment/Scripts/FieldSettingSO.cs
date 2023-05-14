@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using Sirenix.OdinInspector;
 
-namespace GameEngine.PathFinder
+namespace GameEngine.Environment
 {
     [CreateAssetMenu(
         fileName = "FieldSettingSO",

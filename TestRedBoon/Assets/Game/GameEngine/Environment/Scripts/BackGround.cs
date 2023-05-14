@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace GameEngine.PathFinder
+namespace GameEngine.Environment
 {
     public class BackGround : MonoBehaviour
     {

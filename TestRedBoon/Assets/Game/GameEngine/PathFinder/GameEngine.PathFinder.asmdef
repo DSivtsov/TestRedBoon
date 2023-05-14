@@ -1,9 +1,7 @@
 {
-    "name": "Environment",
+    "name": "GameEngine.PathFinder",
     "rootNamespace": "",
-    "references": [
-        "GUID:a54ab74f795ef774786f06b3f812ece4"
-    ],
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
