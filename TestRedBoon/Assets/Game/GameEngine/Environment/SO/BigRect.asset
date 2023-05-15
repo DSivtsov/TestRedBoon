@@ -17,9 +17,9 @@ MonoBehaviour:
   CenterY: 0
   WidthField: 1920
   HeightField: 1080
-  MinNumberEdges: 3
+  MinNumberEdges: 2
   IsLimitedMaxNumberEdge: 1
-  MaxNumberEdges: 6
+  MaxNumberEdges: 3
   MinWidthRectangle: 300
   MinHeightRectangle: 300
   MinPercentEdge: 10

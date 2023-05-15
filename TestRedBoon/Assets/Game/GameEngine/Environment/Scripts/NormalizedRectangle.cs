@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System;
+using System.Collections.Generic;
 
 namespace GameEngine.Environment
 {
@@ -117,9 +118,13 @@ namespace GameEngine.Environment
 
         private bool CheckYMin(Vector2 checkAngle)
         {
-            if (checkAngle.y < -_heightField)
+            float delta = -_heightField - checkAngle.y;
+            //if (checkAngle.y < -_heightField)
+            if (delta > 0)
             {
+                //float delta = -_heightField - checkAngle.y;
                 _bottomLeftAngel.y = -_heightField;
+                _sizeXY.y -= delta;
                 Debug.Log("CheckYMin() = true");
                 return true;
             }
@@ -153,14 +158,54 @@ namespace GameEngine.Environment
 
         private bool CheckXMin(Vector2 checkAngle)
         {
-            if (checkAngle.x < -_widthField)
+            float delta = -_widthField - checkAngle.x;
+            //if (checkAngle.x < -_widthField)
+            if (delta > 0)
             {
+                //float delta = -_widthField - checkAngle.x;
                 _bottomLeftAngel.x = -_widthField;
+                _sizeXY.x -= delta;
                 Debug.Log("CheckXMin() = true");
                 return true;
             }
             else
                 return false;
+        }
+
+        /// <summary>
+        /// Select point ednEdge point from edge connected it and new rect created with BasePointAngleType
+        /// </summary>
+        /// <param name="firstRect"></param>
+        /// <param name="edgeWasUsed">edge of First Rect connected to second Rect</param>
+        /// <param name="angleTypeBasePoint">BasePointAngleType was used to create second Rect</param>
+        /// <returns></returns>
+        public Vector2 GetEndPointEdge(EdgeType edgeWasUsed, BasePointAngleType angleTypeBasePoint)
+        {
+            Vector2 topRightAngle = _bottomLeftAngel + _sizeXY;
+            float x, y;
+            switch (edgeWasUsed)
+            {
+                case EdgeType.Top:
+                    y = topRightAngle.y;
+                    x = (angleTypeBasePoint == BasePointAngleType.BottomRight)? _bottomLeftAngel.x : topRightAngle.x;
+                    break;
+                case EdgeType.Right:
+                    x = topRightAngle.x;
+                    y = (angleTypeBasePoint == BasePointAngleType.TopLeft) ? _bottomLeftAngel.y : topRightAngle.y;
+                    break;
+                case EdgeType.Bottom:
+                    y = _bottomLeftAngel.y;
+                    x = (angleTypeBasePoint == BasePointAngleType.TopRight) ? _bottomLeftAngel.x : topRightAngle.x;
+                    break;
+                case EdgeType.Left:
+                    x = _bottomLeftAngel.x;
+                    y = (angleTypeBasePoint == BasePointAngleType.TopRight) ? _bottomLeftAngel.y : topRightAngle.y;
+                    break;
+                case EdgeType.Nothing:
+                default:
+                    throw new NotSupportedException($"Wrong EdgeType [{edgeWasUsed}]");
+            }
+            return new Vector2(x,y);
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
 using System;
-using GameEngine.PathFinder;
+
 
 namespace GameEngine.Environment
 {
@@ -27,14 +27,16 @@ namespace GameEngine.Environment
 
     public class GenerateField : MonoBehaviour
     {
-        [SerializeField] private PathFinderObject _pathFinder;
+        [SerializeField] private PathFinderData _pathFinderData;
         [SerializeField] private FieldSettingSO _fieldSetting;
         [SerializeField] private DrawRectangle _drawRectangle;
         [SerializeField] private bool _useSeedFromFieldSettingSO = true;
         [Header("DEBUG")]
         [SerializeField] private bool _NormalizedRectangleON = true;
 
-        private PathFinderData _pathFinderData;
+
+
+
         private System.Random _random;
         private int _widthHalfField;
         private int _heightHalfField;
@@ -57,13 +59,13 @@ namespace GameEngine.Environment
                 if (!_drawRectangle)
                     throw new NotImplementedException("GenerateField:  Not linked to DrawRectangle");
             }
-            _pathFinderData = _pathFinder.PathFinderData;
         }
 
         public void Awake()
         {
             Injection();
             InitRandom();
+            InitCreateField();
         }
 
         private void Start()
@@ -72,8 +74,7 @@ namespace GameEngine.Environment
                 NormalizedRectangle.IsTurnDebugCreation = true;
             else
                 NormalizedRectangle.IsTurnDebugCreation = false;
-            InitCreateField();
-            _drawRectangle.DeleteDrownRectangle();
+            
             CreateField();
         }
 
@@ -91,14 +92,16 @@ namespace GameEngine.Environment
             Debug.Log($"Field {_widthHalfField} {_heightHalfField}");
             GetMaximumHeightWidthForRectangle();
             NormalizedRectangle.InitNormalizedRectangle(_widthHalfField, _heightHalfField, _drawRectangle);
+            _pathFinderData.Init(_fieldSetting.MinNumberEdges);
         }
 
         [Button]
         private void CreateField()
         {
+            DeleteGameObjects();
+
             Debug.LogError("DEBUG called CreateField():");
             _wasOutFromFieldLimit = false;
-            //_prevEdgeType = EdgeType.Nothing;
 
             _firstRect = CreateInitialRec();
             _firstRect.Draw();
@@ -111,6 +114,13 @@ namespace GameEngine.Environment
 	                SecondRect SelectAnyTypeEdge Except PevTypeEdge
 	                SelectPointOnEdge
              */
+        }
+
+        private void DeleteGameObjects()
+        {
+            _drawRectangle.DeleteDrownRectangle();
+            _pathFinderData.DeletePoints();
+            _pathFinderData.SetInitialPoint();
         }
 
         private void CreateStartPointFindPath()
@@ -138,28 +148,22 @@ namespace GameEngine.Environment
                 BasePointAngleType selectedAngleType = SelectAngleTypeBasePoint(usedEdgeType);
                 Debug.Log($"basePoint={startPointOnEdge} selectedAngleType[{selectedAngleType}]");
 
-                NormalizedRectangle _secondRect = GetNewNormalizedRectangle(startPointOnEdge, selectedAngleType);
+                NormalizedRectangle secondRect = GetNewNormalizedRectangle(startPointOnEdge, selectedAngleType);
 
-                _wasOutFromFieldLimit = _secondRect.CutRectByFieldLimit(selectedAngleType);
+                _wasOutFromFieldLimit = secondRect.CutRectByFieldLimit(selectedAngleType);
                 if (_wasOutFromFieldLimit)
                 {
                     Debug.LogError($"CutRectByFieldLimit()[{_wasOutFromFieldLimit}]");
                 }
-                _secondRect.Draw();
-                Vector2 endPointEdge = GetPointOnEdgeRect(_firstRect, selectedAngleType);
-                /*
-                 * 	Create struct Edge()
-		                ConvertNormalizedRectToRectMinMax() for FirstRect/SecondRect
-	                    FirstRect,PevTypeEdge= NormolizedReact
-                 */
-                _firstRect = _secondRect;
+                secondRect.Draw();
+
+                Vector2 endPointEdge = _firstRect.GetEndPointEdge(edgeTypeWhereWillNextRect, selectedAngleType);
+                
+                _pathFinderData.AddEdge(_firstRect, secondRect, startPointOnEdge, endPointEdge);
+
+                _firstRect = secondRect;
                 prevUsedEdgeType = edgeTypeWhereWillNextRect;
             }
-        }
-
-        private Vector2 GetPointOnEdgeRect(NormalizedRectangle firstRect, BasePointAngleType selectedBasePointAngleType)
-        {
-            return Vector2.one;
         }
         
         /// <summary>
@@ -185,9 +189,9 @@ namespace GameEngine.Environment
         {
             Vector2 basePoint = new Vector2(_fieldSetting.CenterX, _fieldSetting.CenterY);
 
-            BasePointAngleType selectedAngleType = SelectAnyAngleTypeBasePoint();
+            BasePointAngleType selectedAngleType = SelectAnyAngleTypeForBasePoint();
 
-            Debug.Log($"basePoint={basePoint} selectedAngleType[{selectedAngleType}]");
+            Debug.Log($"basePoint={basePoint} selectedAngleTypeForBasePoint[{selectedAngleType}]");
             NormalizedRectangle newNormalizedRectangle = GetNewNormalizedRectangle(basePoint, selectedAngleType);
             
             return newNormalizedRectangle;
@@ -223,7 +227,7 @@ namespace GameEngine.Environment
             }
         }
 
-        private BasePointAngleType SelectAnyAngleTypeBasePoint()
+        private BasePointAngleType SelectAnyAngleTypeForBasePoint()
         {
             return (BasePointAngleType)_random.Next(0, NUMEANGLE);
         }
