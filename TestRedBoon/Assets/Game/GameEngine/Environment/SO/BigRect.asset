@@ -20,7 +20,7 @@ MonoBehaviour:
   MinNumberEdges: 2
   IsLimitedMaxNumberEdge: 1
   MaxNumberEdges: 3
-  MinWidthRectangle: 300
-  MinHeightRectangle: 300
+  MinWidthRectangle: 150
+  MinHeightRectangle: 150
   MinPercentEdge: 10
   MaxPercentEdge: 60
