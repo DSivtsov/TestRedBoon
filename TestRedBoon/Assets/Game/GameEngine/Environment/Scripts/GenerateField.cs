@@ -41,7 +41,7 @@ namespace GameEngine.Environment
         //To Pass Minimum number of Edges
         private int _maxWidthRectangle;
         private int _maxHeightRectangle;
-        private bool _isOutFromFieldLimit;
+        private bool _wasOutFromFieldLimit;
         private const int NUMEDGES = 4;
         private const int NUMEANGLE = 4;
         private int NumEdge;
@@ -90,13 +90,14 @@ namespace GameEngine.Environment
             _heightHalfField = _fieldSetting.HeightField / 2;
             Debug.Log($"Field {_widthHalfField} {_heightHalfField}");
             GetMaximumHeightWidthForRectangle();
+            NormalizedRectangle.InitNormalizedRectangle(_widthHalfField, _heightHalfField, _drawRectangle);
         }
 
         [Button]
         private void CreateField()
         {
             Debug.LogError("DEBUG called CreateField():");
-            _isOutFromFieldLimit = false;
+            _wasOutFromFieldLimit = false;
             //_prevEdgeType = EdgeType.Nothing;
 
             _firstRect = CreateInitialRec();
@@ -124,7 +125,7 @@ namespace GameEngine.Environment
             NumEdge = 0;
             EdgeType prevUsedEdgeType = EdgeType.Nothing;
 
-            while (!_isOutFromFieldLimit && (_fieldSetting.IsLimitedMaxNumberEdge && ++NumEdge <= _fieldSetting.MaxNumberEdges))
+            while (!_wasOutFromFieldLimit && (_fieldSetting.IsLimitedMaxNumberEdge && ++NumEdge <= _fieldSetting.MaxNumberEdges))
             {
                 Debug.LogWarning($"NumEdge={NumEdge}");
 
@@ -138,12 +139,12 @@ namespace GameEngine.Environment
                 Debug.Log($"basePoint={startPointOnEdge} selectedAngleType[{selectedAngleType}]");
 
                 NormalizedRectangle _secondRect = GetNewNormalizedRectangle(startPointOnEdge, selectedAngleType);
-                //Debug.Log(_secondRect);
-                _isOutFromFieldLimit = CheckExitFromFieldLimit(_secondRect, selectedAngleType);
-                /*
-                 * 	CheckExitFromFieldLimit(NormolizedRect,TypeAngleBasePoint)
-		            attemp to out of Range of Field (in this case) the border the last Rect set on Border Field.
-                */
+
+                _wasOutFromFieldLimit = _secondRect.CutRectByFieldLimit(selectedAngleType);
+                if (_wasOutFromFieldLimit)
+                {
+                    Debug.LogError($"CutRectByFieldLimit()[{_wasOutFromFieldLimit}]");
+                }
                 _secondRect.Draw();
                 Vector2 endPointEdge = GetPointOnEdgeRect(_firstRect, selectedAngleType);
                 /*
@@ -160,41 +161,7 @@ namespace GameEngine.Environment
         {
             return Vector2.one;
         }
-
-        private bool CheckExitFromFieldLimit(NormalizedRectangle secondRect, BasePointAngleType selectedBasePointAngleType)
-        {
-            switch (selectedBasePointAngleType)
-            {
-                case BasePointAngleType.TopLeft:
-                    break;
-                case BasePointAngleType.TopRight:
-                    break;
-                case BasePointAngleType.BottomRight:
-                    break;
-                case BasePointAngleType.BottomLeft:
-                    break;
-                default:
-                    break;
-            }
-            /*
-             * 	switch (TypeAngleBasePoint)
-		BottomLeft:
-			Check TopRightAngle(Start + WeightHeigh)
-				if x > maxWidthField
-					NormolizedReact = CutAngle(NormolizedRect, CutType = Width)
-				if y >maxHeightField
-					NormolizedReact = CutAngle(NormolizedRect, CutType = Height)
-            CutAngle(NormolizedRect, CutType)
-	            switch (CutAngle)
-	             Width:
-		            NormolizedReact=(Start,(Width=maxWidthField,oldHeight)
-	             Height:
-		            NormolizedReact=(Start,(oldWidth,Height=maxHeightField)
-	            Set OutFromFieldLimit=true
-             */
-            return false;
-        }
-
+        
         /// <summary>
         /// The Edge where was placed a basedPoint of new Rect limiti the possible AngleType for that new Rect
         /// </summary>
@@ -309,7 +276,7 @@ namespace GameEngine.Environment
         {
             Vector2 shiftToOtherAngleRectangel = GetShiftToOtherAngleRectangle(selectedBasePointAngleType);
             //Debug.Log($"initialBasePoint: [{selectedBasePointAngleType}]{basePoint} shift:{shiftToOtherAngleRectangel}");
-            NormalizedRectangle newNormalizedRectangle = new NormalizedRectangle(basePoint, shiftToOtherAngleRectangel,_drawRectangle);
+            NormalizedRectangle newNormalizedRectangle = new NormalizedRectangle(basePoint, shiftToOtherAngleRectangel);
             return newNormalizedRectangle;
         }
 

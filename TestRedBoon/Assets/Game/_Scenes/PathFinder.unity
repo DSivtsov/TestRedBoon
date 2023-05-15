@@ -151,7 +151,7 @@ Transform:
   m_GameObject: {fileID: 108541947}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 10, y: 10, z: 1}
+  m_LocalScale: {x: 5, y: 5, z: 1}
   m_Children: []
   m_Father: {fileID: 1600317445}
   m_RootOrder: 0
@@ -519,7 +519,7 @@ Transform:
   m_GameObject: {fileID: 1194497632}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 10, y: 10, z: 1}
+  m_LocalScale: {x: 20, y: 20, z: 1}
   m_Children: []
   m_Father: {fileID: 1600317445}
   m_RootOrder: 2
@@ -683,6 +683,7 @@ MonoBehaviour:
   _fieldSetting: {fileID: 11400000, guid: 197aa90684910134cb27ffd9549a60c0, type: 2}
   _drawRectangle: {fileID: 1623120596}
   _useSeedFromFieldSettingSO: 0
+  _NormalizedRectangleON: 0
 --- !u!4 &1623120595
 Transform:
   m_ObjectHideFlags: 0
@@ -814,7 +815,7 @@ Transform:
   m_GameObject: {fileID: 2051435042}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 10, y: 10, z: 1}
+  m_LocalScale: {x: 20, y: 20, z: 1}
   m_Children: []
   m_Father: {fileID: 1600317445}
   m_RootOrder: 1
