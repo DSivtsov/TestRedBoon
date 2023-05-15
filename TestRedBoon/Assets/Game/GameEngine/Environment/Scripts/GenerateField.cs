@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
 using System;
-
+using GMTools.Common;
 
 namespace GameEngine.Environment
 {
@@ -53,7 +53,7 @@ namespace GameEngine.Environment
 
         private void Injection()
         {
-            Debug.LogWarning("Injection()");
+            CountFrame.DebugLogWarningUpdate("Injection()");
             if (!_drawRectangle)
             {
                 _drawRectangle = gameObject.GetComponent<DrawRectangle>();
@@ -90,7 +90,7 @@ namespace GameEngine.Environment
         {
             _widthHalfField = _fieldSetting.WidthField / 2;
             _heightHalfField = _fieldSetting.HeightField / 2;
-            Debug.Log($"Field {_widthHalfField} {_heightHalfField}");
+            CountFrame.DebugLogUpdate($"Field {_widthHalfField} {_heightHalfField}");
             GetMaximumHeightWidthForRectangle();
             NormalizedRectangle.InitNormalizedRectangle(_widthHalfField, _heightHalfField, _drawRectangle);
             _pathFinderData.Init(_fieldSetting.MinNumberEdges);
@@ -101,7 +101,7 @@ namespace GameEngine.Environment
         {
             DeleteGameObjects();
 
-            Debug.LogError("DEBUG called CreateField():");
+            CountFrame.DebugLogWarningUpdate("DEBUG called CreateField():");
             _wasOutFromFieldLimit = false;
 
             _firstRect = CreateInitialRec();
@@ -124,7 +124,7 @@ namespace GameEngine.Environment
         private Vector2 CreateStartEndPointFindPath(NormalizedRectangle rect)
         {
             EdgeType edgeTypeWhereWillStartPointFindPath = SelectRandomAnyEdgeType();
-            Debug.Log($"StartEndPointFindPath EdgeType[{edgeTypeWhereWillStartPointFindPath}]");
+            CountFrame.DebugLogUpdate($"StartEndPointFindPath EdgeType[{edgeTypeWhereWillStartPointFindPath}]");
             return GetRandomPointOnEdge(rect, edgeTypeWhereWillStartPointFindPath);
         }
 
@@ -135,24 +135,21 @@ namespace GameEngine.Environment
 
             while (!_wasOutFromFieldLimit && (_fieldSetting.IsLimitedMaxNumberEdge && ++NumEdge <= _fieldSetting.MaxNumberEdges))
             {
-                Debug.LogWarning($"NumEdge={NumEdge}");
+                CountFrame.DebugLogUpdate($"NumEdge={NumEdge}");
 
                 EdgeType edgeTypeWhereWillNextRect = (NumEdge == 1) ? SelectRandomAnyEdgeType() : SelectRandomEdgeType(prevUsedEdgeType);
-                Debug.Log($"Next Rec will at [{edgeTypeWhereWillNextRect}] Edge");
+                CountFrame.DebugLogUpdate($"Next Rec will at [{edgeTypeWhereWillNextRect}] Edge");
                 
                 Vector2 startPointOnEdge = GetRandomPointOnEdge(_firstRect, edgeTypeWhereWillNextRect);
                 
                 EdgeType usedEdgeType = edgeTypeWhereWillNextRect;
                 BasePointAngleType selectedAngleType = SelectAngleTypeBasePoint(usedEdgeType);
-                Debug.Log($"basePoint={startPointOnEdge} selectedAngleType[{selectedAngleType}]");
+                CountFrame.DebugLogUpdate($"basePoint={startPointOnEdge} selectedAngleType[{selectedAngleType}]");
 
                 _secondRect = GetNewNormalizedRectangle(startPointOnEdge, selectedAngleType);
 
                 _wasOutFromFieldLimit = _secondRect.CutRectByFieldLimit(selectedAngleType);
-                if (_wasOutFromFieldLimit)
-                {
-                    Debug.LogError($"CutRectByFieldLimit()[{_wasOutFromFieldLimit}]");
-                }
+
                 _secondRect.Draw();
 
                 Vector2 endPointEdge = _firstRect.GetEndPointEdge(edgeTypeWhereWillNextRect, selectedAngleType);
@@ -189,7 +186,7 @@ namespace GameEngine.Environment
 
             BasePointAngleType selectedAngleType = SelectAnyAngleTypeForBasePoint();
 
-            Debug.Log($"basePoint={basePoint} selectedAngleTypeForBasePoint[{selectedAngleType}]");
+            CountFrame.DebugLogUpdate($"basePoint={basePoint} selectedAngleTypeForBasePoint[{selectedAngleType}]");
             NormalizedRectangle newNormalizedRectangle = GetNewNormalizedRectangle(basePoint, selectedAngleType);
             
             return newNormalizedRectangle;
@@ -277,7 +274,7 @@ namespace GameEngine.Environment
         private NormalizedRectangle GetNewNormalizedRectangle(Vector2 basePoint, BasePointAngleType selectedBasePointAngleType)
         {
             Vector2 shiftToOtherAngleRectangel = GetShiftToOtherAngleRectangle(selectedBasePointAngleType);
-            //Debug.Log($"initialBasePoint: [{selectedBasePointAngleType}]{basePoint} shift:{shiftToOtherAngleRectangel}");
+            //CountFrame.DebugLogUpdate($"initialBasePoint: [{selectedBasePointAngleType}]{basePoint} shift:{shiftToOtherAngleRectangel}");
             NormalizedRectangle newNormalizedRectangle = new NormalizedRectangle(basePoint, shiftToOtherAngleRectangel);
             return newNormalizedRectangle;
         }
@@ -316,7 +313,7 @@ namespace GameEngine.Environment
             _maxHeightRectangle = _heightHalfField / (_fieldSetting.MinNumberEdges + 1);
             CheckCalculatedRectangleSize(ref _maxHeightRectangle, _fieldSetting.MinHeightRectangle);
 
-            Debug.Log($"_maxWidthRectangle[{_maxWidthRectangle}] _maxHeightRectangle[{_maxHeightRectangle}]");
+            CountFrame.DebugLogUpdate($"_maxWidthRectangle[{_maxWidthRectangle}] _maxHeightRectangle[{_maxHeightRectangle}]");
         }
 
         private void CheckCalculatedRectangleSize(ref int calculatedRectangleSize, int minRectangleSize)

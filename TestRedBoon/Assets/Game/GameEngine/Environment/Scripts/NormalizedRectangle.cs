@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System;
-using System.Collections.Generic;
+using GMTools.Common;
 
 namespace GameEngine.Environment
 {
@@ -64,7 +64,7 @@ namespace GameEngine.Environment
 
             _bottomLeftAngel = new Vector2(bottomLeftX, bottomLeftY);
             _sizeXY = new Vector2(width, height);
-            if (IsTurnDebugCreation) Debug.Log(this); 
+            if (IsTurnDebugCreation) CountFrame.DebugLogUpdate(this.ToString()); 
         }
 
         public override string ToString()
@@ -125,7 +125,7 @@ namespace GameEngine.Environment
                 //float delta = -_heightField - checkAngle.y;
                 _bottomLeftAngel.y = -_heightField;
                 _sizeXY.y -= delta;
-                Debug.Log("CheckYMin() = true");
+                CountFrame.DebugLogUpdate("CheckYMin() = true");
                 return true;
             }
             else
@@ -137,7 +137,7 @@ namespace GameEngine.Environment
             if (checkAngle.y > _heightField)
             {
                 _sizeXY.y = _heightField - _bottomLeftAngel.y;
-                Debug.Log("CheckYMax() = true");
+                CountFrame.DebugLogUpdate("CheckYMax() = true");
                 return true;
             }
             else
@@ -149,7 +149,7 @@ namespace GameEngine.Environment
             if (checkAngle.x > _widthField)
             {
                 _sizeXY.x = _widthField - _bottomLeftAngel.x;
-                Debug.Log("CheckXMax() = true");
+                CountFrame.DebugLogUpdate("CheckXMax() = true");
                 return true;
             }
             else
@@ -165,7 +165,7 @@ namespace GameEngine.Environment
                 //float delta = -_widthField - checkAngle.x;
                 _bottomLeftAngel.x = -_widthField;
                 _sizeXY.x -= delta;
-                Debug.Log("CheckXMin() = true");
+                CountFrame.DebugLogUpdate("CheckXMin() = true");
                 return true;
             }
             else
