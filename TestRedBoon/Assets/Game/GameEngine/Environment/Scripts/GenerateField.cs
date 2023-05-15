@@ -31,6 +31,8 @@ namespace GameEngine.Environment
         [SerializeField] private FieldSettingSO _fieldSetting;
         [SerializeField] private DrawRectangle _drawRectangle;
         [SerializeField] private bool _useSeedFromFieldSettingSO = true;
+        [Header("DEBUG")]
+        [SerializeField] private bool _NormalizedRectangleON = true;
 
         private PathFinderData _pathFinderData;
         private System.Random _random;
@@ -39,7 +41,6 @@ namespace GameEngine.Environment
         //To Pass Minimum number of Edges
         private int _maxWidthRectangle;
         private int _maxHeightRectangle;
-        private EdgeType _prevEdgeType;
         private bool _isOutFromFieldLimit;
         private const int NUMEDGES = 4;
         private const int NUMEANGLE = 4;
@@ -67,6 +68,10 @@ namespace GameEngine.Environment
 
         private void Start()
         {
+            if (_NormalizedRectangleON)
+                NormalizedRectangle.IsTurnDebugCreation = true;
+            else
+                NormalizedRectangle.IsTurnDebugCreation = false;
             InitCreateField();
             _drawRectangle.DeleteDrownRectangle();
             CreateField();
@@ -90,47 +95,16 @@ namespace GameEngine.Environment
         [Button]
         private void CreateField()
         {
+            Debug.LogError("DEBUG called CreateField():");
             _isOutFromFieldLimit = false;
-            _prevEdgeType = EdgeType.Nothing;
+            //_prevEdgeType = EdgeType.Nothing;
 
             _firstRect = CreateInitialRec();
-
             _firstRect.Draw();
 
-            EdgeType edgeTypeWhereWillStartPointFindPath = SelectRandomEdgeType();
+            CreateStartPointFindPath();
 
-            _pathFinderData.StartPointFindPath = GetRandomPointOnEdge(_firstRect, edgeTypeWhereWillStartPointFindPath);
-
-            NumEdge = 0;
-
-            while (!_isOutFromFieldLimit && (_fieldSetting.IsLimitedMaxNumberEdge && ++NumEdge <= _fieldSetting.MaxNumberEdges))
-            {
-                Debug.LogWarning($"NumEdge={NumEdge}");
-                EdgeType edgeTypeWhereWillNextRect = SelectRandomEdgeType();
-                Vector2 startPointEdge = GetRandomPointOnEdge(_firstRect, edgeTypeWhereWillNextRect);
-
-                _prevEdgeType = edgeTypeWhereWillNextRect;
-
-                BasePointAngleType selectedBasePointAngleType = SelectAngleTypeBasePoint();
-                Debug.Log($"[{_prevEdgeType}] {selectedBasePointAngleType}");
-
-                NormalizedRectangle _secondRect = GetNewNormalizedRectangle(startPointEdge, selectedBasePointAngleType);
-                Debug.Log(_secondRect);
-                _isOutFromFieldLimit = CheckExitFromFieldLimit(_secondRect, selectedBasePointAngleType);
-                /*
-                 * 	CheckExitFromFieldLimit(NormolizedRect,TypeAngleBasePoint)
-		            attemp to out of Range of Field (in this case) the border the last Rect set on Border Field.
-                */
-                _secondRect.Draw();
-                Vector2 endPointEdge = GetPointOnEdgeRect(_firstRect, selectedBasePointAngleType);
-                /*
-                 * 	Create struct Edge()
-		                ConvertNormalizedRectToRectMinMax() for FirstRect/SecondRect
-	                    FirstRect,PevTypeEdge= NormolizedReact
-                 */
-                _firstRect = _secondRect;
-
-            }
+            CreateEdges();
             /*
              * Select  final Point for FindPath
 	                SecondRect SelectAnyTypeEdge Except PevTypeEdge
@@ -138,7 +112,49 @@ namespace GameEngine.Environment
              */
         }
 
+        private void CreateStartPointFindPath()
+        {
+            EdgeType edgeTypeWhereWillStartPointFindPath = SelectRandomAnyEdgeType();
+            Debug.Log($"StartPoint EdgeType[{edgeTypeWhereWillStartPointFindPath}]");
+            _pathFinderData.StartPointFindPath = GetRandomPointOnEdge(_firstRect, edgeTypeWhereWillStartPointFindPath);
+        }
 
+        private void CreateEdges()
+        {
+            NumEdge = 0;
+            EdgeType prevUsedEdgeType = EdgeType.Nothing;
+
+            while (!_isOutFromFieldLimit && (_fieldSetting.IsLimitedMaxNumberEdge && ++NumEdge <= _fieldSetting.MaxNumberEdges))
+            {
+                Debug.LogWarning($"NumEdge={NumEdge}");
+
+                EdgeType edgeTypeWhereWillNextRect = (NumEdge == 1) ? SelectRandomAnyEdgeType() : SelectRandomEdgeType(prevUsedEdgeType);
+                Debug.Log($"Next Rec will at [{edgeTypeWhereWillNextRect}] Edge");
+                
+                Vector2 startPointOnEdge = GetRandomPointOnEdge(_firstRect, edgeTypeWhereWillNextRect);
+                
+                EdgeType usedEdgeType = edgeTypeWhereWillNextRect;
+                BasePointAngleType selectedAngleType = SelectAngleTypeBasePoint(usedEdgeType);
+                Debug.Log($"basePoint={startPointOnEdge} selectedAngleType[{selectedAngleType}]");
+
+                NormalizedRectangle _secondRect = GetNewNormalizedRectangle(startPointOnEdge, selectedAngleType);
+                //Debug.Log(_secondRect);
+                _isOutFromFieldLimit = CheckExitFromFieldLimit(_secondRect, selectedAngleType);
+                /*
+                 * 	CheckExitFromFieldLimit(NormolizedRect,TypeAngleBasePoint)
+		            attemp to out of Range of Field (in this case) the border the last Rect set on Border Field.
+                */
+                _secondRect.Draw();
+                Vector2 endPointEdge = GetPointOnEdgeRect(_firstRect, selectedAngleType);
+                /*
+                 * 	Create struct Edge()
+		                ConvertNormalizedRectToRectMinMax() for FirstRect/SecondRect
+	                    FirstRect,PevTypeEdge= NormolizedReact
+                 */
+                _firstRect = _secondRect;
+                prevUsedEdgeType = edgeTypeWhereWillNextRect;
+            }
+        }
 
         private Vector2 GetPointOnEdgeRect(NormalizedRectangle firstRect, BasePointAngleType selectedBasePointAngleType)
         {
@@ -179,7 +195,10 @@ namespace GameEngine.Environment
             return false;
         }
 
-        Dictionary<EdgeType, List<BasePointAngleType>> possibleAngleTypeOnCurrentEdge = new Dictionary<EdgeType, List<BasePointAngleType>>()
+        /// <summary>
+        /// The Edge where was placed a basedPoint of new Rect limiti the possible AngleType for that new Rect
+        /// </summary>
+        Dictionary<EdgeType, List<BasePointAngleType>> possibleAngleTypeOnUsedEdge = new Dictionary<EdgeType, List<BasePointAngleType>>()
         {
             {EdgeType.Top, new List<BasePointAngleType>{BasePointAngleType.BottomRight, BasePointAngleType.BottomLeft} },
             {EdgeType.Bottom, new List<BasePointAngleType>{BasePointAngleType.TopRight, BasePointAngleType.TopLeft} },
@@ -187,30 +206,28 @@ namespace GameEngine.Environment
             {EdgeType.Left, new List<BasePointAngleType>{BasePointAngleType.BottomRight, BasePointAngleType.TopRight} },
         };
 
-        private BasePointAngleType SelectAngleTypeBasePoint()
+        private BasePointAngleType SelectAngleTypeBasePoint(EdgeType usedEdgeType)
         {
             int randomFromTwo = _random.Next(0, 2);
-            if (!possibleAngleTypeOnCurrentEdge.TryGetValue(_prevEdgeType, out List<BasePointAngleType> possibleAngleTypes))
-                throw new NotSupportedException($"Wrong value [{_prevEdgeType}]");
+            if (!possibleAngleTypeOnUsedEdge.TryGetValue(usedEdgeType, out List<BasePointAngleType> possibleAngleTypes))
+                throw new NotSupportedException($"Wrong value [{usedEdgeType}]");
             return possibleAngleTypes.ElementAt(randomFromTwo);
         }
 
-        [Button]
         private NormalizedRectangle CreateInitialRec()
         {
             Vector2 basePoint = new Vector2(_fieldSetting.CenterX, _fieldSetting.CenterY);
 
-            BasePointAngleType selectedBasePointAngleType = SelectAnyAngleTypeBasePoint();
+            BasePointAngleType selectedAngleType = SelectAnyAngleTypeBasePoint();
 
-            Debug.Log($"basePoint={basePoint} AngleType[{selectedBasePointAngleType}]");
-            NormalizedRectangle newNormalizedRectangle = GetNewNormalizedRectangle(basePoint, selectedBasePointAngleType);
-            Debug.Log(newNormalizedRectangle);
+            Debug.Log($"basePoint={basePoint} selectedAngleType[{selectedAngleType}]");
+            NormalizedRectangle newNormalizedRectangle = GetNewNormalizedRectangle(basePoint, selectedAngleType);
+            
             return newNormalizedRectangle;
         }
 
         private Vector2 GetRandomPointOnEdge(NormalizedRectangle currentRec, EdgeType edgeTypeWhereWillRandomPoint)
         {
-            Debug.Log($"EdgeType[{edgeTypeWhereWillRandomPoint}] of RandomPoint");
             Vector2 RandomPointOnEdge = SelectPointOnEdge(edgeTypeWhereWillRandomPoint, currentRec);
             return RandomPointOnEdge;
         }
@@ -239,28 +256,47 @@ namespace GameEngine.Environment
             }
         }
 
-
-
         private BasePointAngleType SelectAnyAngleTypeBasePoint()
         {
             return (BasePointAngleType)_random.Next(0, NUMEANGLE);
         }
 
-        private EdgeType SelectRandomEdgeType()
+        private EdgeType SelectRandomAnyEdgeType()
         {
-            if (_prevEdgeType == EdgeType.Nothing)
-            {
-                return (EdgeType)_random.Next(0, NUMEDGES);
-            }
-            else
-            {
-                // Get list of indexes of EdgeType exclude the index _prevEdgeType and EdgeType.Nothing
-                IEnumerable<int> modlistIdx = Enumerable.Range(0, NUMEDGES).Where((edge) => edge != (int)_prevEdgeType);
-                // Get from this list a random position, and get corespondent value at this position and convert to EdgeType
-                int rndPositionInList = _random.Next(0, modlistIdx.Count());
-                int valueRNDPosition = modlistIdx.ElementAt(rndPositionInList);
-                return (EdgeType)valueRNDPosition;
-            }
+            return (EdgeType)_random.Next(0, NUMEDGES);
+        }
+
+        /// <summary>
+        /// Randomly selection of edge for new Rect based on used Edge of previous Rect
+        /// </summary>
+        /// <param name="prevUsedEdge">Edge a previous Rect</param>
+        /// <returns></returns>
+        private EdgeType SelectRandomEdgeType(EdgeType prevUsedEdge)
+        {
+            // Get list of indexes of EdgeType exclude the index _prevEdgeType and EdgeType.Nothing
+            IEnumerable<int> modlistIdx = Enumerable.Range(0, NUMEDGES).Where((edge) => edge != (int)GetOpositeEdgeType(prevUsedEdge));
+            // Get from this list a random position, and get corespondent value at this position and convert to EdgeType
+            int rndPositionInList = _random.Next(0, modlistIdx.Count());
+            int valueRNDPosition = modlistIdx.ElementAt(rndPositionInList);
+            return (EdgeType)valueRNDPosition;
+        }
+
+        /// <summary>
+        /// The Edge where was placed a basedPoint of new Rect limiti the possible AngleType for that new Rect
+        /// </summary>
+        Dictionary<EdgeType, EdgeType> possibleOpositeEdge = new Dictionary<EdgeType, EdgeType>()
+        {
+            {EdgeType.Top, EdgeType.Bottom},
+            {EdgeType.Bottom, EdgeType.Top},
+            {EdgeType.Right, EdgeType.Left},
+            {EdgeType.Left, EdgeType.Right},
+        };
+
+        private EdgeType GetOpositeEdgeType(EdgeType edge)
+        {
+            if (!possibleOpositeEdge.TryGetValue(edge, out EdgeType opositeEdgeType))
+                throw new NotSupportedException($"Wrong value [{edge}]");
+            return opositeEdgeType;
         }
 
         /// <summary>
@@ -272,7 +308,7 @@ namespace GameEngine.Environment
         private NormalizedRectangle GetNewNormalizedRectangle(Vector2 basePoint, BasePointAngleType selectedBasePointAngleType)
         {
             Vector2 shiftToOtherAngleRectangel = GetShiftToOtherAngleRectangle(selectedBasePointAngleType);
-            Debug.Log($"initialBasePoint: [{selectedBasePointAngleType}]{basePoint} shift:{shiftToOtherAngleRectangel}");
+            //Debug.Log($"initialBasePoint: [{selectedBasePointAngleType}]{basePoint} shift:{shiftToOtherAngleRectangel}");
             NormalizedRectangle newNormalizedRectangle = new NormalizedRectangle(basePoint, shiftToOtherAngleRectangel,_drawRectangle);
             return newNormalizedRectangle;
         }

@@ -12,6 +12,8 @@ namespace GameEngine.Environment
         private DrawRectangle _drawRectangle;
         private bool _islinkedToDrawRectangle;
 
+        public static bool IsTurnDebugCreation { get; set; } = false;
+
         public Vector2 BottomLeftAngel => _bottomLeftAngel;
         public Vector2 SizeXY => _sizeXY;
 
@@ -38,6 +40,7 @@ namespace GameEngine.Environment
             _bottomLeftAngel = new Vector2(bottomLeftX, bottomLeftY);
             _sizeXY = new Vector2(width, height);
             LinkToDrawRectangle(drawRectangle);
+            if (IsTurnDebugCreation) Debug.Log(this); 
         }
 
         private void LinkToDrawRectangle(DrawRectangle drawRectangle)
