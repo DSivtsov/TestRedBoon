@@ -49,6 +49,7 @@ namespace GameEngine.Environment
         private int NumEdge;
 
         private NormalizedRectangle _firstRect;
+        private NormalizedRectangle _secondRect;
 
         private void Injection()
         {
@@ -106,14 +107,11 @@ namespace GameEngine.Environment
             _firstRect = CreateInitialRec();
             _firstRect.Draw();
 
-            CreateStartPointFindPath();
+            _pathFinderData.StartPointFindPath = CreateStartEndPointFindPath(_firstRect);
 
             CreateEdges();
-            /*
-             * Select  final Point for FindPath
-	                SecondRect SelectAnyTypeEdge Except PevTypeEdge
-	                SelectPointOnEdge
-             */
+
+            _pathFinderData.EndPointFindPath = CreateStartEndPointFindPath(_secondRect);
         }
 
         private void DeleteGameObjects()
@@ -123,11 +121,11 @@ namespace GameEngine.Environment
             _pathFinderData.SetInitialPoint();
         }
 
-        private void CreateStartPointFindPath()
+        private Vector2 CreateStartEndPointFindPath(NormalizedRectangle rect)
         {
             EdgeType edgeTypeWhereWillStartPointFindPath = SelectRandomAnyEdgeType();
-            Debug.Log($"StartPoint EdgeType[{edgeTypeWhereWillStartPointFindPath}]");
-            _pathFinderData.StartPointFindPath = GetRandomPointOnEdge(_firstRect, edgeTypeWhereWillStartPointFindPath);
+            Debug.Log($"StartEndPointFindPath EdgeType[{edgeTypeWhereWillStartPointFindPath}]");
+            return GetRandomPointOnEdge(rect, edgeTypeWhereWillStartPointFindPath);
         }
 
         private void CreateEdges()
@@ -148,20 +146,20 @@ namespace GameEngine.Environment
                 BasePointAngleType selectedAngleType = SelectAngleTypeBasePoint(usedEdgeType);
                 Debug.Log($"basePoint={startPointOnEdge} selectedAngleType[{selectedAngleType}]");
 
-                NormalizedRectangle secondRect = GetNewNormalizedRectangle(startPointOnEdge, selectedAngleType);
+                _secondRect = GetNewNormalizedRectangle(startPointOnEdge, selectedAngleType);
 
-                _wasOutFromFieldLimit = secondRect.CutRectByFieldLimit(selectedAngleType);
+                _wasOutFromFieldLimit = _secondRect.CutRectByFieldLimit(selectedAngleType);
                 if (_wasOutFromFieldLimit)
                 {
                     Debug.LogError($"CutRectByFieldLimit()[{_wasOutFromFieldLimit}]");
                 }
-                secondRect.Draw();
+                _secondRect.Draw();
 
                 Vector2 endPointEdge = _firstRect.GetEndPointEdge(edgeTypeWhereWillNextRect, selectedAngleType);
                 
-                _pathFinderData.AddEdge(_firstRect, secondRect, startPointOnEdge, endPointEdge);
+                _pathFinderData.AddEdge(_firstRect, _secondRect, startPointOnEdge, endPointEdge);
 
-                _firstRect = secondRect;
+                _firstRect = _secondRect;
                 prevUsedEdgeType = edgeTypeWhereWillNextRect;
             }
         }

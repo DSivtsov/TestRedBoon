@@ -60,7 +60,7 @@ namespace GameEngine.Environment
             set
             {
                 _startPointFindPath = value;
-                SetAndActivatePoint(_findPathStartPoint, value);
+                SetAndActivatePoint(_findPathStartPoint, _startPointFindPath);
             }
         }
 
@@ -69,8 +69,8 @@ namespace GameEngine.Environment
             get => _endPointFindPath;
             set
             {
-                _startPointFindPath = value;
-                SetAndActivatePoint(_findPathEndPoint, value);
+                _endPointFindPath = value;
+                SetAndActivatePoint(_findPathEndPoint, _endPointFindPath);
             }
         }
 

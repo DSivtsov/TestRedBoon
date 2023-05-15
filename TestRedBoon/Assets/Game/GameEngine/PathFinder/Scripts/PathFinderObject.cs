@@ -11,10 +11,9 @@ namespace GameEngine.PathFinder
 {
     public class PathFinderObject : MonoBehaviour, IPathFinder
     {
-        [ReadOnly, ShowInInspector] private PathFinderData _pathFinderData;
+        [SerializeField] private PathFinderData _pathFinderData;
         [ReadOnly, ShowInInspector] private List<Vector2> _pathFounded;
 
-       // public PathFinderData PathFinderData => _pathFinderData;
         public List<Vector2> PathFounded => _pathFounded;
 
         [Button]
@@ -61,6 +60,7 @@ namespace GameEngine.PathFinder
             {
                 Debug.Log("Absent Edges");
             }
+            Debug.Log($"CheckData() passed. No detected errors. Found [{_pathFinderData.ListEdges.Count}] Edges");
         }
 
         public IEnumerable<Vector2> GetPath(Vector2 startPointFindPath, Vector2 endPointFindPath, IEnumerable<Edge> edges)
