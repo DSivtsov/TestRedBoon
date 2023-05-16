@@ -23,7 +23,7 @@ namespace GameEngine.Environment
         /// <param name="normalizedRectangle">NormalizedRectangle</param>
         /// <param name="nameNewRectangle">name new GameObject</param>
         [Button]
-        public void Draw(NormalizedRectangle normalizedRectangle, string nameNewRectangle = "NewRectangle")
+        public void Draw(NormalizedRectangle normalizedRectangle, string nameNewRectangle)
         {
             Transform transformRectangle = Instantiate<Transform>(_rectanglePrefab, _transformParent);
             transformRectangle.position = normalizedRectangle.BottomLeftAngel;
@@ -39,6 +39,7 @@ namespace GameEngine.Environment
             {
                 Object.Destroy(item.gameObject);
             }
+            NormalizedRectangle.ClearNumRect();
         }
     } 
 }

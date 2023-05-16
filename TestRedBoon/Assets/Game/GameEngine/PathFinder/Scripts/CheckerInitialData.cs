@@ -52,7 +52,67 @@ namespace GameEngine.PathFinder
         private bool CheckExistOverlapingRectangle()
         {
             Debug.LogWarning("Not ExistOverlapingRectangle()");
+            Rectangle[] allRectangles = GetListAllRectangles(_pathFinderData.ListEdges);
+            for (int idxCheckedRec = 0; idxCheckedRec < allRectangles.Length - 1; idxCheckedRec++)
+            {
+                Rectangle checkedRec = allRectangles[idxCheckedRec];
+                for (int idxOtherRec = idxCheckedRec + 1; idxOtherRec < allRectangles.Length; idxOtherRec++)
+                {
+                    if (ExistOverlapingRectangle(checkedRec, allRectangles[idxOtherRec]))
+                    {
+                        Debug.Log($"idxCheckedRec[{idxCheckedRec}] OtherRect[{idxOtherRec}] ExistOverlapingRectangle[true]");
+                        return true;
+                    }
+                }
+            }
             return false;
+        }
+
+
+
+        private bool ExistOverlapingRectangle(Rectangle checkedRec, Rectangle otherRec)
+        {
+            Vector2[] angles = GetAnglesFromRectangle(otherRec);
+            for (int angle = 0; angle < angles.Length; angle++)
+            {
+                if (IsAnglesInRect(angles[angle], checkedRec))
+                {
+                    Debug.Log($"DEMO!!! AngleType[{(AngleType)angle}] IsAnglesInRect[true]");
+                    Debug.Log($"checkedRec[{show(checkedRec)}] angleOtherRec{angles[angle]} ");
+                    return true; 
+                }
+            }
+            return false;
+        }
+
+        private string show(Rectangle rec) => $"Min{rec.Min} Max{rec.Max}";
+
+        private bool IsAnglesInRect(Vector2 angle, Rectangle checkedRec)
+        {
+            return angle.x > checkedRec.Min.x && angle.x < checkedRec.Max.x
+                && angle.y > checkedRec.Min.y && angle.y < checkedRec.Max.y;
+        }
+
+        private Vector2[] GetAnglesFromRectangle(Rectangle otherRec)
+        {
+            return new Vector2[]
+            {
+                new Vector2(otherRec.Min.x,otherRec.Max.y), //TopLeft = 0,
+                new Vector2(otherRec.Max.x,otherRec.Max.y), //TopRight = 1,
+                new Vector2(otherRec.Max.x,otherRec.Min.y), //BottomRight = 2,
+                new Vector2(otherRec.Min.x,otherRec.Min.y), //BottomLeft = 3,
+            };
+        }
+
+        private Rectangle[] GetListAllRectangles(List<Edge> listEdges)
+        {
+            Rectangle[] allRectangles = new Rectangle[listEdges.Count + 1];
+            allRectangles[0] = listEdges[0].First;
+            for (int i = 0; i < listEdges.Count; i++)
+            {
+                allRectangles[i + 1] = listEdges[i].Second;
+            }
+            return allRectangles;
         }
 
 

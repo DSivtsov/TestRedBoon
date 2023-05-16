@@ -8,34 +8,12 @@ using GMTools.Common;
 
 namespace GameEngine.Environment
 {
-    public enum BasePointAngleType
-    {
-        TopLeft = 0,
-        TopRight = 1,
-        BottomRight = 2,
-        BottomLeft = 3,
-    }
-
-    public enum EdgeType
-    {
-        Top = 0,
-        Right = 1,
-        Bottom = 2,
-        Left = 3,
-        Nothing = 4,
-    }
-
     public class GenerateField : MonoBehaviour
     {
         [SerializeField] private PathFinderData _pathFinderData;
         [SerializeField] private FieldSettingSO _fieldSetting;
         [SerializeField] private DrawRectangle _drawRectangle;
         [SerializeField] private bool _useSeedFromFieldSettingSO = true;
-        [Header("DEBUG")]
-        [SerializeField] private bool _NormalizedRectangleON = true;
-
-
-
 
         private System.Random _random;
         private int _widthHalfField;
@@ -71,11 +49,7 @@ namespace GameEngine.Environment
 
         private void Start()
         {
-            if (_NormalizedRectangleON)
-                NormalizedRectangle.IsTurnDebugCreation = true;
-            else
-                NormalizedRectangle.IsTurnDebugCreation = false;
-            
+
             CreateField();
         }
 
@@ -143,16 +117,16 @@ namespace GameEngine.Environment
                 Vector2 startPointOnEdge = GetRandomPointOnEdge(_firstRect, edgeTypeWhereWillNextRect);
                 
                 EdgeType usedEdgeType = edgeTypeWhereWillNextRect;
-                BasePointAngleType selectedAngleType = SelectAngleTypeBasePoint(usedEdgeType);
-                CountFrame.DebugLogUpdate($"basePoint={startPointOnEdge} selectedAngleType[{selectedAngleType}]");
+                AngleType selectedAngleTypeBasePoint = SelectAngleTypeBasePoint(usedEdgeType);
+                CountFrame.DebugLogUpdate($"basePoint={startPointOnEdge} selectedAngleType[{selectedAngleTypeBasePoint}]");
 
-                _secondRect = GetNewNormalizedRectangle(startPointOnEdge, selectedAngleType);
+                _secondRect = GetNewNormalizedRectangle(startPointOnEdge, selectedAngleTypeBasePoint);
 
-                _wasOutFromFieldLimit = _secondRect.CutRectByFieldLimit(selectedAngleType);
+                _wasOutFromFieldLimit = _secondRect.CutRectByFieldLimit(selectedAngleTypeBasePoint);
 
                 _secondRect.Draw();
 
-                Vector2 endPointEdge = _firstRect.GetEndPointEdge(edgeTypeWhereWillNextRect, selectedAngleType);
+                Vector2 endPointEdge = _firstRect.GetEndPointEdge(edgeTypeWhereWillNextRect, selectedAngleTypeBasePoint);
                 
                 _pathFinderData.AddEdge(_firstRect, _secondRect, startPointOnEdge, endPointEdge);
 
@@ -164,30 +138,30 @@ namespace GameEngine.Environment
         /// <summary>
         /// The Edge where was placed a basedPoint of new Rect limiti the possible AngleType for that new Rect
         /// </summary>
-        Dictionary<EdgeType, List<BasePointAngleType>> possibleAngleTypeOnUsedEdge = new Dictionary<EdgeType, List<BasePointAngleType>>()
+        Dictionary<EdgeType, List<AngleType>> possibleAngleTypeOnUsedEdge = new Dictionary<EdgeType, List<AngleType>>()
         {
-            {EdgeType.Top, new List<BasePointAngleType>{BasePointAngleType.BottomRight, BasePointAngleType.BottomLeft} },
-            {EdgeType.Bottom, new List<BasePointAngleType>{BasePointAngleType.TopRight, BasePointAngleType.TopLeft} },
-            {EdgeType.Right, new List<BasePointAngleType>{BasePointAngleType.TopLeft, BasePointAngleType.BottomLeft} },
-            {EdgeType.Left, new List<BasePointAngleType>{BasePointAngleType.BottomRight, BasePointAngleType.TopRight} },
+            {EdgeType.Top, new List<AngleType>{AngleType.BottomRight, AngleType.BottomLeft} },
+            {EdgeType.Bottom, new List<AngleType>{AngleType.TopRight, AngleType.TopLeft} },
+            {EdgeType.Right, new List<AngleType>{AngleType.TopLeft, AngleType.BottomLeft} },
+            {EdgeType.Left, new List<AngleType>{AngleType.BottomRight, AngleType.TopRight} },
         };
 
-        private BasePointAngleType SelectAngleTypeBasePoint(EdgeType usedEdgeType)
+        private AngleType SelectAngleTypeBasePoint(EdgeType usedEdgeType)
         {
             int randomFromTwo = _random.Next(0, 2);
-            if (!possibleAngleTypeOnUsedEdge.TryGetValue(usedEdgeType, out List<BasePointAngleType> possibleAngleTypes))
+            if (!possibleAngleTypeOnUsedEdge.TryGetValue(usedEdgeType, out List<AngleType> possibleAngleTypesBasePoint))
                 throw new NotSupportedException($"Wrong value [{usedEdgeType}]");
-            return possibleAngleTypes.ElementAt(randomFromTwo);
+            return possibleAngleTypesBasePoint.ElementAt(randomFromTwo);
         }
 
         private NormalizedRectangle CreateInitialRec()
         {
             Vector2 basePoint = new Vector2(_fieldSetting.CenterX, _fieldSetting.CenterY);
 
-            BasePointAngleType selectedAngleType = SelectAnyAngleTypeForBasePoint();
+            AngleType selectedAngleTypeBasePoint = SelectAnyAngleTypeForBasePoint();
 
-            CountFrame.DebugLogUpdate($"basePoint={basePoint} selectedAngleTypeForBasePoint[{selectedAngleType}]");
-            NormalizedRectangle newNormalizedRectangle = GetNewNormalizedRectangle(basePoint, selectedAngleType);
+            CountFrame.DebugLogUpdate($"basePoint={basePoint} selectedAngleTypeForBasePoint[{selectedAngleTypeBasePoint}]");
+            NormalizedRectangle newNormalizedRectangle = GetNewNormalizedRectangle(basePoint, selectedAngleTypeBasePoint);
             
             return newNormalizedRectangle;
         }
@@ -222,9 +196,9 @@ namespace GameEngine.Environment
             }
         }
 
-        private BasePointAngleType SelectAnyAngleTypeForBasePoint()
+        private AngleType SelectAnyAngleTypeForBasePoint()
         {
-            return (BasePointAngleType)_random.Next(0, NUMEANGLE);
+            return (AngleType)_random.Next(0, NUMEANGLE);
         }
 
         private EdgeType SelectRandomAnyEdgeType()
@@ -271,7 +245,7 @@ namespace GameEngine.Environment
         /// <param name="basePoint"></param>
         /// <param name="selectedBasePointAngleType"></param>
         /// <returns></returns>
-        private NormalizedRectangle GetNewNormalizedRectangle(Vector2 basePoint, BasePointAngleType selectedBasePointAngleType)
+        private NormalizedRectangle GetNewNormalizedRectangle(Vector2 basePoint, AngleType selectedBasePointAngleType)
         {
             Vector2 shiftToOtherAngleRectangel = GetShiftToOtherAngleRectangle(selectedBasePointAngleType);
             //CountFrame.DebugLogUpdate($"initialBasePoint: [{selectedBasePointAngleType}]{basePoint} shift:{shiftToOtherAngleRectangel}");
@@ -279,24 +253,24 @@ namespace GameEngine.Environment
             return newNormalizedRectangle;
         }
 
-        private Vector2 GetShiftToOtherAngleRectangle(BasePointAngleType basePointAngleType)
+        private Vector2 GetShiftToOtherAngleRectangle(AngleType basePointAngleType)
         {
             int widthRectangle = _random.Next(_fieldSetting.MinWidthRectangle, (_maxWidthRectangle + 1));
             int heightRectangle = _random.Next(_fieldSetting.MinHeightRectangle, (_maxHeightRectangle + 1));
             return new Vector2(widthRectangle, heightRectangle) * GetDirectionShiftToOtherAngleRectangle(basePointAngleType);
         }
 
-        private Vector2 GetDirectionShiftToOtherAngleRectangle(BasePointAngleType basePointAngleType)
+        private Vector2 GetDirectionShiftToOtherAngleRectangle(AngleType basePointAngleType)
         {
             switch (basePointAngleType)
             {
-                case BasePointAngleType.TopLeft:
+                case AngleType.TopLeft:
                     return new Vector2(1, -1);
-                case BasePointAngleType.TopRight:
+                case AngleType.TopRight:
                     return new Vector2(-1, -1);
-                case BasePointAngleType.BottomRight:
+                case AngleType.BottomRight:
                     return new Vector2(-1, 1);
-                case BasePointAngleType.BottomLeft:
+                case AngleType.BottomLeft:
                     return new Vector2(1, 1);
                 default:
                     throw new System.NotSupportedException($"Wrong value [{basePointAngleType}]");

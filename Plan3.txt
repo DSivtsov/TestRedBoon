@@ -1,0 +1,26 @@
+interface IPathFinder
+{
+IEnumerable<Vector2> GetPath(Vector2 A, Vector2 C, IEnumerable<Edge> edges);
+}
+
+struct Rectangle
+{
+public Vector2 Min;
+public Vector2 Max;
+}
+struct Edge
+{
+public Rectangle First;
+public Rectangle Second;
+public Vector3 Start;
+public Vector3 End;
+}
+
+CheckExistOverlapingRectangle
+	
+	GetListAllRectangles
+	for i = 0 to lenght - 1
+		for j = i +1 to end lenght
+			if( ExistOverlaping(list[i],list[j]))
+				return true
+	return false

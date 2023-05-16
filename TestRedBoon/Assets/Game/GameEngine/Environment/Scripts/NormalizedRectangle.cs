@@ -13,14 +13,14 @@ namespace GameEngine.Environment
         private static DrawRectangle _drawRectangle;
         private static bool _islinkedToDrawRectangle;
 
-        public static bool IsTurnDebugCreation { get; set; } = false;
-
         public Vector2 BottomLeftAngel => _bottomLeftAngel;
         public Vector2 SizeXY => _sizeXY;
 
         private static int _widthField;
         private static int _heightField;
         private static bool _isFieldLimiInited;
+
+        private static ushort _countRect = 0;
 
         public static void InitNormalizedRectangle(int widthField, int heightField, DrawRectangle drawRectangle)
         {
@@ -49,6 +49,8 @@ namespace GameEngine.Environment
             _islinkedToDrawRectangle = false;
         }
 
+        public static void ClearNumRect() => _countRect = 0;
+
         public NormalizedRectangle(Vector2 basePoint, Vector2 shiftToOtherAngleRectangel)
         {
             Vector2 otherPoint = basePoint + shiftToOtherAngleRectangel;
@@ -64,7 +66,8 @@ namespace GameEngine.Environment
 
             _bottomLeftAngel = new Vector2(bottomLeftX, bottomLeftY);
             _sizeXY = new Vector2(width, height);
-            if (IsTurnDebugCreation) CountFrame.DebugLogUpdate(this.ToString()); 
+            _countRect++;
+            CountFrame.DebugLogUpdate(this.ToString()); 
         }
 
         public override string ToString()
@@ -76,7 +79,7 @@ namespace GameEngine.Environment
         {
             if (_islinkedToDrawRectangle)
             {
-                _drawRectangle.Draw(this); 
+                _drawRectangle.Draw(this,$"Rect{_countRect-1}"); 
             }
             else
                 throw new NotImplementedException("NormalizedRectangle:  Not linked to DrawRectangle");
@@ -86,31 +89,31 @@ namespace GameEngine.Environment
         /// <summary>
         /// Cut boundaries Rect if it was out from field Limit
         /// </summary>
-        /// <param name="usedAngleType">BasePointAngleType which was used for creation secondRect</param>
+        /// <param name="usedBasePointAngleType">BasePointAngleType which was used for creation secondRect</param>
         /// <returns>true if was out from FieldLimit</returns>
-        public bool CutRectByFieldLimit(BasePointAngleType usedAngleType)
+        public bool CutRectByFieldLimit(AngleType usedBasePointAngleType)
         {
             if (_isFieldLimiInited)
             {
-                switch (usedAngleType)
+                switch (usedBasePointAngleType)
                 {
-                    case BasePointAngleType.TopLeft:
+                    case AngleType.TopLeft:
                         Vector2 bottomRightAngle = new Vector2(_bottomLeftAngel.x + _sizeXY.x, _bottomLeftAngel.y);
                         return CheckXMax(bottomRightAngle) | CheckYMin(bottomRightAngle);
 
-                    case BasePointAngleType.TopRight:
+                    case AngleType.TopRight:
                         return CheckXMin(_bottomLeftAngel) | CheckYMin(_bottomLeftAngel);
 
-                    case BasePointAngleType.BottomRight:
+                    case AngleType.BottomRight:
                         Vector2 topLeftAngle = new Vector2(_bottomLeftAngel.x, _bottomLeftAngel.y + _sizeXY.y);
                           return CheckXMin(topLeftAngle) | CheckYMax(topLeftAngle);
 
-                    case BasePointAngleType.BottomLeft:
+                    case AngleType.BottomLeft:
                         Vector2 topRightAngle = _bottomLeftAngel +  _sizeXY;
                          return CheckXMax(topRightAngle) | CheckYMax(topRightAngle);
 
                     default:
-                        throw new NotSupportedException($"Not supported AngleType[{usedAngleType}]");
+                        throw new NotSupportedException($"Not supported AngleType[{usedBasePointAngleType}]");
                 }
             }
             throw new NotImplementedException("FieldLimit not inited");
@@ -179,7 +182,7 @@ namespace GameEngine.Environment
         /// <param name="edgeWasUsed">edge of First Rect connected to second Rect</param>
         /// <param name="angleTypeBasePoint">BasePointAngleType was used to create second Rect</param>
         /// <returns></returns>
-        public Vector2 GetEndPointEdge(EdgeType edgeWasUsed, BasePointAngleType angleTypeBasePoint)
+        public Vector2 GetEndPointEdge(EdgeType edgeWasUsed, AngleType angleTypeBasePoint)
         {
             Vector2 topRightAngle = _bottomLeftAngel + _sizeXY;
             float x, y;
@@ -187,19 +190,19 @@ namespace GameEngine.Environment
             {
                 case EdgeType.Top:
                     y = topRightAngle.y;
-                    x = (angleTypeBasePoint == BasePointAngleType.BottomRight)? _bottomLeftAngel.x : topRightAngle.x;
+                    x = (angleTypeBasePoint == AngleType.BottomRight)? _bottomLeftAngel.x : topRightAngle.x;
                     break;
                 case EdgeType.Right:
                     x = topRightAngle.x;
-                    y = (angleTypeBasePoint == BasePointAngleType.TopLeft) ? _bottomLeftAngel.y : topRightAngle.y;
+                    y = (angleTypeBasePoint == AngleType.TopLeft) ? _bottomLeftAngel.y : topRightAngle.y;
                     break;
                 case EdgeType.Bottom:
                     y = _bottomLeftAngel.y;
-                    x = (angleTypeBasePoint == BasePointAngleType.TopRight) ? _bottomLeftAngel.x : topRightAngle.x;
+                    x = (angleTypeBasePoint == AngleType.TopRight) ? _bottomLeftAngel.x : topRightAngle.x;
                     break;
                 case EdgeType.Left:
                     x = _bottomLeftAngel.x;
-                    y = (angleTypeBasePoint == BasePointAngleType.TopRight) ? _bottomLeftAngel.y : topRightAngle.y;
+                    y = (angleTypeBasePoint == AngleType.TopRight) ? _bottomLeftAngel.y : topRightAngle.y;
                     break;
                 case EdgeType.Nothing:
                 default:
