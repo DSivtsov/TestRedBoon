@@ -75,6 +75,9 @@ namespace GameEngine.Environment
         {
             DeleteGameObjects();
 
+            if (!_useSeedFromFieldSettingSO)
+                ReInitializeRandom();
+
             CountFrame.DebugLogWarningUpdate("DEBUG called CreateField():");
             _wasOutFromFieldLimit = false;
 
@@ -88,11 +91,19 @@ namespace GameEngine.Environment
             _pathFinderData.EndPointFindPath = CreateStartEndPointFindPath(_secondRect);
         }
 
+        private void ReInitializeRandom()
+        {
+            int newSeed = _random.Next();
+            Debug.LogWarning($"DEBUG ONLY: Will used new SEED={newSeed}");
+            _random = new System.Random(newSeed);
+        }
+
         private void DeleteGameObjects()
         {
             _drawRectangle.DeleteDrownRectangle();
             _pathFinderData.DeletePoints();
             _pathFinderData.SetInitialPoint();
+            _pathFinderData.ClearPreviousResults();
         }
 
         private Vector2Int CreateStartEndPointFindPath(NormalizedRectangle rect)

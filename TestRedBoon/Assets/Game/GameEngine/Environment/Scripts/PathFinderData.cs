@@ -108,6 +108,11 @@ namespace GameEngine.Environment
             CreateEdgePoints(edge);
         }
 
+        public void ClearPreviousResults()
+        {
+            _listEdges.Clear();
+        }
+
         private void CreateEdgePoints(Edge edge)
         {
             SetAndActivatePoint(_prefabStartEdge, (Vector2)edge.Start);

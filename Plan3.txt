@@ -16,6 +16,9 @@ public Vector3 Start;
 public Vector3 End;
 }
 
+--------------------------//----------------------------------
+Corect the Point created by Instantiate in Create Rec and in Checkinn Data (Wrong Z)???
+--------------------------//----------------------------------
 CheckExistOverlapingRectangle
 	
 	GetListAllRectangles
@@ -24,3 +27,15 @@ CheckExistOverlapingRectangle
 			if( ExistOverlaping(list[i],list[j]))
 				return true
 	return false
+
+Additional Checks:
+	After CheckExistOverlapingRectangle()
+	Check Corect Edge (absent space between first and seconf rec)
+		If Contains in first and second rec
+		Dots StartEdge and EndEdge correctly set the its right order
+	
+	Before 	CheckExistOverlapingRectangle CheckAllRectangleCorrect
+		the Min & Max is thr BootomLeft and TopRight
+	
+	Check PointFindPath (Can Exist Flaf IsPointsFindPathMustBeOnEdgeRectanle - yes/no )
+		startPointFindPath and endPointFindPath Contains in first and last Rectangle
