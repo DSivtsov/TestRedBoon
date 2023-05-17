@@ -10,13 +10,17 @@ using GameEngine.Environment;
 namespace GameEngine.PathFinder
 {
     [Serializable]
-    public class CheckerInitialData
+    public class CheckerInitialData : MonoBehaviour
     {
+        [SerializeField] Transform _prefabPOI;
         private PathFinderData _pathFinderData;
 
-        public CheckerInitialData(PathFinderData pathFinderData)
+        private Transform _pathFinderTransform;
+
+        public void InitialData(PathFinderData pathFinderData)
         {
             this._pathFinderData = pathFinderData;
+            _pathFinderTransform = _pathFinderData.transform;
         }
 
         [Button]
@@ -75,17 +79,25 @@ namespace GameEngine.PathFinder
             Vector2[] angles = GetAnglesFromRectangle(otherRec);
             for (int angle = 0; angle < angles.Length; angle++)
             {
-                if (IsAnglesInRect(angles[angle], checkedRec))
+                Vector2 checkedAngle = angles[angle];
+                if (IsAnglesInRect(checkedAngle, checkedRec))
                 {
                     Debug.Log($"DEMO!!! AngleType[{(AngleType)angle}] IsAnglesInRect[true]");
-                    Debug.Log($"checkedRec[{show(checkedRec)}] angleOtherRec{angles[angle]} ");
+                    Debug.Log($"checkedRec[{ShowRect(checkedRec)}] angleOtherRec{checkedAngle} ");
+                    ShowPoI(checkedAngle);
                     return true; 
                 }
             }
             return false;
         }
 
-        private string show(Rectangle rec) => $"Min{rec.Min} Max{rec.Max}";
+        private void ShowPoI(Vector2 checkedAngle)
+        {
+            Transform transform = Instantiate(_prefabPOI, _pathFinderTransform);
+            transform.position = checkedAngle;
+        }
+
+        private string ShowRect(Rectangle rec) => $"Min{rec.Min} Max{rec.Max}";
 
         private bool IsAnglesInRect(Vector2 angle, Rectangle checkedRec)
         {

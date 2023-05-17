@@ -102,7 +102,7 @@ namespace GameEngine.Environment
         public void AddEdge(NormalizedRectangle firstRect, NormalizedRectangle secondRect, Vector2 startPointOnEdge, Vector2 endPointEdge)
         {
             Rectangle first = new Rectangle(firstRect.BottomLeftAngel, firstRect.BottomLeftAngel + firstRect.SizeXY);
-            Rectangle second = new Rectangle(secondRect.BottomLeftAngel, secondRect.BottomLeftAngel + firstRect.SizeXY);
+            Rectangle second = new Rectangle(secondRect.BottomLeftAngel, secondRect.BottomLeftAngel + secondRect.SizeXY);
             Edge edge = new Edge(first, second, startPointOnEdge, endPointEdge);
             _listEdges.Add(edge);
             CreateEdgePoints(edge);
