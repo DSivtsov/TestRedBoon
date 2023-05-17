@@ -7,14 +7,14 @@ namespace GameEngine.Environment
     [Serializable]
     public class NormalizedRectangle
     {
-        private Vector2 _bottomLeftAngel;
-        private Vector2 _sizeXY;
+        private Vector2Int _bottomLeftAngel;
+        private Vector2Int _sizeXY;
 
         private static DrawRectangle _drawRectangle;
         private static bool _islinkedToDrawRectangle;
 
-        public Vector2 BottomLeftAngel => _bottomLeftAngel;
-        public Vector2 SizeXY => _sizeXY;
+        public Vector2Int BottomLeftAngel => _bottomLeftAngel;
+        public Vector2Int SizeXY => _sizeXY;
 
         private static int _widthField;
         private static int _heightField;
@@ -44,28 +44,28 @@ namespace GameEngine.Environment
 
         public NormalizedRectangle()
         {
-            _bottomLeftAngel = Vector2.zero;
-            _sizeXY = Vector2.one;
+            _bottomLeftAngel = Vector2Int.zero;
+            _sizeXY = Vector2Int.one;
             _islinkedToDrawRectangle = false;
         }
 
         public static void ClearNumRect() => _countRect = 0;
 
-        public NormalizedRectangle(Vector2 basePoint, Vector2 shiftToOtherAngleRectangel)
+        public NormalizedRectangle(Vector2Int basePoint, Vector2Int shiftToOtherAngleRectangel)
         {
-            Vector2 otherPoint = basePoint + shiftToOtherAngleRectangel;
+            Vector2Int otherPoint = basePoint + shiftToOtherAngleRectangel;
 
-            float bottomLeftX = Math.Min(basePoint.x, otherPoint.x);
-            float bottomLeftY = Math.Min(basePoint.y, otherPoint.y);
+            int bottomLeftX = Math.Min(basePoint.x, otherPoint.x);
+            int bottomLeftY = Math.Min(basePoint.y, otherPoint.y);
 
-            float topRightX = Math.Max(basePoint.x, otherPoint.x);
-            float topRightY = Math.Max(basePoint.y, otherPoint.y);
+            int topRightX = Math.Max(basePoint.x, otherPoint.x);
+            int topRightY = Math.Max(basePoint.y, otherPoint.y);
 
-            float width = topRightX - bottomLeftX;
-            float height = topRightY - bottomLeftY;
+            int width = topRightX - bottomLeftX;
+            int height = topRightY - bottomLeftY;
 
-            _bottomLeftAngel = new Vector2(bottomLeftX, bottomLeftY);
-            _sizeXY = new Vector2(width, height);
+            _bottomLeftAngel = new Vector2Int(bottomLeftX, bottomLeftY);
+            _sizeXY = new Vector2Int(width, height);
             _countRect++;
             CountFrame.DebugLogUpdate(this.ToString()); 
         }
@@ -98,18 +98,18 @@ namespace GameEngine.Environment
                 switch (usedBasePointAngleType)
                 {
                     case AngleType.TopLeft:
-                        Vector2 bottomRightAngle = new Vector2(_bottomLeftAngel.x + _sizeXY.x, _bottomLeftAngel.y);
+                        Vector2Int bottomRightAngle = new Vector2Int(_bottomLeftAngel.x + _sizeXY.x, _bottomLeftAngel.y);
                         return CheckXMax(bottomRightAngle) | CheckYMin(bottomRightAngle);
 
                     case AngleType.TopRight:
                         return CheckXMin(_bottomLeftAngel) | CheckYMin(_bottomLeftAngel);
 
                     case AngleType.BottomRight:
-                        Vector2 topLeftAngle = new Vector2(_bottomLeftAngel.x, _bottomLeftAngel.y + _sizeXY.y);
+                        Vector2Int topLeftAngle = new Vector2Int(_bottomLeftAngel.x, _bottomLeftAngel.y + _sizeXY.y);
                           return CheckXMin(topLeftAngle) | CheckYMax(topLeftAngle);
 
                     case AngleType.BottomLeft:
-                        Vector2 topRightAngle = _bottomLeftAngel +  _sizeXY;
+                        Vector2Int topRightAngle = _bottomLeftAngel +  _sizeXY;
                          return CheckXMax(topRightAngle) | CheckYMax(topRightAngle);
 
                     default:
@@ -119,9 +119,9 @@ namespace GameEngine.Environment
             throw new NotImplementedException("FieldLimit not inited");
         }
 
-        private bool CheckYMin(Vector2 checkAngle)
+        private bool CheckYMin(Vector2Int checkAngle)
         {
-            float delta = -_heightField - checkAngle.y;
+            int delta = -_heightField - checkAngle.y;
             //if (checkAngle.y < -_heightField)
             if (delta > 0)
             {
@@ -135,7 +135,7 @@ namespace GameEngine.Environment
                 return false;
         }
 
-        private bool CheckYMax(Vector2 checkAngle)
+        private bool CheckYMax(Vector2Int checkAngle)
         {
             if (checkAngle.y > _heightField)
             {
@@ -147,7 +147,7 @@ namespace GameEngine.Environment
                 return false;
         }
 
-        private bool CheckXMax(Vector2 checkAngle)
+        private bool CheckXMax(Vector2Int checkAngle)
         {
             if (checkAngle.x > _widthField)
             {
@@ -159,9 +159,9 @@ namespace GameEngine.Environment
                 return false;
         }
 
-        private bool CheckXMin(Vector2 checkAngle)
+        private bool CheckXMin(Vector2Int checkAngle)
         {
-            float delta = -_widthField - checkAngle.x;
+            int delta = -_widthField - checkAngle.x;
             //if (checkAngle.x < -_widthField)
             if (delta > 0)
             {
@@ -182,10 +182,10 @@ namespace GameEngine.Environment
         /// <param name="edgeWasUsed">edge of First Rect connected to second Rect</param>
         /// <param name="angleTypeBasePoint">BasePointAngleType was used to create second Rect</param>
         /// <returns></returns>
-        public Vector2 GetEndPointEdge(EdgeType edgeWasUsed, AngleType angleTypeBasePoint)
+        public Vector2Int GetEndPointEdge(EdgeType edgeWasUsed, AngleType angleTypeBasePoint)
         {
-            Vector2 topRightAngle = _bottomLeftAngel + _sizeXY;
-            float x, y;
+            Vector2Int topRightAngle = _bottomLeftAngel + _sizeXY;
+            int x, y;
             switch (edgeWasUsed)
             {
                 case EdgeType.Top:
@@ -208,7 +208,7 @@ namespace GameEngine.Environment
                 default:
                     throw new NotSupportedException($"Wrong EdgeType [{edgeWasUsed}]");
             }
-            return new Vector2(x,y);
+            return new Vector2Int(x,y);
         }
     }
 }

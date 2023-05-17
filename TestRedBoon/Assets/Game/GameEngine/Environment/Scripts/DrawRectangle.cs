@@ -26,8 +26,8 @@ namespace GameEngine.Environment
         public void Draw(NormalizedRectangle normalizedRectangle, string nameNewRectangle)
         {
             Transform transformRectangle = Instantiate<Transform>(_rectanglePrefab, _transformParent);
-            transformRectangle.position = normalizedRectangle.BottomLeftAngel;
-            transformRectangle.localScale = normalizedRectangle.SizeXY;
+            transformRectangle.position = (Vector2)normalizedRectangle.BottomLeftAngel;
+            transformRectangle.localScale = (Vector2)normalizedRectangle.SizeXY;
             transformRectangle.name = nameNewRectangle;
             //transformRectangle.GetComponent<LineRenderer>().widthMultiplier = 5;
         }

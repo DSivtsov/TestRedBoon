@@ -95,7 +95,7 @@ namespace GameEngine.Environment
             _pathFinderData.SetInitialPoint();
         }
 
-        private Vector2 CreateStartEndPointFindPath(NormalizedRectangle rect)
+        private Vector2Int CreateStartEndPointFindPath(NormalizedRectangle rect)
         {
             EdgeType edgeTypeWhereWillStartPointFindPath = SelectRandomAnyEdgeType();
             CountFrame.DebugLogUpdate($"StartEndPointFindPath EdgeType[{edgeTypeWhereWillStartPointFindPath}]");
@@ -114,7 +114,7 @@ namespace GameEngine.Environment
                 EdgeType edgeTypeWhereWillNextRect = (NumEdge == 1) ? SelectRandomAnyEdgeType() : SelectRandomEdgeType(prevUsedEdgeType);
                 CountFrame.DebugLogUpdate($"Next Rec will at [{edgeTypeWhereWillNextRect}] Edge");
                 
-                Vector2 startPointOnEdge = GetRandomPointOnEdge(_firstRect, edgeTypeWhereWillNextRect);
+                Vector2Int startPointOnEdge = GetRandomPointOnEdge(_firstRect, edgeTypeWhereWillNextRect);
                 
                 EdgeType usedEdgeType = edgeTypeWhereWillNextRect;
                 AngleType selectedAngleTypeBasePoint = SelectAngleTypeBasePoint(usedEdgeType);
@@ -126,7 +126,7 @@ namespace GameEngine.Environment
 
                 _secondRect.Draw();
 
-                Vector2 endPointEdge = _firstRect.GetEndPointEdge(edgeTypeWhereWillNextRect, selectedAngleTypeBasePoint);
+                Vector2Int endPointEdge = _firstRect.GetEndPointEdge(edgeTypeWhereWillNextRect, selectedAngleTypeBasePoint);
                 
                 _pathFinderData.AddEdge(_firstRect, _secondRect, startPointOnEdge, endPointEdge);
 
@@ -156,7 +156,7 @@ namespace GameEngine.Environment
 
         private NormalizedRectangle CreateInitialRec()
         {
-            Vector2 basePoint = new Vector2(_fieldSetting.CenterX, _fieldSetting.CenterY);
+            Vector2Int basePoint = new Vector2Int(_fieldSetting.CenterX, _fieldSetting.CenterY);
 
             AngleType selectedAngleTypeBasePoint = SelectAnyAngleTypeForBasePoint();
 
@@ -166,29 +166,29 @@ namespace GameEngine.Environment
             return newNormalizedRectangle;
         }
 
-        private Vector2 GetRandomPointOnEdge(NormalizedRectangle currentRec, EdgeType edgeTypeWhereWillRandomPoint)
+        private Vector2Int GetRandomPointOnEdge(NormalizedRectangle currentRec, EdgeType edgeTypeWhereWillRandomPoint)
         {
-            Vector2 RandomPointOnEdge = SelectPointOnEdge(edgeTypeWhereWillRandomPoint, currentRec);
+            Vector2Int RandomPointOnEdge = SelectPointOnEdge(edgeTypeWhereWillRandomPoint, currentRec);
             return RandomPointOnEdge;
         }
 
-        private Vector2 SelectPointOnEdge(EdgeType edgeTypeWhereWasStartPoint, NormalizedRectangle rec)
+        private Vector2Int SelectPointOnEdge(EdgeType edgeTypeWhereWasStartPoint, NormalizedRectangle rec)
         {
-            float randomPointOnHorizontal = rec.BottomLeftAngel.x + _random.Next(0, (int)rec.SizeXY.x);
-            float randomPointOnVertical = rec.BottomLeftAngel.y + _random.Next(0, (int)rec.SizeXY.y);
+            int randomPointOnHorizontal = rec.BottomLeftAngel.x + _random.Next(0, rec.SizeXY.x);
+            int randomPointOnVertical = rec.BottomLeftAngel.y + _random.Next(0, rec.SizeXY.y);
             switch (edgeTypeWhereWasStartPoint)
             {
                 case EdgeType.Top:
-                    return new Vector2(randomPointOnHorizontal, rec.BottomLeftAngel.y + rec.SizeXY.y);
+                    return new Vector2Int(randomPointOnHorizontal, rec.BottomLeftAngel.y + rec.SizeXY.y);
 
                 case EdgeType.Right:
-                    return new Vector2(rec.BottomLeftAngel.x + (int)rec.SizeXY.x, randomPointOnVertical);
+                        return new Vector2Int(rec.BottomLeftAngel.x + rec.SizeXY.x, randomPointOnVertical); 
 
                 case EdgeType.Bottom:
-                    return new Vector2(randomPointOnHorizontal, rec.BottomLeftAngel.y);
+                    return new Vector2Int(randomPointOnHorizontal, rec.BottomLeftAngel.y);
 
                 case EdgeType.Left:
-                    return new Vector2(rec.BottomLeftAngel.x, randomPointOnVertical);
+                    return new Vector2Int(rec.BottomLeftAngel.x, randomPointOnVertical);
 
                 case EdgeType.Nothing:
                 default:
@@ -245,33 +245,33 @@ namespace GameEngine.Environment
         /// <param name="basePoint"></param>
         /// <param name="selectedBasePointAngleType"></param>
         /// <returns></returns>
-        private NormalizedRectangle GetNewNormalizedRectangle(Vector2 basePoint, AngleType selectedBasePointAngleType)
+        private NormalizedRectangle GetNewNormalizedRectangle(Vector2Int basePoint, AngleType selectedBasePointAngleType)
         {
-            Vector2 shiftToOtherAngleRectangel = GetShiftToOtherAngleRectangle(selectedBasePointAngleType);
+            Vector2Int shiftToOtherAngleRectangel = GetShiftToOtherAngleRectangle(selectedBasePointAngleType);
             //CountFrame.DebugLogUpdate($"initialBasePoint: [{selectedBasePointAngleType}]{basePoint} shift:{shiftToOtherAngleRectangel}");
             NormalizedRectangle newNormalizedRectangle = new NormalizedRectangle(basePoint, shiftToOtherAngleRectangel);
             return newNormalizedRectangle;
         }
 
-        private Vector2 GetShiftToOtherAngleRectangle(AngleType basePointAngleType)
+        private Vector2Int GetShiftToOtherAngleRectangle(AngleType basePointAngleType)
         {
             int widthRectangle = _random.Next(_fieldSetting.MinWidthRectangle, (_maxWidthRectangle + 1));
             int heightRectangle = _random.Next(_fieldSetting.MinHeightRectangle, (_maxHeightRectangle + 1));
-            return new Vector2(widthRectangle, heightRectangle) * GetDirectionShiftToOtherAngleRectangle(basePointAngleType);
+            return new Vector2Int(widthRectangle, heightRectangle) * GetDirectionShiftToOtherAngleRectangle(basePointAngleType);
         }
 
-        private Vector2 GetDirectionShiftToOtherAngleRectangle(AngleType basePointAngleType)
+        private Vector2Int GetDirectionShiftToOtherAngleRectangle(AngleType basePointAngleType)
         {
             switch (basePointAngleType)
             {
                 case AngleType.TopLeft:
-                    return new Vector2(1, -1);
+                    return new Vector2Int(1, -1);
                 case AngleType.TopRight:
-                    return new Vector2(-1, -1);
+                    return new Vector2Int(-1, -1);
                 case AngleType.BottomRight:
-                    return new Vector2(-1, 1);
+                    return new Vector2Int(-1, 1);
                 case AngleType.BottomLeft:
-                    return new Vector2(1, 1);
+                    return new Vector2Int(1, 1);
                 default:
                     throw new System.NotSupportedException($"Wrong value [{basePointAngleType}]");
             }

@@ -88,7 +88,7 @@ namespace GameEngine.Environment
 
         public void SetInitialPoint()
         {
-            SetAndActivatePoint(_prefabInitialPoint, Vector2.zero);
+            SetAndActivatePoint(_prefabInitialPoint, Vector2Int.zero);
         }
 
         [Button]
@@ -99,7 +99,7 @@ namespace GameEngine.Environment
                 UnityEngine.Object.Destroy(item.gameObject);
             }
         }
-        public void AddEdge(NormalizedRectangle firstRect, NormalizedRectangle secondRect, Vector2 startPointOnEdge, Vector2 endPointEdge)
+        public void AddEdge(NormalizedRectangle firstRect, NormalizedRectangle secondRect, Vector2Int startPointOnEdge, Vector2Int endPointEdge)
         {
             Rectangle first = new Rectangle(firstRect.BottomLeftAngel, firstRect.BottomLeftAngel + firstRect.SizeXY);
             Rectangle second = new Rectangle(secondRect.BottomLeftAngel, secondRect.BottomLeftAngel + secondRect.SizeXY);
@@ -110,7 +110,7 @@ namespace GameEngine.Environment
 
         private void CreateEdgePoints(Edge edge)
         {
-            SetAndActivatePoint(_prefabStartEdge, edge.Start);
+            SetAndActivatePoint(_prefabStartEdge, (Vector2)edge.Start);
             SetAndActivatePoint(_prefabEndEdge, edge.End);
         }
     }

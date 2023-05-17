@@ -12,16 +12,16 @@ namespace GameEngine.PathFinder
     public class PathFinderManager : MonoBehaviour
     {
         [SerializeField] private PathFinderData _pathFinderData;
+        [SerializeField] private CheckerInitialData _checkerInitialData;
         [SerializeField] private ShowPath _showPath;
-        [Space]
-        [ShowInInspector] private CheckerInitialData _checkerInitialData;
+
 
         private List<Vector2> _pathFounded;
         private IPathFinder _iFinder;
 
         private void Awake()
         {
-            _checkerInitialData = new CheckerInitialData(_pathFinderData);
+            _checkerInitialData.InitialData(_pathFinderData);
         }
 
         [Button]
