@@ -13,7 +13,10 @@ namespace GameEngine.Environment
         [SerializeField] private PathFinderData _pathFinderData;
         [SerializeField] private FieldSettingSO _fieldSetting;
         [SerializeField] private DrawRectangle _drawRectangle;
-        [SerializeField] private bool _useSeedFromFieldSettingSO = true;
+        [Header("DEBUG")]
+        [SerializeField] private bool _useSeedFromFieldSettingSO = false;
+        [SerializeField] private bool _showUsedRandomSeed = false;
+        [SerializeField] private bool _startAutomaticly = true;
 
         private System.Random _random;
         private int _widthHalfField;
@@ -43,23 +46,17 @@ namespace GameEngine.Environment
         public void Awake()
         {
             Injection();
-            InitRandom();
             InitCreateField();
         }
 
         private void Start()
         {
-
-            CreateField();
+            if (_startAutomaticly)
+            {
+                CreateField(); 
+            }
         }
 
-        private void InitRandom()
-        {
-            if (_useSeedFromFieldSettingSO)
-                _random = new System.Random(_fieldSetting.CurrentSeed);
-            else
-                _random = new System.Random();
-        }
         private void InitCreateField()
         {
             _widthHalfField = _fieldSetting.WidthField / 2;
@@ -71,14 +68,14 @@ namespace GameEngine.Environment
         }
 
         [Button]
-        private void CreateField()
+        public void CreateField()
         {
+            CountFrame.DebugLogWarningUpdate("DEBUG called CreateField():");
+
             DeleteGameObjects();
 
-            if (!_useSeedFromFieldSettingSO)
-                ReInitializeRandom();
+            InitRandom();
 
-            CountFrame.DebugLogWarningUpdate("DEBUG called CreateField():");
             _wasOutFromFieldLimit = false;
 
             _firstRect = CreateInitialRec();
@@ -91,19 +88,32 @@ namespace GameEngine.Environment
             _pathFinderData.EndPointFindPath = CreateStartEndPointFindPath(_secondRect);
         }
 
-        private void ReInitializeRandom()
-        {
-            int newSeed = _random.Next();
-            Debug.LogWarning($"DEBUG ONLY: Will used new SEED={newSeed}");
-            _random = new System.Random(newSeed);
-        }
-
         private void DeleteGameObjects()
         {
             _drawRectangle.DeleteDrownRectangle();
             _pathFinderData.DeletePoints();
             _pathFinderData.SetInitialPoint();
             _pathFinderData.ClearPreviousResults();
+        }
+
+        private void InitRandom()
+        {
+            if (_useSeedFromFieldSettingSO)
+            {
+                Debug.Log($"{this}: Will used the SEED={_fieldSetting.CurrentSeed} from SO [{_fieldSetting.name}] ");
+                _random = new System.Random(_fieldSetting.CurrentSeed); 
+            }
+            else
+            {
+                if (_showUsedRandomSeed)
+                {
+                    int newSeed = _random.Next();
+                    Debug.LogWarning($"{this}: Will used new SEED={newSeed}");
+                    _random = new System.Random(newSeed);
+                }
+                else
+                    _random = new System.Random();
+            }
         }
 
         private Vector2Int CreateStartEndPointFindPath(NormalizedRectangle rect)

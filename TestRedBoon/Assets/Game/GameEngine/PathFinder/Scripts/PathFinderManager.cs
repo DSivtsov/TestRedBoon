@@ -14,6 +14,10 @@ namespace GameEngine.PathFinder
         [SerializeField] private PathFinderData _pathFinderData;
         [SerializeField] private CheckerInitialData _checkerInitialData;
         [SerializeField] private ShowPath _showPath;
+        [SerializeField] private GenerateField _generateField;
+        [Header("DEBUG")]
+        [SerializeField] private bool _createFieldAutoStart = false;
+        [SerializeField] private bool _callGetPathAutoStart = false;
 
 
         private List<Vector2> _pathFounded;
@@ -22,6 +26,14 @@ namespace GameEngine.PathFinder
         private void Awake()
         {
             _checkerInitialData.InitialData(_pathFinderData);
+        }
+
+        private void Start()
+        {
+            if (_createFieldAutoStart)
+                _generateField.CreateField();
+            if (_callGetPathAutoStart)
+                CallGetPath();
         }
 
         [Button]

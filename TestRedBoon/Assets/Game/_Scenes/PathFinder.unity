@@ -157,6 +157,7 @@ MonoBehaviour:
   _pathFinderData: {fileID: 1209225827}
   _checkerInitialData: {fileID: 621855417}
   _showPath: {fileID: 621855416}
+  _generateField: {fileID: 1623120594}
 --- !u!4 &621855415
 Transform:
   m_ObjectHideFlags: 0
@@ -444,9 +445,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _pathFinderData: {fileID: 1209225827}
-  _fieldSetting: {fileID: 11400000, guid: ecdfba6a48910fc4c9d2004aa2a8b3c5, type: 2}
+  _fieldSetting: {fileID: 11400000, guid: 05a285200521bd542ab6208ea78bdda9, type: 2}
   _drawRectangle: {fileID: 1623120596}
-  _useSeedFromFieldSettingSO: 0
+  _useSeedFromFieldSettingSO: 1
+  _showUsedRadmonSeed: 0
+  _startAutomaticly: 0
 --- !u!4 &1623120595
 Transform:
   m_ObjectHideFlags: 0
