@@ -72,27 +72,6 @@ namespace GameEngine.PathFinder
             return false;
         }
 
-
-        // Wrong It only detects if Angle into between Edge of checked Rectanle, not check if it simple overlaping the whole Rectangle
-        //
-        //private bool ExistOverlapingRectangle(Rectangle checkedRec, Rectangle otherRec)
-        //{
-        //    Vector2[] angles = GetAnglesFromRectangle(otherRec);
-        //    for (int angle = 0; angle < angles.Length; angle++)
-        //    {
-        //        Vector2 checkedAngle = angles[angle];
-        //        if (IsAnglesInRect(checkedAngle, checkedRec))
-        //        {
-        //            Debug.Log($"DEMO!!! AngleType[{(AngleType)angle}] IsAnglesInRect[true]");
-        //            Debug.Log($"checkedRec[{ShowRect(checkedRec)}] angleOtherRec{checkedAngle} ");
-        //            ShowPoI(checkedAngle);
-        //            return true; 
-        //        }
-        //    }
-        //    return false;
-        //}
-
-        
         private bool ExistOverlapingRectangle(Rectangle checkedRec, Rectangle otherRec)
         {
             Line[] lines = GetLinesFromRectangle(otherRec);
@@ -143,12 +122,6 @@ namespace GameEngine.PathFinder
             };
         }
 
-        private bool IsAnglesInRect(Vector2 angle, Rectangle checkedRec)
-        {
-            return angle.x > checkedRec.Min.x && angle.x < checkedRec.Max.x
-                && angle.y > checkedRec.Min.y && angle.y < checkedRec.Max.y;
-        }
-
         private Vector2[] GetAnglesFromRectangle(Rectangle otherRec)
         {
             return new Vector2[]
@@ -170,61 +143,63 @@ namespace GameEngine.PathFinder
             }
             return allRectangles;
         }
-    }
-    public class Line
-    {
-        private Vector2 _startPoint;
-        private Vector2 _endPoint;
-        private LineType _lineType;
 
-        public Vector2 StartPoint => _startPoint;
-        public Vector2 EndPoint => _endPoint;
-
-        public Line(Vector2 startPoint, Vector2 endPoint, LineType lineType)
+        private class Line
         {
-            _startPoint = startPoint;
-            _endPoint = endPoint;
-            _lineType = lineType;
-        }
+            private Vector2 _startPoint;
+            private Vector2 _endPoint;
+            private LineType _lineType;
 
-        //it checks as full overlaping and partial also than crossing only one rectanle side
-        public bool IsLineCrossingRect(Rectangle checkedRec)
-        {
-            switch (_lineType)
+            public Vector2 StartPoint => _startPoint;
+            public Vector2 EndPoint => _endPoint;
+
+            public Line(Vector2 startPoint, Vector2 endPoint, LineType lineType)
             {
-                //"Good Variant' only if Line end before rectanle or start after it
-                case LineType.Horizintal:
-                    return !(_endPoint.x <= checkedRec.Min.x || _startPoint.x >= checkedRec.Max.x)
-                            && _startPoint.y > checkedRec.Min.y && _startPoint.y < checkedRec.Max.y;
-                case LineType.Vertical:
-                    return !(_endPoint.y <= checkedRec.Min.y || _startPoint.y >= checkedRec.Max.y)
-                            && _startPoint.x > checkedRec.Min.x && _startPoint.x < checkedRec.Max.x;
-                default:
-                    throw new NotSupportedException($"Wrong [{_lineType}] line type");
+                _startPoint = startPoint;
+                _endPoint = endPoint;
+                _lineType = lineType;
+            }
+
+            //it checks as full overlaping and partial also than crossing only one rectanle side
+            public bool IsLineCrossingRect(Rectangle checkedRec)
+            {
+                switch (_lineType)
+                {
+                    //"Good Variant' only if Line end before rectanle or start after it
+                    case LineType.Horizintal:
+                        return !(_endPoint.x <= checkedRec.Min.x || _startPoint.x >= checkedRec.Max.x)
+                                && _startPoint.y > checkedRec.Min.y && _startPoint.y < checkedRec.Max.y;
+                    case LineType.Vertical:
+                        return !(_endPoint.y <= checkedRec.Min.y || _startPoint.y >= checkedRec.Max.y)
+                                && _startPoint.x > checkedRec.Min.x && _startPoint.x < checkedRec.Max.x;
+                    default:
+                        throw new NotSupportedException($"Wrong [{_lineType}] line type");
+                }
+            }
+
+            public override string ToString()
+            {
+                return $"start({_startPoint}) end({_endPoint})";
+            }
+
+            public Vector3 GetEndPoILine()
+            {
+                switch (_lineType)
+                {
+                    case LineType.Horizintal:
+                        return new Vector3(_endPoint.x - _startPoint.x, 0, 0);
+                    case LineType.Vertical:
+                        return new Vector3(0, _endPoint.y - _startPoint.y, 0);
+                    default:
+                        throw new NotSupportedException($"Wrong [{_lineType}] line type");
+                }
             }
         }
-
-        public override string ToString()
+        public enum LineType
         {
-            return $"start({_startPoint}) end({_endPoint})";
-        }
-
-        public Vector3 GetEndPoILine()
-        {
-            switch (_lineType)
-            {
-                case LineType.Horizintal:
-                    return new Vector3(_endPoint.x - _startPoint.x, 0, 0);
-                case LineType.Vertical:
-                    return new Vector3(0, _endPoint.y - _startPoint.y, 0);
-                default:
-                    throw new NotSupportedException($"Wrong [{_lineType}] line type");
-            }
+            Horizintal = 0,
+            Vertical = 1,
         }
     }
-    public enum LineType
-    {
-        Horizintal = 0,
-        Vertical = 1,
-    }
+    
 }

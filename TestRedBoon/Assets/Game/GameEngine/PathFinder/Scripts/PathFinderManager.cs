@@ -25,7 +25,7 @@ namespace GameEngine.PathFinder
 
         private void Awake()
         {
-            _checkerInitialData.InitialData(_pathFinderData);
+                    _checkerInitialData.InitialData(_pathFinderData);
         }
 
         private void Start()

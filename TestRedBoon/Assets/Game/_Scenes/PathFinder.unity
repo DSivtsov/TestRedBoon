@@ -158,6 +158,8 @@ MonoBehaviour:
   _checkerInitialData: {fileID: 621855417}
   _showPath: {fileID: 621855416}
   _generateField: {fileID: 1623120594}
+  _createFieldAutoStart: 1
+  _callGetPathAutoStart: 0
 --- !u!4 &621855415
 Transform:
   m_ObjectHideFlags: 0
@@ -448,7 +450,7 @@ MonoBehaviour:
   _fieldSetting: {fileID: 11400000, guid: 05a285200521bd542ab6208ea78bdda9, type: 2}
   _drawRectangle: {fileID: 1623120596}
   _useSeedFromFieldSettingSO: 1
-  _showUsedRadmonSeed: 0
+  _showUsedRandomSeed: 0
   _startAutomaticly: 0
 --- !u!4 &1623120595
 Transform:
