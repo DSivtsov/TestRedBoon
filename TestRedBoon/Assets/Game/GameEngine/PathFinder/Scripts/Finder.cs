@@ -15,12 +15,12 @@ namespace GameEngine.PathFinder
         private const int NumDotCrossinsInCaseSimpleTurn = 4;
         private const int NUMNEWSOLUTIONS = 4;
         private const int NumDotHaveCrossingwithEndPathInCaseDirectConnection = 1;
-        private Path _path;
+
         private Edge[] _arredges;
-        private ListDotCrossing _listDotCrossing;
+        private ListIntersec _listDotCrossing;
         private SolutionForDot _solutionEndPath;
         private List<Line> _listLinesEndPoint;
-        private List<Vector2> _listBaseDotSolutionOfEndPoint;
+        //private List<Vector2> _listBaseDotSolutionOfEndPoint;
         private int _idxLastCrossingEdgeFromEndPoint;
         private Rectangle _closestRectAccessableFromEndPoint;
         private int _numEdgeCurrentSolution;
@@ -29,13 +29,13 @@ namespace GameEngine.PathFinder
         IEnumerable<Vector2> IPathFinder.GetPath(Vector2 startPointFindPath, Vector2 endPointFindPath, IEnumerable<Edge> edges)
         {
             _arredges = edges.ToArray();
-            _path = new Path(startPointFindPath, endPointFindPath, _arredges.Length);
+
             Line.InitLineClass(_arredges);
 
-            _listDotCrossing = new ListDotCrossing(_arredges.Length);
+            _listDotCrossing = new ListIntersec(_arredges.Length);
             _listDotCrossing.AddDotCross(startPointFindPath, null);
 
-            (Line lineBTWDots, int numLastTestedEdge) = LinkTwoDotsThroughtAllEdges(startPointFindPath, endPointFindPath, 0, _arredges.Length - 1);
+            (Line lineBTWDots, int numLastTestedEdge) = LinkTwoDotsThroughEdges(startPointFindPath, endPointFindPath, 0, _arredges.Length - 1);
             if (lineBTWDots != null)
             {
                 Debug.Log($"We found the direct Line from StartPath to EndPath without any turns");
@@ -46,11 +46,18 @@ namespace GameEngine.PathFinder
             _solutionEndPath = CreateSolutionForDot(endPointFindPath);
 
             _listLinesEndPoint = _solutionEndPath.GetListLinesFromSolution().ToList();
-            _idxLastCrossingEdgeFromEndPoint = _solutionEndPath.GetIdxLastCrossingEdgeFromEndPoint();
-            _closestRectAccessableFromEndPoint = _arredges[_idxLastCrossingEdgeFromEndPoint].First;
-            _listBaseDotSolutionOfEndPoint = _solutionEndPath.GetListEdgeDotsLastCrossingEdge();
 
-            SolutionForEdge currentSolutionFromStartPath = new SolutionForEdge(startPointFindPath);
+            //_idxLastCrossingEdgeFromEndPoint = _solutionEndPath.GetIdxLastCrossingEdgeFromEndPoint();
+            _idxLastCrossingEdgeFromEndPoint = ((ISolution)_solutionEndPath).NumEdge;
+            
+            _closestRectAccessableFromEndPoint = _arredges[_idxLastCrossingEdgeFromEndPoint].First;
+            //_listBaseDotSolutionOfEndPoint = _solutionEndPath.GetListEdgeDotsLastCrossingEdge();
+
+            //ISolution currentSolutionFromStartPath = new SolutionForEdge(startPointFindPath);
+
+
+            ISolution currentSolutionFromStartPath = CreateSolutionForDot(startPointFindPath);
+            
             int numDotHaveCrossingwithEndPoint = FindCrossingCurrentSolutionWithEndPoint(currentSolutionFromStartPath);
             if (numDotHaveCrossingwithEndPoint != 0)
             {
@@ -63,11 +70,11 @@ namespace GameEngine.PathFinder
             {
                 do
                 {
-                    _numEdgeCurrentSolution = currentSolutionFromStartPath.NumEdge;
+                    _numEdgeCurrentSolution = ((ISolution)currentSolutionFromStartPath).NumEdge;
                     _moreClosestFromStartEdgeToRectAccessableFromEndPoint = _idxLastCrossingEdgeFromEndPoint - 1;
                     if (_numEdgeCurrentSolution == _moreClosestFromStartEdgeToRectAccessableFromEndPoint)
                     {
-                        LinkCurrentSolutionBySimpleTurn(currentSolutionFromStartPath);
+                        LinkCurrentSolutionBySimpleTurn(currentSolutionFromStartPath, _solutionEndPath.GetListEdgeDotsLastCrossingEdge());
                         Debug.Log($"We found the crossing the line from PointEndPath with Last Simple Turn from currentSolution");
                         //It means that we have found a Path all dots in _listDotCrossing
                         _listDotCrossing.SaveDataLastConnectionsWithEndPath(NumDotCrossinsInCaseSimpleTurn, endPointFindPath);
@@ -125,32 +132,32 @@ namespace GameEngine.PathFinder
         /// </summary>
         /// <param name="dotA"></param>
         /// <param name="dotB"></param>
-        /// <param name="nearestNumEdgeForA"></param>
-        /// <param name="nearestNumEdgeForB"></param>
+        /// <param name="numEdgeAfterDotA"></param>
+        /// <param name="numEdgeBeforeDotB"></param>
         /// <returns> if linked (true, numberLastPassEdge) otherwise (false, numberLastNotPassEdge)</returns>
-        private (Line line, int numLastTestingEdge) LinkTwoDotsThroughtAllEdges(Vector2 dotA, Vector2 dotB, int nearestNumEdgeForA, int nearestNumEdgeForB)
+        private (Line line, int numLastTestedEdge) LinkTwoDotsThroughEdges(Vector2 dotA, Vector2 dotB, int numEdgeAfterDotA, int numEdgeBeforeDotB)
         {
             Line lineBTWDots = new Line(dotA,dotB);
             bool directLineBTWdotsExist = true;
-            int currentTestingNumEdge = nearestNumEdgeForA;
-            for (; currentTestingNumEdge <= nearestNumEdgeForB; currentTestingNumEdge++)
+            int currentNumTestingEdge = numEdgeAfterDotA;
+            for (; currentNumTestingEdge <= numEdgeBeforeDotB; currentNumTestingEdge++)
             {
-                if (!lineBTWDots.TryIntersecLineWithEdge(currentTestingNumEdge))
+                if (!lineBTWDots.TryIntersecLineWithEdge(currentNumTestingEdge))
                 {
                     directLineBTWdotsExist = false;
                     break;
                 }
             }
-            return directLineBTWdotsExist ? (lineBTWDots, currentTestingNumEdge): (null, currentTestingNumEdge);
+            return directLineBTWdotsExist ? (lineBTWDots, currentNumTestingEdge): (null, currentNumTestingEdge);
         }
 
 
-        private SolutionForEdge FindCrossingCurrentSolutionWithEdge(SolutionForEdge solutionForEdge)
+        private SolutionForEdge FindCrossingCurrentSolutionWithEdge(ISolution solutionForEdge)
         {
             int numNewSolutions = 0;
-            foreach (Solution currentSolution in ((ISolution) solutionForEdge).GetListSolution())
+            foreach (Solution currentSolution in solutionForEdge.GetListSolution())
             {
-                DotCross prev = currentSolution.DotCrossing;
+                DotIntersec prev = currentSolution.DotCrossing;
                 Vector2 baseDotCurrentSolutions = currentSolution.BaseDot;
                 
                 for (int numEdge = _moreClosestFromStartEdgeToRectAccessableFromEndPoint; numEdge < _numEdgeCurrentSolution; numEdge--)
@@ -185,7 +192,7 @@ namespace GameEngine.PathFinder
             throw new System.NotImplementedException();
         }
 
-        private Solution TryFindNewSolutionForEdge(Vector2 currentBaseDotSolutionin, Vector2 basedot, DotCross prev, out Vector2 dotCrossing)
+        private Solution TryFindNewSolutionForEdge(Vector2 currentBaseDotSolutionin, Vector2 basedot, DotIntersec prev, out Vector2 dotCrossing)
         {
             throw new NotImplementedException();
         }
@@ -201,13 +208,13 @@ namespace GameEngine.PathFinder
         /// </summary>
         /// <param name="solutionForEdge"></param>
         /// <returns>number dots where Solution lines intersect with EndPoint in the rect</returns>
-        private int FindCrossingCurrentSolutionWithEndPoint(SolutionForEdge solutionForEdge)
+        private int FindCrossingCurrentSolutionWithEndPoint(ISolution solutionForEdge)
         {
             int numNewDotCorssing = 0;
             
-            foreach (Solution currentSolution in ((ISolution)solutionForEdge).GetListSolution())
+            foreach (Solution currentSolution in solutionForEdge.GetListSolution())
             {
-                DotCross prev = currentSolution.DotCrossing;
+                DotIntersec prev = currentSolution.DotCrossing;
                 foreach (Line currentLineSolution in currentSolution.GetListLines())
                 {
                     foreach (Line currentLineEndPoint in _listLinesEndPoint)
@@ -225,13 +232,13 @@ namespace GameEngine.PathFinder
             return numNewDotCorssing;
         }
 
-        private void LinkCurrentSolutionBySimpleTurn(SolutionForEdge solutionForEdge)
+        private void LinkCurrentSolutionBySimpleTurn(ISolution solutionForEdge, List<Vector2> listDotsOnLastEdgeForSolutionEndPoint)
         {
-            foreach (Solution currentSolution in ((ISolution)solutionForEdge).GetListSolution())
+            foreach (Solution currentSolution in solutionForEdge.GetListSolution())
             {
-                DotCross prev = currentSolution.DotCrossing;
+                DotIntersec prev = currentSolution.DotCrossing;
                 Vector2 baseDotCurrentSolutions = currentSolution.BaseDot;
-                foreach (Vector2 dotOnEdgeFromEndPath in _listBaseDotSolutionOfEndPoint)
+                foreach (Vector2 dotOnEdgeFromEndPath in listDotsOnLastEdgeForSolutionEndPoint)
                 {
 
                     _listDotCrossing.AddDotCross(dotOnEdgeFromEndPath, prev);
@@ -280,25 +287,25 @@ namespace GameEngine.PathFinder
         }
     }
 
-        public class DebugFinder
-    {
-        private Vector2 startPointFindPath;
-        private Vector2 endPointFindPath;
+    //    public class DebugFinder
+    //{
+    //    private Vector2 startPointFindPath;
+    //    private Vector2 endPointFindPath;
 
-        public DebugFinder(Vector2 startPointFindPath, Vector2 endPointFindPath)
-        {
-            this.startPointFindPath = startPointFindPath;
-            this.endPointFindPath = endPointFindPath;
-        }
+    //    public DebugFinder(Vector2 startPointFindPath, Vector2 endPointFindPath)
+    //    {
+    //        this.startPointFindPath = startPointFindPath;
+    //        this.endPointFindPath = endPointFindPath;
+    //    }
 
-        public void ShowLineConnections(List<LineConnection> variants)
-        {
-            Debug.Log($"[startPointFindPath] {startPointFindPath}");
-            for (int i = 0; i < variants.Count; i++)
-            {
-                Debug.Log($"[{i}] {variants[i]}");
-            }
-            Debug.Log($"[endPointFindPath] {endPointFindPath}");
-        }
-    }
+    //    public void ShowLineConnections(List<LineConnection> variants)
+    //    {
+    //        Debug.Log($"[startPointFindPath] {startPointFindPath}");
+    //        for (int i = 0; i < variants.Count; i++)
+    //        {
+    //            Debug.Log($"[{i}] {variants[i]}");
+    //        }
+    //        Debug.Log($"[endPointFindPath] {endPointFindPath}");
+    //    }
+    //}
 }

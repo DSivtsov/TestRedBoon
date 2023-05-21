@@ -16,12 +16,12 @@ namespace GameEngine.PathFinder
         [SerializeField] Transform _prefabPOILine;
         private PathFinderData _pathFinderData;
 
-        private Transform _pathFinderTransform;
+        private Transform _pathFinderDataTransform;
 
         public void InitialData(PathFinderData pathFinderData)
         {
             this._pathFinderData = pathFinderData;
-            _pathFinderTransform = _pathFinderData.transform;
+            _pathFinderDataTransform = _pathFinderData.transform;
         }
 
         [Button]
@@ -91,9 +91,9 @@ namespace GameEngine.PathFinder
 
         private void ShowPoILine(Line checkedLine)
         {
-            Transform transform = Instantiate(_prefabPOILine, _pathFinderTransform);
-            transform.position = new Vector3(checkedLine.StartPoint.x, checkedLine.StartPoint.y, transform.position.z);
-            LineRenderer lineRenderer = transform.GetComponent<LineRenderer>();
+            Transform transformLine = Instantiate(_prefabPOILine, _pathFinderDataTransform);
+            transformLine.position = new Vector3(checkedLine.StartPoint.x, checkedLine.StartPoint.y, transformLine.position.z);
+            LineRenderer lineRenderer = transformLine.GetComponent<LineRenderer>();
             if (lineRenderer)
             {
                 lineRenderer.SetPosition(1, checkedLine.GetEndPoILine());
@@ -104,7 +104,7 @@ namespace GameEngine.PathFinder
 
         private void ShowPoI(Vector2 checkedAngle)
         {
-            Transform transform = Instantiate(_prefabPOI, _pathFinderTransform);
+            Transform transform = Instantiate(_prefabPOI, _pathFinderDataTransform);
             transform.position = checkedAngle;
         }
 

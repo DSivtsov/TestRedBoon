@@ -64,7 +64,7 @@ class SolutionForDot : ISolution	// angleLineB > angleLineA in degrees
 class SolutionForEdge : ISolution
 	Solution 	dotA
 	Solution	dotB 	//for horizontal edge lineA.dot.x <  lineB.dot.x for vertical lineA.dot.y <  lineB.dot.y 
-
+-------------------------//--------------------------------------------------
 SolutionForDot GetFromDotSolution(Vector2) // for StartPath
 
 bool rez = TryLinkSolutionWithDot(SolutionForDot, Vector2)

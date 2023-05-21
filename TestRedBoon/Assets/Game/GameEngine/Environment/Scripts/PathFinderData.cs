@@ -5,6 +5,7 @@ using System;
 
 namespace GameEngine.Environment
 {
+    [Serializable]
     public struct Rectangle
     {
         public Vector2 Min;
@@ -16,6 +17,7 @@ namespace GameEngine.Environment
             Max = max;
         }
     }
+    [Serializable]
     public struct Edge
     {
         public Rectangle First;
@@ -46,9 +48,12 @@ namespace GameEngine.Environment
         [SerializeField] private Transform _prefabStartEdge;
         [SerializeField] private Transform _prefabEndEdge;
         [Header("RESULT")]
-        [ShowInInspector, ReadOnly] private Vector2 _startPointFindPath;
-        [ShowInInspector, ReadOnly] private Vector2 _endPointFindPath;
-        [ShowInInspector, ReadOnly] private List<Edge> _listEdges;
+        //[ShowInInspector, ReadOnly] private Vector2 _startPointFindPath;
+        //[ShowInInspector, ReadOnly] private Vector2 _endPointFindPath;
+        //[ShowInInspector, ReadOnly] private List<Edge> _listEdges;
+        [SerializeField] private Vector2 _startPointFindPath;
+        [SerializeField] private Vector2 _endPointFindPath;
+        [SerializeField] private List<Edge> _listEdges;
 
         private Transform _parentTransformAllPoint;
 

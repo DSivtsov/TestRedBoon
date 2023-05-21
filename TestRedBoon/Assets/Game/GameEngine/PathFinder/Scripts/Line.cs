@@ -84,18 +84,22 @@ namespace GameEngine.PathFinder
         /// <returns>true if Line interesect the edge</returns>
         internal bool TryIntersecLineWithEdge(int currentTestingNumEdge)
         {
+
             if (_classIsInited)
             {
+                float x, y;
                 var currentEdge = _arrTupleEdges[currentTestingNumEdge];
                 switch (currentEdge.type)
                 {
                     case EdgeType.Horizontal:
-                        float x = (_factorB - currentEdge.constValue);
+                        y = currentEdge.constValue;
+                        x = (_factorB - y) / _factorX;
                         if (x >= currentEdge.minValue && x <= currentEdge.maxValue)
                             return true;
                         return false;
                     case EdgeType.Vertical:
-                        float y = (_factorB - _factorX * currentEdge.constValue);
+                        x = currentEdge.constValue;
+                        y = (_factorB - _factorX * x);
                         if (y >= currentEdge.minValue && y <= currentEdge.maxValue)
                             return true;
                         return false;

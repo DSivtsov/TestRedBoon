@@ -168,7 +168,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 621855413}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -150}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -186,6 +186,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9985af0cbc0131a4288d4cdcf8e92d47, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _prefabStepPath: {fileID: 5415572637205803682, guid: 67c619445f7368d44981917fc8e48f58, type: 3}
 --- !u!114 &621855417
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -402,6 +403,8 @@ MonoBehaviour:
   _findPathEndPoint: {fileID: 4237624375057807679, guid: 199629b009fa18c41b2a207e529205bf, type: 3}
   _prefabStartEdge: {fileID: 2959957032051084419, guid: aeef30b5492f1374abc28239111f9f06, type: 3}
   _prefabEndEdge: {fileID: 6083566368960686323, guid: 4785d590ab973bf46a4d1ea7d7a7f242, type: 3}
+  _startPointFindPath: {x: 0, y: 0}
+  _endPointFindPath: {x: 0, y: 0}
 --- !u!4 &1209225828
 Transform:
   m_ObjectHideFlags: 0
