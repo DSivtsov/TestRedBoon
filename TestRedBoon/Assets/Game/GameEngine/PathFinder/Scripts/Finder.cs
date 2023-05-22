@@ -37,8 +37,8 @@ namespace GameEngine.PathFinder
             _listDotCrossing = new ListIntersec(_arredges.Length);
             _listDotCrossing.AddDotCross(startPointFindPath, null);
 
-            (Line lineBTWDots, int numLastTestedEdge) = TryLinkTwoDotsThroughEdges(startPointFindPath, endPointFindPath, 0, _lastNumberEdge);
-            if (lineBTWDots != null)
+            (bool isPassedEdges, _, _) = TryLinkTwoDotsThroughEdges(startPointFindPath, endPointFindPath, 0, _lastNumberEdge);
+            if (isPassedEdges)
             {
                 Debug.Log($"We found the direct Line from StartPath to EndPath without any turns");
                 //It means that we have found a Path all dots in _listDotCrossing
@@ -52,7 +52,10 @@ namespace GameEngine.PathFinder
             _listLinesEndPoint = _solutionEndPath.GetListLinesFromSolution().ToList();
             _idxLastCrossingEdgeFromEndPoint = _solutionEndPath.NumEdge;
             _closestRectAccessableFromEndPoint = _arredges[_idxLastCrossingEdgeFromEndPoint].First;
+            Debug.Log($"SolutionForDot(endPointFindPath): _listLinesEndPoint[{_listLinesEndPoint.Count}] _idxLastCrossingEdgeFromEndPoint[{_idxLastCrossingEdgeFromEndPoint}]" +
+                $" _closestRectAccessableFromEndPoint[{_closestRectAccessableFromEndPoint.Min},{_closestRectAccessableFromEndPoint.Max}]");
 
+            Debug.LogWarning($"CreateSolutionForDot(startPointFindPath, closeEdge[{FirstNumberEdge}], farEdge[{_lastNumberEdge}])");
             ISolution currentSolutionFromStartPath = CreateSolutionForDot(startPointFindPath, FirstNumberEdge, _lastNumberEdge);
             
             int numDotHaveCrossingwithEndPoint = FindCrossingCurrentSolutionWithEndPoint(currentSolutionFromStartPath);
@@ -96,49 +99,100 @@ namespace GameEngine.PathFinder
         private SolutionForDot CreateSolutionForDot(Vector2 baseDotSolution, int closestNumEdge, int farthestNumEdge)
         {
             DebugTurnOn(active: true);
-            int currentTestingNumEdge;
-            int step = (closestNumEdge < farthestNumEdge) ? -1 : 1;
-            int numTestedEdge = Math.Abs(closestNumEdge - farthestNumEdge);
-            for (int i = 0; i <= numTestedEdge; i++)
+            //int currentTestingNumEdge;
+            //int step = (closestNumEdge < farthestNumEdge) ? -1 : 1;
+            //int numTestedEdge = Math.Abs(closestNumEdge - farthestNumEdge);
+            (Line notPassedLine, int numEdgeNotPassed, int closestNumEdge, Vector2 baseDotSolution) missedOneLine = default;
+            //for (int i = 0; i <= numTestedEdge; i++)
+            //{
+            //    currentTestingNumEdge = farthestNumEdge + i * step;
+            List<Line> listLines = new List<Line>(2);
+            foreach ((int currentTestingNumEdge, int nextEdgeAftercurrent) in GetOrderedListNumEdges(closestNumEdge, farthestNumEdge))
             {
-                currentTestingNumEdge = farthestNumEdge + i * step;
                 Debug.Log($"Trying link with Edge[{currentTestingNumEdge}]");
-                List <Line> listLines = new List<Line>(2);
-                    foreach (Vector2 dotEdge in GitListDotsEdge(_arredges[currentTestingNumEdge]))
+
+                foreach (Vector2 dotEdge in GitListDotsEdge(_arredges[currentTestingNumEdge]))
+                {
+                    //Test possibility to create line with baseDot and dot from other edge with can pass all edges between them
+                    //int nextEdgeAftercurrent = currentTestingNumEdge + step;    will skip current edge fot testing pass
+                    (bool isPassedEdges, Line lineBTWBaseDotAndEdge, int numLastTestedEdge) = TryLinkTwoDotsThroughEdges(baseDotSolution, dotEdge, closestNumEdge,
+                        nextEdgeAftercurrent);
+                    if (isPassedEdges)
                     {
-                        if (i != numTestedEdge)
-                        {
-                            //Test possibility to create line with baseDot and dot from other edge with can pass all edges between them
-                            int nextEdgeAftercurrent = currentTestingNumEdge + step;    //will skip current edge fot testing pass
-                            (Line lineBTWBaseDotAndEdge, int numLastTestedEdge) = TryLinkTwoDotsThroughEdges(baseDotSolution, dotEdge, closestNumEdge, nextEdgeAftercurrent);
-                            if (lineBTWBaseDotAndEdge != null)
-                            {
-                                listLines.Add(lineBTWBaseDotAndEdge);
-                            } 
-                        }
-                        else
-                        {
-                            //in case trying to link the baseDotSolution with the same edge where it exist, it will always be possible
-                            listLines.Add(new Line(baseDotSolution, dotEdge)); 
-                        }
-                } 
+                        listLines.Add(lineBTWBaseDotAndEdge);
+                    }
+                    else
+                    {
+                        missedOneLine = (lineBTWBaseDotAndEdge, numLastTestedEdge, closestNumEdge, baseDotSolution);
+                        Debug.Log($"Not passed numEdge[{numLastTestedEdge}]");
+                    }
+                }
                 Debug.Log($"Was found {listLines.Count()} LinkLines the current {baseDotSolution} with Edge[{currentTestingNumEdge}] ");
                 switch (listLines.Count())
                 {
                     case 1:
                         Debug.Log("HARD CASE");
+                        listLines.Add(FindMissingLineOnEdge(missedOneLine, listLines[0]));
                         DebugDrawLine(listLines, $"HARD CASE ForEdge[{currentTestingNumEdge}]");
-                        break;
+                        return new SolutionForDot(new Solution(listLines, new DotIntersec(baseDotSolution, null)), currentTestingNumEdge);
                     case 2:
                         Debug.Log("Will Try create new {Solution}");
                         DebugDrawLine(listLines, $"Solution ForEdge[{currentTestingNumEdge}]");
-                        Solution solution = new Solution(listLines, new DotIntersec(baseDotSolution, null));
-                        return new SolutionForDot(solution, currentTestingNumEdge);
+                        return new SolutionForDot(new Solution(listLines, new DotIntersec(baseDotSolution, null)), currentTestingNumEdge);
                     default:
                         break;
+                } 
+            }
+            foreach (Vector2 dotEdge in GitListDotsEdge(_arredges[closestNumEdge]))
+            {
+                //in case trying to link the baseDotSolution with the same edge where it exist, it will always be possible
+                listLines.Add(new Line(baseDotSolution, dotEdge));
+            }
+            Debug.Log("Will create a new {Solution} on closest Edge");
+            DebugDrawLine(listLines, $"Solution ForEdge[{closestNumEdge}]");
+            return new SolutionForDot(new Solution(listLines, new DotIntersec(baseDotSolution, null)), closestNumEdge);
+        }
+        /// <summary>
+        /// Give order num Edges from farthestNumEdge till closestNumEdge
+        /// </summary>
+        /// <param name="closestNumEdge"></param>
+        /// <param name="farthestNumEdge"></param>
+        /// <returns></returns>
+        private IEnumerable<(int currentTestingNumEdge, int nextEdgeAfterCurrent)> GetOrderedListNumEdges(int closestNumEdge, int farthestNumEdge)
+        {
+            int step = (closestNumEdge < farthestNumEdge) ? -1 : 1;
+            int numTestedEdge = Math.Abs(closestNumEdge - farthestNumEdge);
+            int currentTestingNumEdge, nextEdgeAfterCurrent;
+            for (int i = 0; i < numTestedEdge; i++)
+            {
+                currentTestingNumEdge = farthestNumEdge + i * step;
+                nextEdgeAfterCurrent = currentTestingNumEdge + step;
+                yield return (farthestNumEdge + i * step, nextEdgeAfterCurrent);
+            }
+        }
+
+        private Line FindMissingLineOnEdge((Line notPassedLine, int numEdgeNotPassed, int closestNumEdge, Vector2 baseDotSolution) missedOneLine, Line linePassed)
+        {
+            //Debug.Log($"notPassedLine[{missedOneLine.notPassedLine}]");
+            //Debug.Log($"linePassed[{linePassed}]");
+            foreach ((int currentTestingNumEdge, int nextEdgeAftercurrent) in GetOrderedListNumEdges(missedOneLine.closestNumEdge, missedOneLine.numEdgeNotPassed))
+            {
+                foreach (Vector2 dotEdge in GitListDotsEdge(_arredges[currentTestingNumEdge]))
+                {
+                    (bool isPassedEdges, Line lineBTWBaseDotAndEdge, int numLastTestedEdge) = TryLinkTwoDotsThroughEdges(missedOneLine.baseDotSolution, dotEdge,
+                        missedOneLine.closestNumEdge, nextEdgeAftercurrent);
+                    if (isPassedEdges && lineBTWBaseDotAndEdge.IsBetweenLines(linePassed, missedOneLine.notPassedLine))
+                        return lineBTWBaseDotAndEdge;
                 }
             }
-            throw new NotImplementedException($"Can't find any solution for endPath Dot {baseDotSolution}");
+            foreach (Vector2 dotEdge in GitListDotsEdge(_arredges[missedOneLine.closestNumEdge]))
+            {
+                //in case trying to link the baseDotSolution with the same edge where it exist, it will always be possible
+                Line lineFromClosestEdge = new Line(missedOneLine.baseDotSolution, dotEdge);
+                if (lineFromClosestEdge.IsBetweenLines(linePassed, missedOneLine.notPassedLine))
+                    return lineFromClosestEdge;
+            }
+            throw new NotImplementedException($"Can't find line between Basedot {missedOneLine.baseDotSolution} and Egde num[{missedOneLine.closestNumEdge}]");
         }
 
         private IEnumerable<Vector2> GitListDotsEdge(Edge edge)
@@ -155,7 +209,7 @@ namespace GameEngine.PathFinder
         /// <param name="numEdgeAfterDotA"></param>
         /// <param name="numEdgeBeforeDotB"></param>
         /// <returns> if linked (true, numberLastPassEdge) otherwise (false, numberLastNotPassEdge)</returns>
-        private (Line line, int numLastTestedEdge) TryLinkTwoDotsThroughEdges(Vector2 dotA, Vector2 dotB, int numEdgeAfterDotA, int numEdgeBeforeDotB)
+        private (bool isPassedEdge, Line line, int numLastTestedEdge) TryLinkTwoDotsThroughEdges(Vector2 dotA, Vector2 dotB, int numEdgeAfterDotA, int numEdgeBeforeDotB)
         {
             CheckEdgeNumbers(ref numEdgeAfterDotA, ref numEdgeBeforeDotB);
             Debug.Log($"TryLinkTwoDots({dotA}, {dotB}), check Edges from [{numEdgeAfterDotA}] till [{numEdgeBeforeDotB}]");
@@ -167,12 +221,12 @@ namespace GameEngine.PathFinder
                 if (!lineBTWDots.TryIntersecLineWithEdge(currentNumTestingEdge))
                 {
                     DebugDrawLineSegment(dotA, dotB, $"Not crossing Edge[{currentNumTestingEdge}]");
-                    Debug.Log($"IntersecLine Not crossing Edge[{currentNumTestingEdge}]");
+                    Debug.Log($"Intersec Line Not crossing Edge[{currentNumTestingEdge}]");
                     directLineBTWdotsExist = false;
                     break;
                 }
             }
-            return directLineBTWdotsExist ? (lineBTWDots, currentNumTestingEdge): (null, currentNumTestingEdge);
+            return (directLineBTWdotsExist, lineBTWDots, currentNumTestingEdge);
         }
 
         private void CheckEdgeNumbers(ref int numEdgeAfterDotA, ref int numEdgeBeforeDotB)

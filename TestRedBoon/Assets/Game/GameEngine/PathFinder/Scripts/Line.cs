@@ -38,16 +38,20 @@ namespace GameEngine.PathFinder
         {
             if (currentEdge.Start.y == currentEdge.End.y)
             {
-                float minValue = Math.Min(currentEdge.Start.x, currentEdge.End.x);
-                float maxValue = Math.Max(currentEdge.Start.x, currentEdge.End.x);
-                return (currentEdge.Start.y, minValue, maxValue, EdgeType.Horizontal); 
+                GetMinMax(currentEdge.Start.x, currentEdge.End.x, out float minValue, out float maxValue);
+                return (currentEdge.Start.y, minValue, maxValue, EdgeType.Horizontal);
             }
             else
             {
-                float minValue = Math.Min(currentEdge.Start.y, currentEdge.End.y);
-                float maxValue = Math.Max(currentEdge.Start.y, currentEdge.End.y);
+                GetMinMax(currentEdge.Start.y, currentEdge.End.y, out float minValue, out float maxValue);
                 return (currentEdge.Start.x, minValue, maxValue, EdgeType.Vertical);
             }
+        }
+
+        private static void GetMinMax(float value1, float value2, out float minValue, out float maxValue)
+        {
+            minValue = Math.Min(value1, value2);
+            maxValue = Math.Max(value1, value2);
         }
 
         public Line(Vector2 dotA, Vector2 dotB)
@@ -61,20 +65,6 @@ namespace GameEngine.PathFinder
         /// </summary>
         /// <returns>factors for {i} equation</returns>
         public (float ai1, float ai2, float bi) GetDataForMatrix2x2() => (_factorX, 1f, _factorB);
-
-        //internal void LineCrossingEdge(Vector2 start, Vector2 end)
-        //{
-        //    //Demands get LineEdge from edge
-        //    //Build Matrix2x2 with LineEdges and Line
-        //    //Get Solution
-        //    throw new NotImplementedException();
-        //}
-
-        //internal void TryIntersecLineWithEdge(int currentTestingNumEdge)
-        //{
-        //    Edge curentEdge = _arrEdges[currentTestingNumEdge];
-        //    LineCrossingEdge(curentEdge.Start, curentEdge.End);
-        //}
 
         public float FindXForY(float y) => (_factorB - y) / _factorX;
 
@@ -118,6 +108,24 @@ namespace GameEngine.PathFinder
         private static bool InRange(float y, float minValue, float maxValue)
         {
             return (int)(y - minValue) >= 0 && 0 <= (int)(maxValue - y);
+        }
+
+        public override string ToString()
+        {
+            return $"_factorX[{_factorX}] _factorB[{_factorB}]";
+        }
+
+        //internal (float min, float max) GetMinMaxFactorX(Line notPassedLine)
+        //{
+        //    GetMinMax(_factorX, notPassedLine._factorX, out float minFactorx, out float maxFactorx);
+        //    Debug.Log($"minFactorx={minFactorx} maxFactorx={maxFactorx}");
+        //    return (minFactorx, maxFactorx);
+        //}
+
+        internal bool IsBetweenLines(Line linePassed, Line notPassedLine)
+        {
+            GetMinMax(linePassed._factorX, notPassedLine._factorX, out float minFactorx, out float maxFactorx);
+            return _factorX > minFactorx && _factorX < maxFactorx;
         }
     }
 }
