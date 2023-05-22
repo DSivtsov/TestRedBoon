@@ -76,6 +76,10 @@ namespace GameEngine.PathFinder
         //    LineCrossingEdge(curentEdge.Start, curentEdge.End);
         //}
 
+        public float FindXForY(float y) => (_factorB - y) / _factorX;
+
+        public float FindYForX(float x) => (_factorB - _factorX * x);
+
         //Currently all edges is Vertical or is Horizontal in this case the detection crossing Line with them can be simplify by use special structure
         /// <summary>
         /// Try Intersec Line With Edge
@@ -89,27 +93,31 @@ namespace GameEngine.PathFinder
             {
                 float x, y;
                 var currentEdge = _arrTupleEdges[currentTestingNumEdge];
+                float minValue = currentEdge.minValue;
+                float maxValue = currentEdge.maxValue;
                 switch (currentEdge.type)
                 {
                     case EdgeType.Horizontal:
                         y = currentEdge.constValue;
-                        x = (_factorB - y) / _factorX;
-                        if (x >= currentEdge.minValue && x <= currentEdge.maxValue)
+                        if (InRange(FindXForY(y), minValue, maxValue))
                             return true;
                         return false;
                     case EdgeType.Vertical:
                         x = currentEdge.constValue;
-                        y = (_factorB - _factorX * x);
-                        if (y >= currentEdge.minValue && y <= currentEdge.maxValue)
+                        if (InRange(FindYForX(x), minValue,maxValue))
                             return true;
                         return false;
                     default:
                         throw new NotSupportedException($"Wrong [{currentEdge.type}] Edge type");
-                } 
+                }
             }
             else
                 throw new NotSupportedException($"Class [{this}] is not inited");
         }
 
+        private static bool InRange(float y, float minValue, float maxValue)
+        {
+            return (int)(y - minValue) >= 0 && 0 <= (int)(maxValue - y);
+        }
     }
 }

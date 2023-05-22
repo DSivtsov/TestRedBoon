@@ -21,10 +21,12 @@ namespace GameEngine.PathFinder
     {
         public readonly Line LineB;
         public readonly Line LineA;
-        public readonly Vector2 BaseDot;
-        public readonly DotIntersec DotCrossing;
+        //public readonly Vector2 BaseDot;
+        public readonly DotIntersec IntersecBaseDot;
 
-        public Solution(List<Line> lines, Vector2 baseDot, DotIntersec dotCrossing)
+        public Vector2 BaseDotIntersec => IntersecBaseDot.dot;
+
+        public Solution(List<Line> lines, DotIntersec dotCrossing)
         {
             if (lines.Count == 2)
             {
@@ -33,8 +35,8 @@ namespace GameEngine.PathFinder
             }
             else
                 throw new NotSupportedException($"Wrong number lines in {lines}");
-            this.BaseDot = baseDot;
-            this.DotCrossing = dotCrossing;
+            //this.BaseDot = baseDot;
+            this.IntersecBaseDot = dotCrossing;
         }
 
         internal List<LineConnection> TryLinkSolutionWithEdgeDonCrossBordersRect(Edge edge)
@@ -46,88 +48,6 @@ namespace GameEngine.PathFinder
         {
             yield return LineB;
             yield return LineA;
-        }
-    }
-
-
-    public class SolutionForDot : ISolution
-    {
-
-        Solution _SolutionDotA;
-        int _numLastEdge;
-
-        int ISolution.NumEdge => _numLastEdge;
-
-        public SolutionForDot(Solution dotA, int numLastEdge)
-        {
-            _SolutionDotA = dotA;
-            _numLastEdge = numLastEdge;
-        }
-
-        IEnumerable<Solution> ISolution.GetListSolution()
-        {
-            yield return _SolutionDotA;
-        }
-
-        public IEnumerable<Line> GetListLinesFromSolution()
-        {
-            yield return _SolutionDotA.LineB;
-            yield return _SolutionDotA.LineA;
-        }
-
-        //internal int GetIdxLastCrossingEdgeFromEndPoint()
-        //{
-        //    return _numLastEdge;
-        //}
-
-        internal List<Vector2> GetListEdgeDotsLastCrossingEdge()
-        {
-            //Dots on Edge where LineB & LineA cross this edge
-            throw new NotImplementedException();
-        }
-
-        IEnumerable<Vector2> ISolution.GetListBasedDotsSolution()
-        {
-            yield return _SolutionDotA.BaseDot;
-        }
-    }
-
-    public class SolutionForEdge : ISolution
-    {
-        private Solution _SolutionDotA;
-        private Solution _SolutionDotB;  //for horizontal edge lineA.dot.x <  lineB.dot.x for vertical lineA.dot.y <  lineB.dot.y 
-        private int _numEdge;
-        private Vector2 _startPointFindPath;
-
-        int ISolution.NumEdge => this._numEdge;
-
-        public SolutionForEdge(Vector2 startPointFindPath)
-        {
-
-        }
-
-        public SolutionForEdge()
-        {
-        }
-
-        IEnumerable<Solution> ISolution.GetListSolution()
-        {
-            yield return _SolutionDotB;
-            yield return _SolutionDotA;
-        }
-
-        public IEnumerable<Line> GetListLinesFromSolution()
-        {
-            yield return _SolutionDotB.LineB;
-            yield return _SolutionDotB.LineA;
-            yield return _SolutionDotA.LineB;
-            yield return _SolutionDotA.LineA;
-        }
-
-        IEnumerable<Vector2> ISolution.GetListBasedDotsSolution()
-        {
-            yield return _SolutionDotB.BaseDot;
-            yield return _SolutionDotA.BaseDot;
         }
     }
 }
