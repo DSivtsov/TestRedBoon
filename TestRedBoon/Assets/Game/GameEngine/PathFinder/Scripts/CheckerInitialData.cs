@@ -80,7 +80,7 @@ namespace GameEngine.PathFinder
                 Line checkedLine = lines[line];
                 if (checkedLine.IsLineCrossingRect(checkedRec))
                 {
-                    Debug.Log($"DEMO!!! EndgeType[{(EdgeType)line}] IsLineCrossingRect[true]");
+                    Debug.Log($"DEMO!!! EndgeType[{((EdgeType)line)}] IsLineCrossingRect[true]");
                     Debug.Log($"checkedRec[{ShowRect(checkedRec)}] lineOtherRec {checkedLine} ");
                     ShowPoILine(checkedLine);
                     return true;

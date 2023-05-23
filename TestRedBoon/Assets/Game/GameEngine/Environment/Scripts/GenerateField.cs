@@ -105,6 +105,7 @@ namespace GameEngine.Environment
             }
             else
             {
+                _random = new System.Random();
                 if (_showUsedRandomSeed)
                 {
                     int newSeed = _random.Next();

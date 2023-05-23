@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using GameEngine.Environment;
-
+using System;
 
 namespace GameEngine.PathFinder
 {
@@ -9,6 +9,7 @@ namespace GameEngine.PathFinder
     {
         [SerializeField] private FieldSettingSO _fieldSetting;
         [SerializeField] private Transform _prefabLineDebug;
+        [SerializeField] private Transform _prefabDotCrossDebug;
 
         private Transform _transforDebugFinder;
         private float _positioZTransforDebugFinder;
@@ -63,6 +64,13 @@ namespace GameEngine.PathFinder
             {
                 UnityEngine.Object.Destroy(item.gameObject);
             }
+        }
+
+        internal void ShowDotCross(Vector2 dot, string nameDot)
+        {
+            Transform transformLine = UnityEngine.Object.Instantiate<Transform>(_prefabDotCrossDebug, _transforDebugFinder);
+            transformLine.position = new Vector3(dot.x, dot.y, _positioZTransforDebugFinder);
+            transformLine.name = (nameDot == null) ? $"DotCross{_countLine++}" : nameDot;
         }
     }
 }

@@ -21,7 +21,6 @@ namespace GameEngine.PathFinder
     {
         public readonly Line LineB;
         public readonly Line LineA;
-        //public readonly Vector2 BaseDot;
         public readonly DotIntersec IntersecBaseDot;
 
         public Vector2 BaseDotIntersec => IntersecBaseDot.dot;
@@ -31,11 +30,10 @@ namespace GameEngine.PathFinder
             if (lines.Count == 2)
             {
                 LineB = lines[0];
-                LineA = lines[0];
+                LineA = lines[1];
             }
             else
                 throw new NotSupportedException($"Wrong number lines in {lines}");
-            //this.BaseDot = baseDot;
             this.IntersecBaseDot = dotCrossing;
         }
 
