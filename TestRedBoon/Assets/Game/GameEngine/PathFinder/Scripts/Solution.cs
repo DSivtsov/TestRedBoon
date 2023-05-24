@@ -9,12 +9,18 @@ using GameEngine.Environment;
 
 namespace GameEngine.PathFinder
 {
+    public enum SolutionSide
+    {
+        Start = 0,
+        End = 1,
+    }
     public interface ISolution
     {
-        public IEnumerable<Solution> GetListSolution();
-        public IEnumerable<Line> GetListLinesFromSolution();
-        public IEnumerable<Vector2> GetListBasedDotsSolution();
-        public int NumEdge { get; }
+        IEnumerable<Solution> GetListSolution();
+        IEnumerable<Line> GetListLinesFromSolution();
+        IEnumerable<Vector2> GetListBasedDotsSolution();
+        int NumLastCrossedEdgeEdge { get; }
+        int NumRecBaseDotSolution { get; }
     }
 
     public class Solution // angleLineB > angleLineA in degrees // in k factor
@@ -22,6 +28,7 @@ namespace GameEngine.PathFinder
         public readonly Line LineB;
         public readonly Line LineA;
         public readonly DotIntersec IntersecBaseDot;
+        //public readonly int NumRecBaseDot;
 
         public Vector2 BaseDotIntersec => IntersecBaseDot.dot;
 

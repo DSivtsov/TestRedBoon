@@ -8,15 +8,20 @@ namespace GameEngine.PathFinder
     public class SolutionForDot : ISolution
     {
 
-        Solution _SolutionDotA;
-        int _numLastEdge;
+        private readonly Solution _SolutionDotA;
+        private readonly int _numLastCrossedEdge;
+        private readonly int _numRecBaseDot;
 
-        int ISolution.NumEdge => _numLastEdge;
+        int ISolution.NumLastCrossedEdgeEdge => _numLastCrossedEdge;
 
-        public SolutionForDot(Solution solution, int numLastEdge)
+        int ISolution.NumRecBaseDotSolution => _numRecBaseDot;
+
+        public SolutionForDot(Solution solution, int numLastEdge, int numRecBaseDot)
         {
             _SolutionDotA = solution;
-            _numLastEdge = numLastEdge;
+            _numLastCrossedEdge = numLastEdge;
+            //Rec will before last crossed Edge
+            _numRecBaseDot = numRecBaseDot;
         }
 
         IEnumerable<Solution> ISolution.GetListSolution()

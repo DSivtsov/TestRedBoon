@@ -10,11 +10,18 @@ namespace GameEngine.PathFinder
         private Solution _SolutionDotB;  //for horizontal edge lineA.dot.x <  lineB.dot.x for vertical lineA.dot.y <  lineB.dot.y 
         private int _numEdge;
         private Vector2 _startPointFindPath;
+        private readonly int _numRecBaseEdge;
 
-        int ISolution.NumEdge => this._numEdge;
+        int ISolution.NumLastCrossedEdgeEdge => this._numEdge;
+
+        int ISolution.NumRecBaseDotSolution => _numRecBaseEdge;
 
         public SolutionForEdge()
         {
+            throw new System.NotImplementedException("SolutionForEdge.ctor()");
+            //Rec will !!! after last crossed Edge !!!
+            //_numRecBaseDot = (solutionSide == SolutionSide.Start)
+            //    ? StoreInfoEdges.GetNumRect(numLastEdge, RecType.SecondRect) : StoreInfoEdges.GetNumRect(numLastEdge, RecType.FirstRect);
         }
 
         IEnumerable<Solution> ISolution.GetListSolution()

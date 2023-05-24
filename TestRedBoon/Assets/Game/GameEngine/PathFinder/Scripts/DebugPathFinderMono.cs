@@ -5,7 +5,7 @@ using System;
 
 namespace GameEngine.PathFinder
 {
-    public class DebugPathFinder : MonoBehaviour
+    public class DebugPathFinderMono : MonoBehaviour
     {
         [SerializeField] private FieldSettingSO _fieldSetting;
         [SerializeField] private Transform _prefabLineDebug;
@@ -37,7 +37,7 @@ namespace GameEngine.PathFinder
             {
                 Vector2 startDot = new Vector2(-_widthHalfField, (float)lines[i].FindYForX(-_widthHalfField));
                 Vector2 endDot = new Vector2(_widthHalfField, (float)lines[i].FindYForX(_widthHalfField));
-                ShowLine(startDot, endDot, $"{nameGroup}_{i}"); 
+                ShowLine(startDot, endDot, $"{nameGroup}_{i}");
             }
         }
 
@@ -49,7 +49,7 @@ namespace GameEngine.PathFinder
         }
 
 
-        public void ShowLine(Vector2 startDot, Vector2 endDot,string nameLine)
+        public void ShowLine(Vector2 startDot, Vector2 endDot, string nameLine)
         {
             Transform transformLine = UnityEngine.Object.Instantiate<Transform>(_prefabLineDebug, _transforDebugFinder);
             transformLine.position = new Vector3(startDot.x, startDot.y, _positioZTransforDebugFinder);
@@ -74,3 +74,4 @@ namespace GameEngine.PathFinder
         }
     }
 }
+

@@ -31,7 +31,8 @@ CheckExistOverlapingRectangle
 Additional Checks:
 	After CheckExistOverlapingRectangle()
 	
-	Check startPointFindPath and endPointFindPath must be not part of Edge (first or last)
+	!!!Check startPointFindPath and endPointFindPath must be not part of Edge (first or last)
+		(AND Also not on Edge side also)
 		because in that case the first or last edges not usefulness and can be skipped (thrown)
 	
 	Check Corect Edge (absent space between first and seconf rec)
