@@ -150,15 +150,30 @@ namespace GameEngine.PathFinder
             return numNewDotCorssing;
         }
 
+        private static bool IsLinePassedThroughEdges(Line line, int numEdgeStart, int numEdgeEnd)
+        {
+            bool directLineBTWdotsExist = true;
+            for (int currentNumTestingEdge = numEdgeStart; currentNumTestingEdge <= numEdgeEnd; currentNumTestingEdge++)
+            {
+                //Debug.Log($"currentNumTestingEdge={currentNumTestingEdge}");
+                if (!line.TryIntersecLineWithEdge(currentNumTestingEdge))
+                {
+                    Debug.Log($"Intersec Line Not crossing Edge[{currentNumTestingEdge}]");
+                    directLineBTWdotsExist = false;
+                    break;
+                }
+            }
+            return directLineBTWdotsExist;
+        }
+
         private int FindCrossingCurrentSolutionWithSolutionForEndPoint(ISolution solutionObjStart)
         {
             int numNewDotCorssing = 0;
-            int count = 0;
+            //int count = 0;
             DebugFinder.DebugTurnOn(true);
             int numLastCrossingEdgeFromStart = solutionObjStart.NumLastCrossedEdgeEdge;
             int numRecBaseDotStart = solutionObjStart.NumRecBaseDotSolution;
             Debug.Log($"idxLastCrossingEdgeFromEndPoint[{_numLastCrossingEdgeFromSolutionEnd}] idxLastCrossingEdgeFromCurrentSolution[{numLastCrossingEdgeFromStart}]");
-            List<Rectangle> listPossibleRect = GetListPossibleRect(_numLastCrossingEdgeFromSolutionEnd, numLastCrossingEdgeFromStart);
             foreach (Solution currentSolutionStart in solutionObjStart.GetListSolution())
             {
                 Vector2 baseDotStart = currentSolutionStart.BaseDotIntersec;
@@ -168,35 +183,49 @@ namespace GameEngine.PathFinder
                 {
                     foreach (Line lineSolutionEnd in _listLinesSolutionEnd)
                     {
-                        //Debug.Log($"lineSolutionStart({lineSolutionStart}), lineSolutionEnd({lineSolutionEnd})");
                         (bool isCrossing, Vector2 dotCrossing) = CrossLineSolutionWithLine(lineSolutionStart, lineSolutionEnd);
-                        //if (isCrossing && IsDotInOneFromListRect(dotCrossing, listPossibleRect))
-                        //{
-                        //    DebugDrawDotCross(dotCrossing);
-                        //    _listDotCrossing.AddDotCross(dotCrossing, prev);
-                        //    numNewDotCorssing++;
-                        //}
                         if (isCrossing)
                         {
-                            Debug.Log($"dotCrossing_{count} {dotCrossing}");
-                            DebugFinder.DebugDrawDot(dotCrossing, $"dotCrossing_{count}");
-                            count++;
+                            //Debug.Log($"dotCrossing_{count} {dotCrossing}");
+                            //DebugFinder.DebugDrawDot(dotCrossing, $"dotCrossing_{count}");
+                            //count++;
                             
                             if (StoreInfoEdges.IsDotCrossingBetweenBaseDotAndEdge(dotCrossing, baseDotStart, numLastCrossingEdgeFromStart))
                             {//DotCrossing Between BaseDotStart And LastCrossingEdgeFromCurrentSolution
                                 (bool dotInRec, int numRect) = StoreInfoEdges.IsDotInRectBetweenRecBaseDotAndRectEdge(dotCrossing, numRecBaseDotStart, numLastCrossingEdgeFromStart,
                                     SolutionSide.Start);
-                                Debug.Log($"dotInRec[{dotInRec}] numRect[{numRect}]");
+                                if (IsLinePassEdges(lineSolutionEnd, _numLastCrossingEdgeFromSolutionEnd, numRect, SolutionSide.Start))
+                                {
+                                    DebugFinder.DebugDrawDot(dotCrossing);
+                                    _listDotCrossing.AddDotCross(dotCrossing, prev);
+                                    numNewDotCorssing++;
+                                }
                             }
                             else if (StoreInfoEdges.IsDotCrossingBetweenBaseDotAndEdge(dotCrossing, _baseDotSolutionEnd, _numLastCrossingEdgeFromSolutionEnd))
                             {//DotCrossing Between _numLastCrossingEdgeFromSolutionEnd and BaseDotEnd
                                 (bool dotInRec, int numRect) = StoreInfoEdges.IsDotInRectBetweenRecBaseDotAndRectEdge(dotCrossing, _numRecBaseDotEnd, _numLastCrossingEdgeFromSolutionEnd,
                                     SolutionSide.End);
-                                Debug.Log($"dotInRec[{dotInRec}] numRect[{numRect}]");
+                                if (IsLinePassEdges(lineSolutionStart, numLastCrossingEdgeFromStart, numRect, SolutionSide.End))
+                                {
+                                    DebugFinder.DebugDrawDot(dotCrossing);
+                                    _listDotCrossing.AddDotCross(dotCrossing, prev);
+                                    numNewDotCorssing++;
+                                }
                             }
                             else
                             {//Dot cross Between edges Solution Start and End
-                                Debug.LogWarning("Dot cross Between edges Solution Start and End");
+                                (bool dotInRec, int numRect) = StoreInfoEdges.IsDotInRectBetweenEdges(dotCrossing, numLastCrossingEdgeFromStart, _numLastCrossingEdgeFromSolutionEnd);
+                                //Debug.Log($"dotInRec[{dotInRec}] numRect[{numRect}]");
+                                //Debug.Log("forLineFromSTart");
+                                bool rezLineSolutionStart = (IsLinePassEdges(lineSolutionStart, numLastCrossingEdgeFromStart, numRect, SolutionSide.End));
+                                //Debug.Log("forLineFromEnd");
+                                bool rezLineSolutionEnd = IsLinePassEdges(lineSolutionEnd, _numLastCrossingEdgeFromSolutionEnd, numRect, SolutionSide.Start);
+                                if (rezLineSolutionStart && rezLineSolutionEnd)
+                                {
+                                    DebugFinder.DebugDrawDot(dotCrossing);
+                                    _listDotCrossing.AddDotCross(dotCrossing, prev);
+                                    numNewDotCorssing++;
+                                }
                             }
                         }
                     }
@@ -206,6 +235,22 @@ namespace GameEngine.PathFinder
             DebugFinder.DebugTurnOn(false);
             Debug.Log($"{this}: numNewDotCorssing[{numNewDotCorssing}]");
             return numNewDotCorssing;
+        }
+
+        private bool IsLinePassEdges(Line lineOtherSolution, int numLastCrossingEdgeByLineOtherSolution, int numRectWhereDotCrossing, SolutionSide solutionSide)
+        {
+            int numEgde = StoreInfoEdges.GetNumEdge(numRectWhereDotCrossing, solutionSide);
+            //Debug.Log($"numRectWhereDotCrossing[{numRectWhereDotCrossing}] numEgde={numEgde} numLastCrossingEdgeFromSolution[{numLastCrossingEdgeByLineOtherSolution}] " +
+            //    $"solutionSide[{solutionSide}]");
+            switch (solutionSide)
+            {
+                case SolutionSide.Start:
+                    return IsLinePassedThroughEdges(lineOtherSolution, numEgde, numLastCrossingEdgeByLineOtherSolution - 1);
+                case SolutionSide.End:
+                    return IsLinePassedThroughEdges(lineOtherSolution, numLastCrossingEdgeByLineOtherSolution + 1, numEgde);
+                default:
+                    throw new NotSupportedException($"Value [{solutionSide}] is not supported");
+            }
         }
 
         private List<Rectangle> GetListPossibleRect(int idxLastCrossingEdgeFromEndPoint, int idxLastCrossingEdgeFromCurrentSolution)
@@ -219,14 +264,7 @@ namespace GameEngine.PathFinder
 
         private SolutionForDot CreateSolutionForDot(Vector2 baseDotSolution, int closestNumEdge, int farthestNumEdge, int numRecBaseDot)
         {
-            
-            //int currentTestingNumEdge;
-            //int step = (closestNumEdge < farthestNumEdge) ? -1 : 1;
-            //int numTestedEdge = Math.Abs(closestNumEdge - farthestNumEdge);
-            (Line notPassedLine, int numEdgeNotPassed, int closestNumEdge, Vector2 baseDotSolution) missedOneLine = default;
-            //for (int i = 0; i <= numTestedEdge; i++)
-            //{
-            //    currentTestingNumEdge = farthestNumEdge + i * step;
+            //(Line notPassedLine, int numEdgeNotPassed, int closestNumEdge, Vector2 baseDotSolution) missedOneLine = default;
             List<Line> listLines = new List<Line>(2);
             foreach ((int currentTestingNumEdge, int nextEdgeAftercurrent) in GetOrderedListNumEdges(closestNumEdge, farthestNumEdge))
             {
@@ -242,10 +280,10 @@ namespace GameEngine.PathFinder
                     {
                         listLines.Add(lineBTWBaseDotAndEdge);
                     }
-                    else
-                    {
-                        missedOneLine = (lineBTWBaseDotAndEdge, numLastTestedEdge, closestNumEdge, baseDotSolution);
-                    }
+                    //else
+                    //{
+                    //    missedOneLine = (lineBTWBaseDotAndEdge, numLastTestedEdge, closestNumEdge, baseDotSolution);
+                    //}
                 }
                 Debug.Log($"Was found {listLines.Count()} LinkLines the current {baseDotSolution} with Edge[{currentTestingNumEdge}] ");
                 switch (listLines.Count())

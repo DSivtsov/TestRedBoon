@@ -18,12 +18,12 @@ namespace GameEngine.PathFinder
 
         private readonly struct EdgeInfo
         {
-            public readonly float ConstValue;
-            public readonly float MinValue;
-            public readonly float MaxValue;
-            public readonly EdgeType TypeEdge;
+            internal readonly float ConstValue;
+            internal readonly float MinValue;
+            internal readonly float MaxValue;
+            internal readonly EdgeType TypeEdge;
 
-            public EdgeInfo(Vector2 Start, Vector2 End)
+            internal EdgeInfo(Vector2 Start, Vector2 End)
             {
                 float minValue, maxValue;
                 if (Start.y == End.y)
@@ -45,12 +45,17 @@ namespace GameEngine.PathFinder
 
         private static bool _classIsInited = false;
 
-        public static int GetNumRect(int numEdge, RecType recType) => numEdge + (int)recType;
+        internal static int GetNumRect(int numEdge, RecType recType) => numEdge + (int)recType;
 
-        public static int GetNumRectWithEdgeForSolution(int numEdge, SolutionSide solutionSide)
+        internal static int GetNumRectWithEdgeForSolution(int numEdge, SolutionSide solutionSide)
             => StoreInfoEdges.GetNumRect(numEdge, (solutionSide == SolutionSide.Start) ? RecType.FirstRect : RecType.SecondRect );
 
-        public static void InitStoreEdges(Edge[] arrEdges)
+        internal static int GetNumEdge(int numRect, SolutionSide solutionSide)
+        {
+            return numRect - (int)((solutionSide == SolutionSide.Start) ? RecType.FirstRect : RecType.SecondRect);
+        }
+
+        internal static void InitStoreEdges(Edge[] arrEdges)
         {
             _arrEdges = arrEdges;
             _arrRectangle = new Rectangle[arrEdges.Length + 1];
@@ -100,20 +105,32 @@ namespace GameEngine.PathFinder
         internal static (bool IsDotInRect, int numRect) IsDotInRectBetweenRecBaseDotAndRectEdge(Vector2 dotCrossing, int numRectBaseDot, int idxLastCrossingEdge,
             SolutionSide solutionSide)
         {
+            int numRectEdgeEnd = GetNumRect(idxLastCrossingEdge, (solutionSide == SolutionSide.Start) ? RecType.FirstRect : RecType.SecondRect);
+            return DotInRectangles(dotCrossing, numRectBaseDot, numRectEdgeEnd);
+        }
+
+        internal static (bool dotInRec, int numRect) IsDotInRectBetweenEdges(Vector2 dotCrossing, int numLastCrossingEdgeFromStartSolution, int numLastCrossingEdgeFromEndSolution)
+        {
+            int numRectEdgeStart = GetNumRect(numLastCrossingEdgeFromStartSolution, RecType.SecondRect);
+            int numRectEdgeEnd = GetNumRect(numLastCrossingEdgeFromEndSolution, RecType.FirstRect);
+            return DotInRectangles(dotCrossing, numRectEdgeStart, numRectEdgeEnd);
+        }
+
+        private static (bool dotInRec, int numRect) DotInRectangles(Vector2 dotCrossing, int numRectEdgeStart, int numRectEdgeEnd)
+        {
             if (_classIsInited)
             {
-                int numRectEdge = GetNumRect(idxLastCrossingEdge, (solutionSide == SolutionSide.Start) ? RecType.FirstRect : RecType.SecondRect);
-                //Debug.Log($"IsDotInRectBetweenRecBaseDotAndRectEdge numRectBaseDot={numRectBaseDot} numRectEdge={numRectEdge}");
-                for (int numRect = numRectBaseDot; numRect <= numRectEdge; numRect++)
+                for (int numRect = numRectEdgeStart; numRect <= numRectEdgeEnd; numRect++)
                 {
                     if (IsDotInRect(dotCrossing, _arrRectangle[numRect]))
-                        return (true,numRect);
+                        return (true, numRect);
                 }
                 return (false, -1);
             }
             else
                 throw new NotSupportedException($"Class [{typeof(StoreInfoEdges)}] is not inited");
         }
+
 
         internal static void GetMinMax(float value1, float value2, out float minValue, out float maxValue)
         {
@@ -136,5 +153,7 @@ namespace GameEngine.PathFinder
         {
             return (int)(value - minValue) >= 0 && (int)(maxValue - value) >= 0 ;
         }
+
+
     }
 }

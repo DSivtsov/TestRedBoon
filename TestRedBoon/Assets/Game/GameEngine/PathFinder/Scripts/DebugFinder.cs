@@ -34,13 +34,6 @@ namespace GameEngine.PathFinder
         }
 
         [System.Diagnostics.Conditional("DEBUGFINDER")]
-        public static void DebugDrawDotCross(Vector2 dot, string nameDot)
-        {
-            if (_initDebugPathFinder && _debugTurnOn)
-                _debugPathFinder.ShowDotCross(dot, nameDot);
-        }
-
-        [System.Diagnostics.Conditional("DEBUGFINDER")]
         public static void DebugDrawLine(Line line)
         {
             if (_initDebugPathFinder && _debugTurnOn)
