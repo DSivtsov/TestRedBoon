@@ -16,14 +16,14 @@ namespace GameEngine.PathFinder
     }
     public interface ISolution
     {
-        IEnumerable<Solution> GetListSolution();
-        IEnumerable<Line> GetListLinesFromSolution();
+        IEnumerable<SectorSolutions> GetListSectorSolutions();
+        IEnumerable<Line> GetListLinesFromSectorSolutions();
         IEnumerable<Vector2> GetListBasedDotsSolution();
         int NumLastCrossedEdgeEdge { get; }
         int NumRecBaseDotSolution { get; }
     }
 
-    public class Solution // angleLineB > angleLineA in degrees // in k factor
+    public class SectorSolutions // angleLineB > angleLineA in degrees // in k factor
     {
         public readonly Line LineB;
         public readonly Line LineA;
@@ -32,7 +32,7 @@ namespace GameEngine.PathFinder
 
         public Vector2 BaseDotIntersec => IntersecBaseDot.dot;
 
-        public Solution(List<Line> lines, DotIntersec dotCrossing)
+        public SectorSolutions(List<Line> lines, DotIntersec dotCrossing)
         {
             if (lines.Count == 2)
             {

@@ -8,7 +8,7 @@ namespace GameEngine.PathFinder
     public class SolutionForDot : ISolution
     {
 
-        private readonly Solution _SolutionDotA;
+        private readonly SectorSolutions _sectorSolutionsDotA;
         private readonly int _numLastCrossedEdge;
         private readonly int _numRecBaseDot;
 
@@ -16,23 +16,23 @@ namespace GameEngine.PathFinder
 
         int ISolution.NumRecBaseDotSolution => _numRecBaseDot;
 
-        public SolutionForDot(Solution solution, int numLastEdge, int numRecBaseDot)
+        public SolutionForDot(SectorSolutions sectorSolutions, int numLastEdge, int numRecBaseDot)
         {
-            _SolutionDotA = solution;
+            _sectorSolutionsDotA = sectorSolutions;
             _numLastCrossedEdge = numLastEdge;
             //Rec will before last crossed Edge
             _numRecBaseDot = numRecBaseDot;
         }
 
-        IEnumerable<Solution> ISolution.GetListSolution()
+        IEnumerable<SectorSolutions> ISolution.GetListSectorSolutions()
         {
-            yield return _SolutionDotA;
+            yield return _sectorSolutionsDotA;
         }
 
-        public IEnumerable<Line> GetListLinesFromSolution()
+        public IEnumerable<Line> GetListLinesFromSectorSolutions()
         {
-            yield return _SolutionDotA.LineB;
-            yield return _SolutionDotA.LineA;
+            yield return _sectorSolutionsDotA.LineB;
+            yield return _sectorSolutionsDotA.LineA;
         }
 
         internal List<Vector2> GetListEdgeDotsLastCrossingEdge()
@@ -43,7 +43,7 @@ namespace GameEngine.PathFinder
 
         IEnumerable<Vector2> ISolution.GetListBasedDotsSolution()
         {
-            yield return _SolutionDotA.IntersecBaseDot.dot;
+            yield return _sectorSolutionsDotA.IntersecBaseDot.dot;
         }
     }
 }

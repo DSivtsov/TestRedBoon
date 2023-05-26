@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using GameEngine.Environment;
 
@@ -154,6 +155,11 @@ namespace GameEngine.PathFinder
             return (int)(value - minValue) >= 0 && (int)(maxValue - value) >= 0 ;
         }
 
-
+        internal static IEnumerable<Vector2> GitListDotsEdge(int numEdge)
+        {
+            Edge edge = _arrEdges[numEdge];
+            yield return edge.Start;
+            yield return edge.End;
+        }
     }
 }

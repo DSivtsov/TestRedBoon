@@ -6,8 +6,8 @@ namespace GameEngine.PathFinder
 {
     public class SolutionForEdge : ISolution
     {
-        private Solution _SolutionDotA;
-        private Solution _SolutionDotB;  //for horizontal edge lineA.dot.x <  lineB.dot.x for vertical lineA.dot.y <  lineB.dot.y 
+        private SectorSolutions _SolutionDotA;
+        private SectorSolutions _SolutionDotB;  //for horizontal edge lineA.dot.x <  lineB.dot.x for vertical lineA.dot.y <  lineB.dot.y 
         private int _numEdge;
         private Vector2 _startPointFindPath;
         private readonly int _numRecBaseEdge;
@@ -24,13 +24,13 @@ namespace GameEngine.PathFinder
             //    ? StoreInfoEdges.GetNumRect(numLastEdge, RecType.SecondRect) : StoreInfoEdges.GetNumRect(numLastEdge, RecType.FirstRect);
         }
 
-        IEnumerable<Solution> ISolution.GetListSolution()
+        IEnumerable<SectorSolutions> ISolution.GetListSectorSolutions()
         {
             yield return _SolutionDotB;
             yield return _SolutionDotA;
         }
 
-        public IEnumerable<Line> GetListLinesFromSolution()
+        public IEnumerable<Line> GetListLinesFromSectorSolutions()
         {
             yield return _SolutionDotB.LineB;
             yield return _SolutionDotB.LineA;
