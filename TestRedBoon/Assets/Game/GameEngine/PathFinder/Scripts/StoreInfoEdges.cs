@@ -22,7 +22,7 @@ namespace GameEngine.PathFinder
             internal readonly float ConstValue;
             internal readonly float MinValue;
             internal readonly float MaxValue;
-            internal readonly EdgeType TypeEdge;
+            internal readonly LineType TypeLineEdge;
 
             internal EdgeInfo(Vector2 Start, Vector2 End)
             {
@@ -31,13 +31,13 @@ namespace GameEngine.PathFinder
                 {
                     GetMinMax(Start.x, End.x, out minValue, out maxValue);
                     ConstValue = Start.y;
-                    TypeEdge = EdgeType.Horizontal;
+                    TypeLineEdge = LineType.Horizontal;
                 }
                 else
                 {
                     GetMinMax(Start.y, End.y, out minValue, out maxValue);
                     ConstValue = Start.x;
-                    TypeEdge = EdgeType.Vertical;
+                    TypeLineEdge = LineType.Vertical;
                 }
                 MinValue = minValue;
                 MaxValue = maxValue;
@@ -71,12 +71,12 @@ namespace GameEngine.PathFinder
             _classIsInited = true;
         }
 
-        internal static (float constValue, float minValue, float maxValue, EdgeType type) GetEdgeInfo(int numEdge)
+        internal static (float constValue, float minValue, float maxValue, LineType lineTypeEdge) GetEdgeInfo(int numEdge)
         {
             if (_classIsInited)
             {
                 EdgeInfo edgeInfo = _edgesInfo[numEdge];
-                return (edgeInfo.ConstValue, edgeInfo.MinValue, edgeInfo.MaxValue, edgeInfo.TypeEdge);
+                return (edgeInfo.ConstValue, edgeInfo.MinValue, edgeInfo.MaxValue, edgeInfo.TypeLineEdge);
             }
             else
                 throw new NotSupportedException($"Class [{typeof(StoreInfoEdges)}] is not inited");
@@ -91,12 +91,12 @@ namespace GameEngine.PathFinder
         /// <returns>true if the DotCrossing Between BaseDot And Edge</returns>
         internal static bool IsDotCrossingBetweenBaseDotAndEdge(Vector2 dotCrossing, Vector2 baseDotStart, int numEdge)
         {
-            (float constValueEdge, _, _, EdgeType type)  = GetEdgeInfo(numEdge);
+            (float constValueEdge, _, _, LineType type)  = GetEdgeInfo(numEdge);
             switch (type)
             {
-                case EdgeType.Horizontal:
+                case LineType.Horizontal:
                     return Math.Sign(dotCrossing.y - baseDotStart.y) == Math.Sign(constValueEdge - dotCrossing.y);
-                case EdgeType.Vertical:
+                case LineType.Vertical:
                     return Math.Sign(dotCrossing.x - baseDotStart.x) == Math.Sign(constValueEdge - dotCrossing.x);
                 default:
                     throw new NotSupportedException($"Wrong Value EdgeType[{type}]");
@@ -160,6 +160,20 @@ namespace GameEngine.PathFinder
             Edge edge = _arrEdges[numEdge];
             yield return edge.Start;
             yield return edge.End;
+        }
+
+        internal static bool IsDotOnEdge(Vector2 dot, int numEdge)
+        {
+            float dotX = dot.x;
+            float dotY = dot.y;
+            foreach (Vector2 dotEdge in GitListDotsEdge(numEdge))
+            {
+                float dotEdgeX = dotEdge.x;
+                float dotEdgeY = dotEdge.y;
+                if ((int)(dotX - dotEdgeX) == 0 && (int)(dotY - dotEdgeY) == 0)
+                    return true; 
+            }
+            return false;
         }
     }
 }

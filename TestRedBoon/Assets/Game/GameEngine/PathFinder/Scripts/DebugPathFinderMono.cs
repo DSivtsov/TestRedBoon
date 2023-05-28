@@ -35,16 +35,23 @@ namespace GameEngine.PathFinder
             string nameGroup = (nameGroupLine == null) ? $"GroupLine{_countLine++}" : nameGroupLine;
             for (int i = 0; i < lines.Count; i++)
             {
-                Vector2 startDot = new Vector2(-_widthHalfField, (float)lines[i].FindYForX(-_widthHalfField));
-                Vector2 endDot = new Vector2(_widthHalfField, (float)lines[i].FindYForX(_widthHalfField));
+                (Vector2 startDot, Vector2 endDot) = lines[i].GetDotsforScreen(_widthHalfField, _heightHalfField);
+                //Vector2 startDot = new Vector2(-_widthHalfField, (float)lines[i].FindYForX(-_widthHalfField));
+                //Vector2 endDot = new Vector2(_widthHalfField, (float)lines[i].FindYForX(_widthHalfField));
                 ShowLine(startDot, endDot, $"{nameGroup}_{i}");
             }
         }
 
+        private void GetDotsforScreen(int widthHalfField, int heightHalfField)
+        {
+            throw new NotImplementedException();
+        }
+
         public void ShowLine(Line line, string nameLine)
         {
-            Vector2 startDot = new Vector2(-_widthHalfField, (float)line.FindYForX(-_widthHalfField));
-            Vector2 endDot = new Vector2(_widthHalfField, (float)line.FindYForX(_widthHalfField));
+            (Vector2 startDot, Vector2 endDot) = line.GetDotsforScreen(_widthHalfField, _heightHalfField);
+            //Vector2 startDot = new Vector2(-_widthHalfField, (float)line.FindYForX(-_widthHalfField));
+            //Vector2 endDot = new Vector2(_widthHalfField, (float)line.FindYForX(_widthHalfField));
             ShowLine(startDot, endDot, nameLine);
         }
 
