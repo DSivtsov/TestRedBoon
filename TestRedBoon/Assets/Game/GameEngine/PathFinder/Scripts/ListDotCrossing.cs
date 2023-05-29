@@ -5,35 +5,35 @@ using UnityEngine;
 
 namespace GameEngine.PathFinder
 {
-    public class DotIntersec
+    public class LinkedDot
     {
         public readonly Vector2 dot;
-        public readonly DotIntersec prev;
+        public readonly LinkedDot prev;
 
-        public DotIntersec(Vector2 dot, DotIntersec prev)
+        public LinkedDot(Vector2 dot, LinkedDot prev)
         {
             this.dot = dot;
             this.prev = prev;
         }
     }
 
-    public class ListIntersec
+    public class ListLinkedDot
     {
-        List<DotIntersec> _list;
+        List<LinkedDot> _list;
         int _numDotHaveCrossingwithEndPath;
         Vector2 _endPointFindPath;
         //Intersect will be at twice more than edge
         private const int FactorIntersectToEdge = 2;
         private List<Vector2> _path;
 
-        internal ListIntersec(int numEdges)
+        internal ListLinkedDot(int numEdges)
         {
-            _list = new List<DotIntersec>(numEdges * FactorIntersectToEdge);
+            _list = new List<LinkedDot>(numEdges * FactorIntersectToEdge);
         }
 
-        internal void AddDotCross(Vector2 rez, DotIntersec prev)
+        internal void AddDotCross(Vector2 rez, LinkedDot prev)
         {
-            _list.Add(new DotIntersec(rez, prev));
+            _list.Add(new LinkedDot(rez, prev));
         }
 
         private const int INCLUDESTARTANDENDPATH = 2;
@@ -54,7 +54,7 @@ namespace GameEngine.PathFinder
         private void SelectAnyPathWithBeginLastDotCrossing()
         {
             Debug.LogWarning("Will take the last founded dot of crossing the endPath");
-            DotIntersec lastDotCrossing = _list[_list.Count - 1];
+            LinkedDot lastDotCrossing = _list[_list.Count - 1];
             //The dot of StartPath incluided in list and have .prev == null
             do
             {

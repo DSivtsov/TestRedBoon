@@ -19,7 +19,7 @@ namespace GameEngine.PathFinder
         IEnumerable<SectorSolutions> GetListSectorSolutions();
         IEnumerable<Line> GetListLinesFromSectorSolutions();
         IEnumerable<Vector2> GetListBasedDotsSolution();
-        int NumLastCrossedEdgeEdge { get; }
+        int NumLastCrossedEdgeBySolution { get; }
         int NumRecBaseDotSolution { get; }
     }
 
@@ -27,12 +27,12 @@ namespace GameEngine.PathFinder
     {
         public readonly Line LineB;
         public readonly Line LineA;
-        public readonly DotIntersec IntersecBaseDot;
+        public readonly LinkedDot IntersecBaseDot;
         //public readonly int NumRecBaseDot;
 
         public Vector2 BaseDotIntersec => IntersecBaseDot.dot;
 
-        public SectorSolutions(List<Line> lines, DotIntersec dotCrossing)
+        public SectorSolutions(List<Line> lines, LinkedDot dotCrossing)
         {
             if (lines.Count == 2)
             {

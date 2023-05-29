@@ -12,7 +12,7 @@ namespace GameEngine.PathFinder
         private readonly int _numLastCrossedEdge;
         private readonly int _numRecBaseDot;
 
-        int ISolution.NumLastCrossedEdgeEdge => _numLastCrossedEdge;
+        int ISolution.NumLastCrossedEdgeBySolution => _numLastCrossedEdge;
 
         int ISolution.NumRecBaseDotSolution => _numRecBaseDot;
 

@@ -12,7 +12,7 @@ namespace GameEngine.PathFinder
         private Vector2 _startPointFindPath;
         private readonly int _numRecBaseEdge;
 
-        int ISolution.NumLastCrossedEdgeEdge => this._numEdge;
+        int ISolution.NumLastCrossedEdgeBySolution => this._numEdge;
 
         int ISolution.NumRecBaseDotSolution => _numRecBaseEdge;
 
