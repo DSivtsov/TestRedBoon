@@ -5,35 +5,35 @@ using UnityEngine;
 
 namespace GameEngine.PathFinder
 {
-    public class LinkedDot
+    public class ConnectionDot
     {
         public readonly Vector2 dot;
-        public readonly LinkedDot prev;
+        public readonly IEnumerable<ConnectionDot> prevConnectionDots;
 
-        public LinkedDot(Vector2 dot, LinkedDot prev)
+        public ConnectionDot(Vector2 dot, IEnumerable<ConnectionDot> prevConnectionDots)
         {
             this.dot = dot;
-            this.prev = prev;
+            this.prevConnectionDots = prevConnectionDots;
         }
     }
 
-    public class ListLinkedDot
+    public class ListDotsPath
     {
-        List<LinkedDot> _list;
+        List<ConnectionDot> _list;
         int _numDotHaveCrossingwithEndPath;
         Vector2 _endPointFindPath;
         //Intersect will be at twice more than edge
         private const int FactorIntersectToEdge = 2;
         private List<Vector2> _path;
 
-        internal ListLinkedDot(int numEdges)
+        internal ListDotsPath(int numEdges)
         {
-            _list = new List<LinkedDot>(numEdges * FactorIntersectToEdge);
+            _list = new List<ConnectionDot>(numEdges * FactorIntersectToEdge);
         }
 
-        internal void AddDotCross(Vector2 rez, LinkedDot prev)
+        internal void AddDotCross(Vector2 rez, IEnumerable<ConnectionDot> prevConnectionDots)
         {
-            _list.Add(new LinkedDot(rez, prev));
+            _list.Add(new ConnectionDot(rez, prevConnectionDots));
         }
 
         private const int INCLUDESTARTANDENDPATH = 2;
@@ -54,12 +54,12 @@ namespace GameEngine.PathFinder
         private void SelectAnyPathWithBeginLastDotCrossing()
         {
             Debug.LogWarning("Will take the last founded dot of crossing the endPath");
-            LinkedDot lastDotCrossing = _list[_list.Count - 1];
+            ConnectionDot lastDotCrossing = _list[_list.Count - 1];
             //The dot of StartPath incluided in list and have .prev == null
             do
             {
                 _path.Add(lastDotCrossing.dot);
-                lastDotCrossing = lastDotCrossing.prev;
+                lastDotCrossing = lastDotCrossing.prevConnectionDots.ElementAt(0);
             } while (lastDotCrossing != null);
         }
 

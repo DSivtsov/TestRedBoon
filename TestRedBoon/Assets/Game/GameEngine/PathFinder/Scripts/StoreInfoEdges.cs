@@ -155,7 +155,7 @@ namespace GameEngine.PathFinder
             return (int)(value - minValue) >= 0 && (int)(maxValue - value) >= 0 ;
         }
 
-        internal static IEnumerable<Vector2> GitListDotsEdge(int numEdge)
+        internal static IEnumerable<Vector2> GetListDotsEdge(int numEdge)
         {
             Edge edge = _arrEdges[numEdge];
             yield return edge.Start;
@@ -166,7 +166,7 @@ namespace GameEngine.PathFinder
         {
             float dotX = dot.x;
             float dotY = dot.y;
-            foreach (Vector2 dotEdge in GitListDotsEdge(numEdge))
+            foreach (Vector2 dotEdge in GetListDotsEdge(numEdge))
             {
                 float dotEdgeX = dotEdge.x;
                 float dotEdgeY = dotEdge.y;
@@ -175,5 +175,27 @@ namespace GameEngine.PathFinder
             }
             return false;
         }
+
+        /// <summary>
+        /// Give order num Edges from farthestNumEdge till closestNumEdge
+        /// </summary>
+        /// <param name="closestNumEdge"></param>
+        /// <param name="farthestNumEdge"></param>
+        /// <returns></returns>
+        internal static IEnumerable<(int currentTestingNumEdge, int nextEdgeAfterCurrent)> GetOrderedListNumEdges(int closestNumEdge, int farthestNumEdge)
+        {
+            int step = (closestNumEdge < farthestNumEdge) ? -1 : 1;
+            int numTestedEdge = Math.Abs(closestNumEdge - farthestNumEdge);
+            int currentTestingNumEdge, nextEdgeAfterCurrent;
+            for (int i = 0; i < numTestedEdge; i++)
+            {
+                currentTestingNumEdge = farthestNumEdge + i * step;
+                nextEdgeAfterCurrent = currentTestingNumEdge + step;
+                yield return (farthestNumEdge + i * step, nextEdgeAfterCurrent);
+            }
+        }
+
+
+
     }
 }

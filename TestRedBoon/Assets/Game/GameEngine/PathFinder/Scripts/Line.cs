@@ -112,68 +112,45 @@ namespace GameEngine.PathFinder
         {
             return $"_factorX[{_factorX}] _factorY[{_factorY}] _factorB[{_factorB}]";
         }
-    }
-    public sealed class LineHorizontal : Line
-    {// factorX * X +  factorY * Y = factorB
-        private const float FactorXVerticalLine = 0;
-        private const float FactorYVerticalLine = 1f;
-        public LineHorizontal(float factorB) : base(FactorXVerticalLine, FactorYVerticalLine, factorB) { }
 
-        internal override (Vector2 startDot, Vector2 endDot) GetDotsforScreen(int widthHalfField, int heightHalfField)
+        /// <summary>
+        /// Test possibility to create line between dotA and dotB which can pass all edges between them
+        /// </summary>
+        /// <param name="dotA"></param>
+        /// <param name="dotB"></param>
+        /// <param name="startNumEdge"></param>
+        /// <param name="endNumEdge"></param>
+        /// <returns> if linked (true, numberLastPassEdge) otherwise (false, numberLastNotPassEdge)</returns>
+        internal static (bool isPassedEdge, Line line, int numLastTestedEdge) TryLinkTwoDotsThroughEdges(Vector2 dotA, Vector2 dotB, int startNumEdge, int endNumEdge)
         {
-            Vector2 startDot = new Vector2(-widthHalfField, _factorB);
-            Vector2 endDot = new Vector2(widthHalfField, _factorB);
-            return (startDot, endDot);
-        }
-
-        internal override bool TryIntersecLineWithEdge(int currentTestingNumEdge)
-        {
-            float y = _factorB;
-            (float constValue, float minValue, float maxValue, LineType lineTypeEdge) = StoreInfoEdges.GetEdgeInfo(currentTestingNumEdge);
-            switch (lineTypeEdge)
+            CorrectOrderEdgeNumbers(ref startNumEdge, ref endNumEdge);
+            Debug.Log($"TryLinkTwoDots({dotA}, {dotB}), check Edges from [{startNumEdge}] till [{endNumEdge}]");
+            Line lineBTWDots = Line.CreateLine(dotA, dotB);
+            bool directLineBTWdotsExist = true;
+            int currentNumTestingEdge = startNumEdge;
+            for (; currentNumTestingEdge <= endNumEdge; currentNumTestingEdge++)
             {
-                case LineType.Horizontal:
-                    if ((int)(y - constValue) == 0)
-                        return true;
-                    return false;
-                case LineType.Vertical:
-                    if (StoreInfoEdges.InRange(y, minValue, maxValue))
-                        return true;
-                    return false;
-                default:
-                    throw new NotSupportedException($"Wrong [{lineTypeEdge}] Edge type");
+                if (!lineBTWDots.TryIntersecLineWithEdge(currentNumTestingEdge))
+                {
+                    DebugFinder.DebugDrawLineSegment(dotA, dotB, $"Not crossing Edge[{currentNumTestingEdge}]");
+                    Debug.Log($"Intersec Line Not crossing Edge[{currentNumTestingEdge}]");
+                    directLineBTWdotsExist = false;
+                    break;
+                }
             }
+            return (directLineBTWdotsExist, lineBTWDots, currentNumTestingEdge);
         }
-    }
 
-    public sealed class LineVertical : Line
-    {// factorX * X +  factorY * Y = factorB
-        private const float FactorXVerticalLine = 1f;
-        private const float FactorYVerticalLine = 0;
-        public LineVertical(float factorB) : base(FactorXVerticalLine, FactorYVerticalLine, factorB) { }
-
-        internal override (Vector2 startDot, Vector2 endDot) GetDotsforScreen(int widthHalfField, int heightHalfField)
+        private static void CorrectOrderEdgeNumbers(ref int startNumEdge, ref int endNumEdge)
         {
-            Vector2 startDot = new Vector2(_factorB, -heightHalfField);
-            Vector2 endDot = new Vector2(_factorB, heightHalfField);
-            return (startDot, endDot);
-        }
-        internal override bool TryIntersecLineWithEdge(int currentTestingNumEdge)
-        {
-            float x = _factorB;
-            (float constValue, float minValue, float maxValue, LineType lineTypeEdge) = StoreInfoEdges.GetEdgeInfo(currentTestingNumEdge);
-            switch (lineTypeEdge)
+            if (startNumEdge == endNumEdge)
+                return;
+            //throw new NotImplementedException($"Wrong call TryLinkTwoDotsThroughEdges() the numEdgeAfterDotA[{numEdgeAfterDotA}]==numEdgeBeforeDotB[{numEdgeBeforeDotB}]");
+            if (startNumEdge > endNumEdge)
             {
-                case LineType.Vertical:
-                    if ((int)(x - constValue) == 0)
-                        return true;
-                    return false;
-                case LineType.Horizontal:
-                    if (StoreInfoEdges.InRange(x, minValue, maxValue))
-                        return true;
-                    return false;
-                default:
-                    throw new NotSupportedException($"Wrong [{lineTypeEdge}] Edge type");
+                int temp = endNumEdge;
+                endNumEdge = startNumEdge;
+                startNumEdge = temp;
             }
         }
     }
