@@ -22,18 +22,19 @@ namespace GameEngine.PathFinder
         int NumLastCrossedEdgeBySolution { get; }
         int NumRecBaseDotSolution { get; }
 
-        IEnumerable<ConnectionDot> GetListDotPathSectorSolutions();
+        IEnumerable<ConnectionDot> GetListConnectionDotsSolution();
     }
 
     public class SectorSolutions // angleLineB > angleLineA in degrees // in k factor
     {
         public readonly Line LineB;
         public readonly Line LineA;
-        public readonly ConnectionDot connectionDot;
+        //public readonly ConnectionDot connectionDot;
+        public readonly Vector2 baseDotSectorSolutions;
 
         //public Vector2 BaseDotSectorSolutions => connectionDots.dot;
 
-        public SectorSolutions(List<Line> lines, ConnectionDot connectionDot)
+        public SectorSolutions(List<Line> lines, Vector2 baseDotSectorSolutions)
         {
             if (lines.Count == 2)
             {
@@ -42,7 +43,8 @@ namespace GameEngine.PathFinder
             }
             else
                 throw new NotSupportedException($"Wrong number lines in {lines}");
-            this.connectionDot = connectionDot;
+            //this.connectionDot = connectionDot;
+            this.baseDotSectorSolutions = baseDotSectorSolutions;
         }
 
         internal List<LineConnection> TryLinkSolutionWithEdgeDonCrossBordersRect(Edge edge)

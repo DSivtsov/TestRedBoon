@@ -9,10 +9,10 @@ namespace GameEngine.PathFinder
 {
     public class SolutionForEdgeForStartPoint : ISolution
     {
-        private readonly SectorSolutions _sectorSolutionsDotA;
-        private readonly SectorSolutions _sectorSolutionsDotB;  //for horizontal edge lineA.dot.x <  lineB.dot.x for vertical lineA.dot.y <  lineB.dot.y 
+        private readonly SectorSolutions[] _arrSectorSolutions;
         private readonly int _numLastCrossedEdge;
         private readonly int _numRecBaseDot;
+        private readonly ConnectionDot[] _arrConnectionDot;
 
         private const int NUMNEWSOLUTIONS = 4;
 
@@ -20,47 +20,44 @@ namespace GameEngine.PathFinder
 
         int ISolution.NumRecBaseDotSolution => _numRecBaseDot;
 
-        public SolutionForEdgeForStartPoint(SectorSolutions sectorSolutionsDotA, SectorSolutions sectorSolutionsDotB, int numLastEdge, int numRecBaseDot)
+        public SolutionForEdgeForStartPoint(SectorSolutions[] arrSectorSolutions, ConnectionDot[] arrConnectionDot, int numLastEdge, int numRecBaseDot)
         {
-            //Rec will !!! after last crossed Edge !!!
-            //_numRecBaseDot = (solutionSide == SolutionSide.Start)
-            //    ? StoreInfoEdges.GetNumRect(numLastEdge, RecType.SecondRect) : StoreInfoEdges.GetNumRect(numLastEdge, RecType.FirstRect);
-            _sectorSolutionsDotA = sectorSolutionsDotA;
-            _sectorSolutionsDotB = sectorSolutionsDotB;
+            _arrSectorSolutions = arrSectorSolutions;
+            _arrConnectionDot = arrConnectionDot;
             _numLastCrossedEdge = numLastEdge;
             _numRecBaseDot = numRecBaseDot;
         }
 
         IEnumerable<SectorSolutions> ISolution.GetListSectorSolutions()
         {
-            yield return _sectorSolutionsDotB;
-            yield return _sectorSolutionsDotA;
+            for (int i = 0; i < _arrSectorSolutions.Length; i++)
+                yield return _arrSectorSolutions[i];
         }
 
         public IEnumerable<Line> GetListLinesFromSectorSolutions()
         {
-            yield return _sectorSolutionsDotB.LineB;
-            yield return _sectorSolutionsDotB.LineA;
-            yield return _sectorSolutionsDotA.LineB;
-            yield return _sectorSolutionsDotA.LineA;
+            for (int i = 0; i < _arrSectorSolutions.Length; i++)
+            {
+                yield return _arrSectorSolutions[i].LineB;
+                yield return _arrSectorSolutions[i].LineA;
+            }
         }
 
         IEnumerable<Vector2> ISolution.GetListBasedDotsSolution()
         {
-            yield return _sectorSolutionsDotB.connectionDot.dot;
-            yield return _sectorSolutionsDotA.connectionDot.dot;
+            for (int i = 0; i < _arrSectorSolutions.Length; i++)
+                yield return _arrSectorSolutions[i].baseDotSectorSolutions;
         }
 
-        IEnumerable<ConnectionDot> ISolution.GetListDotPathSectorSolutions()
+        IEnumerable<ConnectionDot> ISolution.GetListConnectionDotsSolution()
         {
-            yield return _sectorSolutionsDotB.connectionDot;
-            yield return _sectorSolutionsDotA.connectionDot;
+            for (int i = 0; i < _arrConnectionDot.Length; i++)
+                yield return _arrConnectionDot[i];
         }
 
 
         internal static SolutionForEdgeForStartPoint CreateNewSolutionForEdge(ISolution solutionObjForStartPoint, int farthestNumEdge)
         {
-            int numNewSolutions = 0;
             int numEdgeCurrentSolution = solutionObjForStartPoint.NumLastCrossedEdgeBySolution;
             if (numEdgeCurrentSolution == farthestNumEdge)
                 throw new NotSupportedException("Something wrong, because in this case must be called Finder.IsBothSolutionOnOneEdge()");
@@ -72,7 +69,7 @@ namespace GameEngine.PathFinder
             int numRecBaseDot = StoreInfoEdges.GetNumRectWithEdgeForSolution(numEdgeCurrentSolution, SolutionSide.Start);
             List<Line>[] arrlistLines = new List<Line>[2] { new List<Line>(2), new List<Line>(2) };
 
-            List<ConnectionDot> arrDotPathsSectorSolutions = solutionObjForStartPoint.GetListDotPathSectorSolutions().ToList();
+            List<ConnectionDot> arrDotPathsSectorSolutions = solutionObjForStartPoint.GetListConnectionDotsSolution().ToList();
             Vector2[] newBaseDotsSectorSolutions = StoreInfoEdges.GetListDotsEdge(numEdgeCurrentSolution).ToArray();
 
             //we trying to find solution on next edge after Edge current solution
@@ -104,66 +101,42 @@ namespace GameEngine.PathFinder
                         break;
                     case 4:
                         Debug.Log("Will create new {Solution}");
-                        DebugFinder.DebugTurnOn(active: true);
-                        DebugFinder.DebugDrawLine(arrlistLines[0], $"SolutionDotA ForEdge[{currentTestingNumEdge}]");
-                        DebugFinder.DebugDrawLine(arrlistLines[1], $"SolutionDotB ForEdge[{currentTestingNumEdge}]");
-                        DebugFinder.DebugTurnOn(active: false);
-                        return new SolutionForEdgeForStartPoint(new SectorSolutions(arrlistLines[0], new ConnectionDot(newBaseDotsSectorSolutions[0], null)),
-                            new SectorSolutions(arrlistLines[1], new ConnectionDot(newBaseDotsSectorSolutions[1], null)), currentTestingNumEdge, numRecBaseDot);
+                        return CreateSolutionForEdgeForStartPoint(numRecBaseDot, arrlistLines, newBaseDotsSectorSolutions, currentTestingNumEdge);
                     default:
                         break;
                 }
                 arrlistLines[0].Clear();
                 arrlistLines[1].Clear();
             }
-
-            IEnumerable<Vector2> baseDotsCurrentSolution = solutionObjForStartPoint.GetListBasedDotsSolution();
-            foreach (SectorSolutions currentSolution in solutionObjForStartPoint.GetListSectorSolutions())
+            for (int numBaseDot = 0; numBaseDot < newBaseDotsSectorSolutions.Length; numBaseDot++)
             {
-                ConnectionDot prev = currentSolution.connectionDot;
-                Vector2 baseDotCurrentSolutions = currentSolution.connectionDot.dot;
-
-                for (int numEdge = farthestNumEdge; numEdge < numEdgeCurrentSolution; numEdge--)
+                foreach (Vector2 dotEdge in StoreInfoEdges.GetListDotsEdge(closestNumEdge))
                 {
-                    //Edge edge = _arredges[numEdge];
-                    Edge edge = new Edge();
-                    foreach (Vector2 basedot in GetListBaseDotFromEdge(edge))
-                    {
-                        foreach (Vector2 currentBaseDotSolutionin in baseDotsCurrentSolution)
-                        {
-                            SectorSolutions newSolutionForEdge = TryFindNewSolutionForEdge(currentBaseDotSolutionin, basedot, prev, out Vector2 dotCrossing);
-
-                            if (newSolutionForEdge != null)
-                            {
-                                //_listDotsPath.AddDotCross(newSolutionForEdge.BaseDotIntersec, prev);
-                                numNewSolutions++;
-                            }
-                        }
-
-                    }
-                    if (numNewSolutions == NUMNEWSOLUTIONS)
-                    {
-                        Debug.Log("We Found New Solution more close to EndPath Can repeat External Cycle");
-                        //return new SolutionForEdgeFromStartPoint();
-                    }
-                    else
-                    {
-                        Debug.Log("We Must select ednge more close to StartPsth and try to Found New Solution on this Edge");
-                    }
+                    //link the baseDotSolution with the same edge where it exist, it will always be possible
+                    arrlistLines[numBaseDot].Add(Line.CreateLine(newBaseDotsSectorSolutions[numBaseDot], dotEdge));
                 }
             }
-
-            throw new System.NotImplementedException();
+            return CreateSolutionForEdgeForStartPoint(numRecBaseDot, arrlistLines, newBaseDotsSectorSolutions, closestNumEdge);
         }
 
-        private static SectorSolutions TryFindNewSolutionForEdge(Vector2 currentBaseDotSolutionin, Vector2 basedot, ConnectionDot prev, out Vector2 dotCrossing)
+        private static SolutionForEdgeForStartPoint CreateSolutionForEdgeForStartPoint(int numRecBaseDot, List<Line>[] arrlistLines, Vector2[] newBaseDotsSectorSolutions,
+            int currentTestingNumEdge)
         {
-            throw new NotImplementedException();
-        }
-
-        private static IEnumerable<Vector2> GetListBaseDotFromEdge(Edge edge)
-        {
-            throw new NotImplementedException();
+            DebugFinder.DebugTurnOn(active: true);
+            DebugFinder.DebugDrawLine(arrlistLines[0], $"Solution1 ForEdge[{currentTestingNumEdge}]");
+            DebugFinder.DebugDrawLine(arrlistLines[1], $"Solution2 ForEdge[{currentTestingNumEdge}]");
+            DebugFinder.DebugTurnOn(active: false);
+            SectorSolutions[] arrSectorSolutions = new SectorSolutions[]
+            {
+                            new SectorSolutions(arrlistLines[0], newBaseDotsSectorSolutions[0]),
+                            new SectorSolutions(arrlistLines[1], newBaseDotsSectorSolutions[1])
+            };
+            ConnectionDot[] arrConnectionDots = new ConnectionDot[]
+            {
+                            new ConnectionDot(newBaseDotsSectorSolutions[0], null),
+                            new ConnectionDot(newBaseDotsSectorSolutions[1], null)
+            };
+            return new SolutionForEdgeForStartPoint(arrSectorSolutions, arrConnectionDots, currentTestingNumEdge, numRecBaseDot);
         }
     }
 }
