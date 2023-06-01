@@ -497,9 +497,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _pathFinderData: {fileID: 1209225827}
-  _fieldSetting: {fileID: 11400000, guid: dc96c4275a5c0424589e857937c55d51, type: 2}
+  _fieldSetting: {fileID: 11400000, guid: 7ae49aea9011c354f9cab8e2ef1d5c9d, type: 2}
   _drawRectangle: {fileID: 1623120596}
-  _useSeedFromFieldSettingSO: 0
+  _useSeedFromFieldSettingSO: 1
   _showUsedRandomSeed: 1
   _startAutomaticly: 0
 --- !u!4 &1623120595

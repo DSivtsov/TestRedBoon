@@ -135,9 +135,9 @@ namespace GameEngine.Environment
 
                 EdgeType edgeTypeWhereWillNextRect = (NumEdge == 1) ? SelectRandomAnyEdgeType() : SelectRandomEdgeType(prevUsedEdgeType);
                 CountFrame.DebugLogUpdate($"Next Rec will at [{edgeTypeWhereWillNextRect}] Edge");
-                
+
                 Vector2Int startPointOnEdge = GetRandomPointOnEdge(_firstRect, edgeTypeWhereWillNextRect);
-                
+
                 EdgeType usedEdgeType = edgeTypeWhereWillNextRect;
                 AngleType selectedAngleTypeBasePoint = SelectAngleTypeBasePoint(usedEdgeType);
                 CountFrame.DebugLogUpdate($"basePoint={startPointOnEdge} selectedAngleType[{selectedAngleTypeBasePoint}]");
@@ -148,15 +148,78 @@ namespace GameEngine.Environment
 
                 _secondRect.Draw();
 
-                Vector2Int endPointEdge = _firstRect.GetEndPointEdge(edgeTypeWhereWillNextRect, selectedAngleTypeBasePoint);
-                
+                Vector2Int endPointEdge = FindEndPointEdge(startPointOnEdge, edgeTypeWhereWillNextRect, selectedAngleTypeBasePoint);
+
                 _pathFinderData.AddEdge(_firstRect, _secondRect, startPointOnEdge, endPointEdge);
 
                 _firstRect = _secondRect;
                 prevUsedEdgeType = edgeTypeWhereWillNextRect;
             }
         }
-        
+
+        /// <summary>
+        /// Select the position of the EndPointEdge. It can be determined by the shorter length of FirstRect or SecondRect
+        /// </summary>
+        /// <param name="startPointOnEdge">of the FirstRect</param>
+        /// <param name="edgeTypeOnFirstRect">edgeType of the FirstRect</param>
+        /// <param name="selectedAngleTypeBasePoint">selectedAngleTypeBasePointNewRect (SecondRect) </param>
+        /// <returns></returns>
+        private Vector2Int FindEndPointEdge(Vector2Int startPointOnEdge, EdgeType edgeTypeOnFirstRect, AngleType selectedAngleTypeBasePointForSecRect)
+        {
+            Vector2Int endPointEdgeFirstRect = _firstRect.GetEndPointEdge(edgeTypeOnFirstRect, selectedAngleTypeBasePointForSecRect);
+
+            (EdgeType edgeTypeOnSecondRect, AngleType selectedAngleTypeBasePointForFirstRect) =
+                GetDataToGetEndPointEdgeOnSecRect(edgeTypeOnFirstRect, selectedAngleTypeBasePointForSecRect);
+
+            Vector2Int endPointEdgeSecondRect = _secondRect.GetEndPointEdge(edgeTypeOnSecondRect, selectedAngleTypeBasePointForFirstRect);
+
+            return Vector2.SqrMagnitude(startPointOnEdge - endPointEdgeFirstRect) < Vector2.SqrMagnitude(startPointOnEdge - endPointEdgeSecondRect) ?
+                endPointEdgeFirstRect : endPointEdgeSecondRect;
+        }
+
+        private (EdgeType edgeTypeOnSecondRect, AngleType selectedAngleTypeBasePointForFirstRect) GetDataToGetEndPointEdgeOnSecRect(EdgeType edgeTypeOnFirstRect,
+            AngleType selectedAngleTypeBasePointForSecRect)
+        {
+            try
+            {
+                switch (edgeTypeOnFirstRect)
+                {
+                    case EdgeType.Top:
+                        return (EdgeType.Bottom, verticalMirroringAngleType[selectedAngleTypeBasePointForSecRect]);
+                    case EdgeType.Bottom:
+                        return (EdgeType.Top, verticalMirroringAngleType[selectedAngleTypeBasePointForSecRect]);
+                    case EdgeType.Right:
+                        return (EdgeType.Left, horizontalMirroringAngleType[selectedAngleTypeBasePointForSecRect]);
+                    case EdgeType.Left:
+                        return (EdgeType.Right, horizontalMirroringAngleType[selectedAngleTypeBasePointForSecRect]);
+                    case EdgeType.Nothing:
+                    default:
+                        throw new NotSupportedException($"Wrong edgeTypeOnFirstRect [{edgeTypeOnFirstRect}]");
+                }
+            }
+            catch (KeyNotFoundException)
+            {
+
+                throw new NotSupportedException($"Wrong selectedAngleTypeBasePointForSecRect [{selectedAngleTypeBasePointForSecRect}]");
+            }
+        }
+
+        Dictionary<AngleType, AngleType> verticalMirroringAngleType = new Dictionary<AngleType, AngleType>()
+        {
+            {AngleType.TopLeft, AngleType.BottomLeft},
+            {AngleType.TopRight, AngleType.BottomRight},
+            {AngleType.BottomLeft, AngleType.TopLeft},
+            {AngleType.BottomRight, AngleType.TopRight},
+        };
+
+        Dictionary<AngleType, AngleType> horizontalMirroringAngleType = new Dictionary<AngleType, AngleType>()
+        {
+            {AngleType.TopLeft, AngleType.TopRight},
+            {AngleType.TopRight, AngleType.TopLeft},
+            {AngleType.BottomLeft, AngleType.BottomRight},
+            {AngleType.BottomRight, AngleType.BottomLeft},
+        };
+
         /// <summary>
         /// The Edge where was placed a basedPoint of new Rect limiti the possible AngleType for that new Rect
         /// </summary>
