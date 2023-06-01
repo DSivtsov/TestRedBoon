@@ -1,0 +1,3 @@
+Refactoring class DotCrossing
+Refactoring class Line (derived class LineVertical LineHorizontal)
+Refactoring class SolutionDot Solution Edge (add constructor)
