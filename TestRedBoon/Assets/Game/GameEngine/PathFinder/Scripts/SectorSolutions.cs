@@ -24,15 +24,14 @@ namespace GameEngine.PathFinder
 
         IEnumerable<ConnectionDot> GetListConnectionDotsSolution();
     }
-
+    /// <summary>
+    /// It's s sector of possible solutions limited by two line, both of which start from the point baseDotSectorSolutions
+    /// </summary>
     public class SectorSolutions // angleLineB > angleLineA in degrees // in k factor
     {
         public readonly Line LineB;
         public readonly Line LineA;
-        //public readonly ConnectionDot connectionDot;
         public readonly Vector2 baseDotSectorSolutions;
-
-        //public Vector2 BaseDotSectorSolutions => connectionDots.dot;
 
         public SectorSolutions(List<Line> lines, Vector2 baseDotSectorSolutions)
         {

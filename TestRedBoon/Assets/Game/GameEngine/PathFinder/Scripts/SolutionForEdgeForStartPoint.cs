@@ -56,11 +56,12 @@ namespace GameEngine.PathFinder
         }
 
 
-        internal static SolutionForEdgeForStartPoint CreateNewSolutionForEdge(ISolution solutionObjForStartPoint, int farthestNumEdge)
+        internal static SolutionForEdgeForStartPoint FindAndCreateNewSolutionForEdgeForStartPoint(ISolution solutionObjForStartPoint, int farthestNumEdge)
         {
             int numEdgeCurrentSolution = solutionObjForStartPoint.NumLastCrossedEdgeBySolution;
             if (numEdgeCurrentSolution == farthestNumEdge)
-                throw new NotSupportedException("Something wrong, because in this case must be called Finder.IsBothSolutionOnOneEdge()");
+                //It means that the intial Data contain the problem which we not detected at checking it
+                throw new NotSupportedException("Something wrong, because in this case the Finder.IsBothSolutionOnOneEdge() should have been called before");
 
             //we trying to find solution on next edge after Edge current solution
             int closestNumEdge = numEdgeCurrentSolution + 1;
@@ -80,7 +81,7 @@ namespace GameEngine.PathFinder
                 {
                     foreach (Vector2 dotEdge in StoreInfoEdges.GetListDotsEdge(currentTestingNumEdge))
                     {
-                        (bool isPassedEdges, Line lineBTWBaseDotAndEdge, int numLastTestedEdge) = Line.TryLinkTwoDotsThroughEdges(newBaseDotsSectorSolutions[numBaseDot], dotEdge,
+                        (bool isPassedEdges, Line lineBTWBaseDotAndEdge, _) = Line.TryLinkTwoDotsThroughEdges(newBaseDotsSectorSolutions[numBaseDot], dotEdge,
                             closestNumEdge, nextEdgeAfterCurrentWhereTakenDots);
                         if (isPassedEdges)
                         {
@@ -101,7 +102,7 @@ namespace GameEngine.PathFinder
                         break;
                     case 4:
                         Debug.Log("Will create new {Solution}");
-                        return CreateSolutionForEdgeForStartPoint(numRecBaseDot, arrlistLines, newBaseDotsSectorSolutions, currentTestingNumEdge);
+                        return CreateSolutionForEdge(numRecBaseDot, arrlistLines, newBaseDotsSectorSolutions, currentTestingNumEdge);
                     default:
                         break;
                 }
@@ -116,10 +117,10 @@ namespace GameEngine.PathFinder
                     arrlistLines[numBaseDot].Add(Line.CreateLine(newBaseDotsSectorSolutions[numBaseDot], dotEdge));
                 }
             }
-            return CreateSolutionForEdgeForStartPoint(numRecBaseDot, arrlistLines, newBaseDotsSectorSolutions, closestNumEdge);
+            return CreateSolutionForEdge(numRecBaseDot, arrlistLines, newBaseDotsSectorSolutions, closestNumEdge);
         }
 
-        private static SolutionForEdgeForStartPoint CreateSolutionForEdgeForStartPoint(int numRecBaseDot, List<Line>[] arrlistLines, Vector2[] newBaseDotsSectorSolutions,
+        private static SolutionForEdgeForStartPoint CreateSolutionForEdge(int numRecBaseDot, List<Line>[] arrlistLines, Vector2[] newBaseDotsSectorSolutions,
             int currentTestingNumEdge)
         {
             DebugFinder.DebugTurnOn(active: true);

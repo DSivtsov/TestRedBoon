@@ -114,13 +114,13 @@ namespace GameEngine.PathFinder
         }
 
         /// <summary>
-        /// Test possibility to create line between dotA and dotB which can pass all edges between them
+        /// Test possibility to create line between dotA and dotB which can pass the edges from startNumEdge till endNumEdge
         /// </summary>
         /// <param name="dotA"></param>
         /// <param name="dotB"></param>
         /// <param name="startNumEdge"></param>
         /// <param name="endNumEdge"></param>
-        /// <returns> if linked (true, numberLastPassEdge) otherwise (false, numberLastNotPassEdge)</returns>
+        /// <returns> if linked (true, Line , numLastTestedEdge) otherwise (false, Line, numLastTestedEdge)</returns>
         internal static (bool isPassedEdge, Line line, int numLastTestedEdge) TryLinkTwoDotsThroughEdges(Vector2 dotA, Vector2 dotB, int startNumEdge, int endNumEdge)
         {
             CorrectOrderEdgeNumbers(ref startNumEdge, ref endNumEdge);

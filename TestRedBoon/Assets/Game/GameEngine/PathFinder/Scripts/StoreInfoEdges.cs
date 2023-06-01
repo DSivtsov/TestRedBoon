@@ -44,6 +44,21 @@ namespace GameEngine.PathFinder
             }
         }
 
+        internal static void InitStoreInfoEdges(Edge[] arrEdges)
+        {
+            _arrEdges = arrEdges;
+            _arrRectangle = new Rectangle[arrEdges.Length + 1];
+            _edgesInfo = new EdgeInfo[arrEdges.Length];
+            _arrRectangle[0] = arrEdges[0].First;
+            for (int i = 0; i < arrEdges.Length; i++)
+            {
+                _arrRectangle[i + 1] = arrEdges[i].Second;
+                Edge currentEdge = arrEdges[i];
+                _edgesInfo[i] = new EdgeInfo(currentEdge.Start, currentEdge.End);
+            }
+            _classIsInited = true;
+        }
+
         private static bool _classIsInited = false;
 
         internal static int GetNumRect(int numEdge, RecType recType) => numEdge + (int)recType;
@@ -54,21 +69,6 @@ namespace GameEngine.PathFinder
         internal static int GetNumEdge(int numRect, SolutionSide solutionSide)
         {
             return numRect - (int)((solutionSide == SolutionSide.Start) ? RecType.FirstRect : RecType.SecondRect);
-        }
-
-        internal static void InitStoreEdges(Edge[] arrEdges)
-        {
-            _arrEdges = arrEdges;
-            _arrRectangle = new Rectangle[arrEdges.Length + 1];
-            _edgesInfo = new EdgeInfo[arrEdges.Length];
-            _arrRectangle[0] = arrEdges[0].First;
-            for (int i = 0; i < arrEdges.Length; i++)
-            {
-                _arrRectangle[i+1] = arrEdges[i].Second;
-                Edge currentEdge = arrEdges[i];
-                _edgesInfo[i] = new EdgeInfo(currentEdge.Start,currentEdge.End);
-            }
-            _classIsInited = true;
         }
 
         internal static (float constValue, float minValue, float maxValue, LineType lineTypeEdge) GetEdgeInfo(int numEdge)

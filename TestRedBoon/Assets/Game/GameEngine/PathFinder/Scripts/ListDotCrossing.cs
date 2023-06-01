@@ -5,9 +5,21 @@ using UnityEngine;
 
 namespace GameEngine.PathFinder
 {
+    /*
+     *  Store the connection between different Solutions (connection between "baseDotSectorSolutions")
+     *  
+     *  Note.
+     *  For simplify the ConnectionDot.baseDot separated from SectorSolutions.baseDotSectorSolutions (but in most cases it is one point, but not in all cases)
+     */
+    /// <summary>
+    /// Store the connection between different Solutions
+    /// </summary>
     public class ConnectionDot
     {
         public readonly Vector2 baseDot;
+        /// <summary>
+        /// can connected to more than one of other ConnectionDot
+        /// </summary>
         public readonly IEnumerable<ConnectionDot> prevConnectionDots;
 
         public ConnectionDot(Vector2 connectionDot, IEnumerable<ConnectionDot> prevConnectionDots)
@@ -18,7 +30,6 @@ namespace GameEngine.PathFinder
 
         public override string ToString()
         {
-            //Debug.Log($"connectionDot{connectionDot} prevConnectionDots!=null[{prevConnectionDots != null}] Count[{prevConnectionDots?.Count()}]");
             IEnumerable<string> values = prevConnectionDots
                 .Select<ConnectionDot, string>((connectionDots) => (connectionDots == null) ? "NULL":connectionDots.baseDot.ToString()) ;
             var listDots = string.Join(" ", values);
