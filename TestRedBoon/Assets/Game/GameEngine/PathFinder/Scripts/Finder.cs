@@ -15,10 +15,7 @@ namespace GameEngine.PathFinder
         private Edge[] _arredges;
         private ISolution _currentSolutionForStartPoint;
         private ISolution _solutionForEndPoint;
-        private int _numRecBaseDotEnd;
-        private List<Line> _listLinesSolutionEnd;
         private int _numLastCrossingEdgeFromSolutionEnd;
-        private Rectangle _closestRectAccessableFromSolutionEnd;
         private Vector2 _startPointFindPath;
         private Vector2 _endPointFindPath;
         IEnumerable<Vector2> IPathFinder.GetPath(Vector2 startPointFindPath, Vector2 endPointFindPath, IEnumerable<Edge> edges)
@@ -36,7 +33,7 @@ namespace GameEngine.PathFinder
 
 
             _solutionForEndPoint = SolutionForDot.FindAndCreateSolutionForDot(_endPointFindPath, _arredges.Length - 1, FirstNumberEdge, SolutionSide.End);
-            InitParametersSolutionEndPoint();
+            _numLastCrossingEdgeFromSolutionEnd = _solutionForEndPoint.NumLastCrossedEdgeBySolution;
             DebugFinder.DebugTurnOn(true);
             IEnumerable<Vector2> path;
             do
@@ -59,14 +56,6 @@ namespace GameEngine.PathFinder
             throw new NotSupportedException("This is not possible, inaccessible point, we must exit early or get an exception");
         }
 
-        private void InitParametersSolutionEndPoint()
-        {
-            _numRecBaseDotEnd = _solutionForEndPoint.NumRecBaseDotSolution;
-            _listLinesSolutionEnd = _solutionForEndPoint.GetListLinesFromSectorSolutions().ToList();
-            _numLastCrossingEdgeFromSolutionEnd = _solutionForEndPoint.NumLastCrossedEdgeBySolution;
-            _closestRectAccessableFromSolutionEnd = _arredges[_numLastCrossingEdgeFromSolutionEnd].First;
-        }
-
         /// <summary>
         /// Try find Link between current SolutionForStartPoint with SolutionForEndPoint
         /// </summary>
@@ -82,7 +71,6 @@ namespace GameEngine.PathFinder
                 if (isPassedEdges)
                 {
                     Debug.LogWarning($"We found the direct Line from current Solution For StartPath to EndPath without any turns");
-                    //ListDotsPath.SaveDataLastConnectionsWithEndPath(_currentSolutionForStartPoint.GetListConnectionDotsSolution().ToList(), _endPointFindPath);
                     DebugFinder.DebugDrawDot(_endPointFindPath);
                     ConnectionDot connectionDotEndPath = new ConnectionDot(_endPointFindPath, _currentSolutionForStartPoint.GetListConnectionDotsSolution());
                     ListDotsPath.AddConnectionDot(connectionDotEndPath);
@@ -104,7 +92,6 @@ namespace GameEngine.PathFinder
                 Debug.LogWarning($"We found the Both Solution have dots on one Edge");
                 //Both Solution have dots on one Edge, the can be SolutionForDot (2 DotCross) and SolutionForEdfe (4 DotCross)
                 IEnumerable<ConnectionDot> connectionDotsHaveDirectLinkWithEndPath = BothSolutionHaveDotsOnOneEdge();
-                //ListDotsPath.SaveDataLastConnectionsWithEndPath(numDotHaveCrossingwithEndPoint, _endPointFindPath);
                 DebugFinder.DebugDrawDot(_endPointFindPath);
                 ConnectionDot connectionDotEndPath = new ConnectionDot(_endPointFindPath, connectionDotsHaveDirectLinkWithEndPath);
                 ListDotsPath.AddConnectionDot(connectionDotEndPath);
@@ -115,11 +102,7 @@ namespace GameEngine.PathFinder
 
         private IEnumerable<ConnectionDot> BothSolutionHaveDotsOnOneEdge()
         {
-            //int numDotHaveCrossingwithEndPoint = 0;
-            //List<ConnectionDot> connectionDotsHaveDirectLinkWithEndPath = new List<ConnectionDot>(2);
             Edge edge = _arredges[_currentSolutionForStartPoint.NumLastCrossedEdgeBySolution];
-            //foreach (SectorSolutions currentSolution in _currentSolutionForStartPoint.GetListSectorSolutions())
-            //{
             IEnumerable<ConnectionDot> prevConnectionDots = _currentSolutionForStartPoint.GetListConnectionDotsSolution();
             DebugFinder.DebugDrawDot(edge.Start);
             ConnectionDot connectionDotEdgeStart = new ConnectionDot(edge.Start, prevConnectionDots);
@@ -127,9 +110,6 @@ namespace GameEngine.PathFinder
             DebugFinder.DebugDrawDot(edge.End);
             ConnectionDot connectionDotEdgeEnd = new ConnectionDot(edge.End, prevConnectionDots);
             ListDotsPath.AddConnectionDot(connectionDotEdgeEnd);
-            //connectionDotsHaveDirectLinkWithEndPath = new List<ConnectionDot> { connectionDotEdgeStart, connectionDotEdgeEnd };
-                //numDotHaveCrossingwithEndPoint += 2;
-            //}
             return new List<ConnectionDot> { connectionDotEdgeStart, connectionDotEdgeEnd };
         }
 
@@ -140,7 +120,6 @@ namespace GameEngine.PathFinder
         private IEnumerable<Vector2> TryCrossingCurrentSolutionWithSolutionForEndPoint()
         {
             Debug.LogWarning("TryCrossingCurrentSolutionWithSolutionForEndPoint");
-            //int numDotHaveCrossingwithEndPoint = 0;
             int numLastCrossingEdgeFromStart = _currentSolutionForStartPoint.NumLastCrossedEdgeBySolution;
             int numRecBaseDotStart = _currentSolutionForStartPoint.NumRecBaseDotSolution;
             List<ConnectionDot> connectionDotsHaveDirectLinkWithEndPath = new List<ConnectionDot>(8);
@@ -151,7 +130,7 @@ namespace GameEngine.PathFinder
                 IEnumerable<ConnectionDot> prevConnectionDots = _currentSolutionForStartPoint.GetListConnectionDotsSolution();
                 foreach (Line lineSolutionStart in currentSolutionStart.GetListLines())
                 {
-                    foreach (Line lineSolutionEnd in _listLinesSolutionEnd)
+                    foreach (Line lineSolutionEnd in _solutionForEndPoint.GetListLinesFromSectorSolutions())
                     {
                         (bool isCrossing, Vector2 dotCrossing) = CrossLineSolutionWithLine(lineSolutionStart, lineSolutionEnd);
                         if (isCrossing)
@@ -177,7 +156,7 @@ namespace GameEngine.PathFinder
                             else if (StoreInfoEdges.IsDotCrossingBetweenBaseDotAndEdge(dotCrossing, _endPointFindPath, _numLastCrossingEdgeFromSolutionEnd))
                             {//DotCrossing Between _numLastCrossingEdgeFromSolutionEnd and BaseDotEnd
                                 //Debug.Log("Check Existed DotCrossing Between _numLastCrossingEdgeFromSolutionEnd and BaseDotEnd");
-                                (bool dotInRec, int numRect) = StoreInfoEdges.IsDotInRectBetweenRecBaseDotAndRectEdge(dotCrossing, _numRecBaseDotEnd,
+                                (bool dotInRec, int numRect) = StoreInfoEdges.IsDotInRectBetweenRecBaseDotAndRectEdge(dotCrossing, _solutionForEndPoint.NumRecBaseDotSolution,
                                     _numLastCrossingEdgeFromSolutionEnd, SolutionSide.End);
                                 if (dotInRec && IsLinePassEdges(lineSolutionStart, numLastCrossingEdgeFromStart, numRect, SolutionSide.End))
                                     AddDotCrossing(dotCrossing, prevConnectionDots, connectionDotsHaveDirectLinkWithEndPath);
@@ -203,7 +182,6 @@ namespace GameEngine.PathFinder
             if (connectionDotsHaveDirectLinkWithEndPath.Count != 0)
             {
                 //It means that we have found a Path all dots in _listDotCrossing
-                //ListDotsPath.SaveDataLastConnectionsWithEndPath(numDotHaveCrossingwithEndPoint, _endPointFindPath);
                 DebugFinder.DebugDrawDot(_endPointFindPath);
                 ConnectionDot connectionDotEndPath = new ConnectionDot(_endPointFindPath, connectionDotsHaveDirectLinkWithEndPath);
                 ListDotsPath.AddConnectionDot(connectionDotEndPath);
@@ -236,7 +214,6 @@ namespace GameEngine.PathFinder
             ConnectionDot connectionDot = new ConnectionDot(dotCrossing, prevConnectionDots);
             connectionDotsHaveDirectLinkWithEndPath.Add(connectionDot);
             ListDotsPath.AddConnectionDot(connectionDot);
-            //numDotHaveCrossingwithEndPoint++;
         }
 
         private bool IsLinePassEdges(Line lineOtherSolution, int numLastCrossingEdgeByLineOtherSolution, int numRectWhereDotCrossing, SolutionSide solutionSide)

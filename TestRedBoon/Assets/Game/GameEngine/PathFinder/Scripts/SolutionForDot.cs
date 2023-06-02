@@ -107,12 +107,10 @@ namespace GameEngine.PathFinder
             initialConnectionDot = new ConnectionDot(baseDotSolution, _initialPreviousConnectionDots);
             if (solutionSide != SolutionSide.End)
             {
-                //To ListDotsPath will be added all ConnectionDots except DotEnd
+                //To ListDotsPath will be added ConnectionDot only for Start, all other (include the ConnectionDot for End) will be added in procees of Path Finding
                 DebugFinder.DebugDrawDot(baseDotSolution);
                 ListDotsPath.AddConnectionDot(initialConnectionDot); 
             }
-            //else
-            //    DebugFinder.DebugDrawDot(baseDotSolution, "DotEnd");
             DebugFinder.DebugTurnOn(false);
             return new SolutionForDot(new SectorSolutions(listLines, baseDotSolution), numLastTestedEdge, numRecBaseDot, initialConnectionDot);
         }

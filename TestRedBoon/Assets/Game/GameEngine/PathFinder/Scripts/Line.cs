@@ -25,12 +25,6 @@ namespace GameEngine.PathFinder
             _factorX = factorX;
             _factorB = factorB;
             _factorY = factorY;
-            //_factorX = -(dotB.y - dotA.y) / (dotB.x - dotA.x);
-            //_factorB = dotA.y + _factorX * dotA.x;
-            //if (Single.IsNaN(dotB.x - dotA.x) || (int)(dotB.x - dotA.x) == 0)
-            //{
-            //    throw new NotFiniteNumberException($"(dotB.x - dotA.x)[{(int)(dotB.x - dotA.x)}] _factorX[{_factorX}]= -(dotB.y - dotA.y) / (dotB.x - dotA.x)");
-            //}
         }
 
         internal static Line CreateLine(Vector2 dotA, Vector2 dotB)
@@ -147,7 +141,6 @@ namespace GameEngine.PathFinder
         {
             if (startNumEdge == endNumEdge)
                 return;
-            //throw new NotImplementedException($"Wrong call TryLinkTwoDotsThroughEdges() the numEdgeAfterDotA[{numEdgeAfterDotA}]==numEdgeBeforeDotB[{numEdgeBeforeDotB}]");
             if (startNumEdge > endNumEdge)
             {
                 int temp = endNumEdge;

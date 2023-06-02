@@ -78,11 +78,8 @@ namespace GameEngine.PathFinder
         //Not have special optimization for selecting Dots to Path
         private static void SelectAnyPathWithBeginLastDotCrossing()
         {
-            //add the EndDotPath
-            //_path.Add(_endPointFindPath);
             Debug.LogWarning("Will build the path through the lastDotCrossing");
             //in case of absent special demands to optimize the selection of Dots for Path, Let's just start from the last
-            //ConnectionDot connectionDot = _connectionDotsHaveDirectLinkWithEndPath.Last();
             ConnectionDot connectionDotEndPath = _list.Last();
             _path.Add(connectionDotEndPath.baseDot);
             IEnumerable<ConnectionDot> colectionPreviousConnectionDots = connectionDotEndPath.prevConnectionDots;
@@ -95,12 +92,5 @@ namespace GameEngine.PathFinder
                 colectionPreviousConnectionDots = connectionDotEndPath.prevConnectionDots;
             } while (colectionPreviousConnectionDots.Count() != 0);
         }
-
-        //internal static void SaveDataLastConnectionsWithEndPath(IEnumerable<ConnectionDot> connectionDotsHaveDirectLinkWithEndPath, Vector2 endPointFindPath)
-        //{
-        //    _endPointFindPath = endPointFindPath;
-        //    _connectionDotsHaveDirectLinkWithEndPath = connectionDotsHaveDirectLinkWithEndPath;
-        //    //_numDotHaveCrossingwithEndPath = numDotHaveCrossingwithEndPath;
-        //}
     }
 }
