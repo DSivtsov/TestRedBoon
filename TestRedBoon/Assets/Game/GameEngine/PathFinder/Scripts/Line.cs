@@ -120,8 +120,8 @@ namespace GameEngine.PathFinder
         /// <param name="dotB"></param>
         /// <param name="startNumEdge"></param>
         /// <param name="endNumEdge"></param>
-        /// <returns> if linked (true, Line , numLastTestedEdge) otherwise (false, Line, numLastTestedEdge)</returns>
-        internal static (bool isPassedEdge, Line line, int numLastTestedEdge) TryLinkTwoDotsThroughEdges(Vector2 dotA, Vector2 dotB, int startNumEdge, int endNumEdge)
+        /// <returns> if linked (true, Line) otherwise (false, Line)</returns>
+        internal static (bool isPassedEdge, Line line) TryLinkTwoDotsThroughEdges(Vector2 dotA, Vector2 dotB, int startNumEdge, int endNumEdge)
         {
             CorrectOrderEdgeNumbers(ref startNumEdge, ref endNumEdge);
             Debug.Log($"TryLinkTwoDots({dotA}, {dotB}), check Edges from [{startNumEdge}] till [{endNumEdge}]");
@@ -132,13 +132,15 @@ namespace GameEngine.PathFinder
             {
                 if (!lineBTWDots.TryIntersecLineWithEdge(currentNumTestingEdge))
                 {
+                    DebugFinder.DebugTurnOn(false);
                     DebugFinder.DebugDrawLineSegment(dotA, dotB, $"Not crossing Edge[{currentNumTestingEdge}]");
+                    DebugFinder.DebugTurnOn(true);
                     Debug.Log($"Intersec Line Not crossing Edge[{currentNumTestingEdge}]");
                     directLineBTWdotsExist = false;
                     break;
                 }
             }
-            return (directLineBTWdotsExist, lineBTWDots, currentNumTestingEdge);
+            return (directLineBTWdotsExist, lineBTWDots);
         }
 
         private static void CorrectOrderEdgeNumbers(ref int startNumEdge, ref int endNumEdge)

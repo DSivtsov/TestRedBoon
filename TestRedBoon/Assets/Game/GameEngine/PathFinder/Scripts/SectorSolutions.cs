@@ -9,25 +9,10 @@ using GameEngine.Environment;
 
 namespace GameEngine.PathFinder
 {
-    public enum SolutionSide
-    {
-        Start = 0,
-        End = 1,
-    }
-    public interface ISolution
-    {
-        IEnumerable<SectorSolutions> GetListSectorSolutions();
-        IEnumerable<Line> GetListLinesFromSectorSolutions();
-        IEnumerable<Vector2> GetListBasedDotsSolution();
-        int NumLastCrossedEdgeBySolution { get; }
-        int NumRecBaseDotSolution { get; }
-
-        IEnumerable<ConnectionDot> GetListConnectionDotsSolution();
-    }
     /// <summary>
     /// It's s sector of possible solutions limited by two line, both of which start from the point baseDotSectorSolutions
     /// </summary>
-    public class SectorSolutions // angleLineB > angleLineA in degrees // in k factor
+    public class SectorSolutions
     {
         public readonly Line LineB;
         public readonly Line LineA;
@@ -42,13 +27,7 @@ namespace GameEngine.PathFinder
             }
             else
                 throw new NotSupportedException($"Wrong number lines in {lines}");
-            //this.connectionDot = connectionDot;
             this.baseDotSectorSolutions = baseDotSectorSolutions;
-        }
-
-        internal List<LineConnection> TryLinkSolutionWithEdgeDonCrossBordersRect(Edge edge)
-        {
-            throw new NotImplementedException();
         }
 
         public IEnumerable<Line> GetListLines()

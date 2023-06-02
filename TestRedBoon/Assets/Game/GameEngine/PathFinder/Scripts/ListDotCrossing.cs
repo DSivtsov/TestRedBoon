@@ -43,9 +43,10 @@ namespace GameEngine.PathFinder
         private const int FactorIntersectToEdge = 2;
 
         private static List<ConnectionDot> _list;
-        private static int _numDotHaveCrossingwithEndPath;
+        //private static int _numDotHaveCrossingwithEndPath;
         private static Vector2 _endPointFindPath;
         private static List<Vector2> _path;
+        private static IEnumerable<ConnectionDot> _connectionDotsHaveDirectLinkWithEndPath;
 
         internal static void InitListDotsPath(int numEdges)
         {
@@ -74,29 +75,32 @@ namespace GameEngine.PathFinder
             return _path.Reverse<Vector2>();
         }
 
-        //Not have special optimization at selecting Dots to Path
+        //Not have special optimization for selecting Dots to Path
         private static void SelectAnyPathWithBeginLastDotCrossing()
         {
             //add the EndDotPath
-            _path.Add(_endPointFindPath);
+            //_path.Add(_endPointFindPath);
             Debug.LogWarning("Will build the path through the lastDotCrossing");
-            ConnectionDot lastDotCrossing = _list[_list.Count - 1];
-            //The dot of StartPath incluided in list and have .prev == null
+            //in case of absent special demands to optimize the selection of Dots for Path, Let's just start from the last
+            //ConnectionDot connectionDot = _connectionDotsHaveDirectLinkWithEndPath.Last();
+            ConnectionDot connectionDotEndPath = _list.Last();
+            _path.Add(connectionDotEndPath.baseDot);
+            IEnumerable<ConnectionDot> colectionPreviousConnectionDots = connectionDotEndPath.prevConnectionDots;
+            //The dot of StartPath always incluided in list and have .prevConnectionDots  IEnumerable<ConnectionDot>.Count() == 0
             do
             {
-                _path.Add(lastDotCrossing.baseDot);
-                IEnumerable<ConnectionDot> colectionPreviousConnectionDots = lastDotCrossing.prevConnectionDots;
-                lastDotCrossing = (colectionPreviousConnectionDots.Count() == 0) ? null : colectionPreviousConnectionDots.ElementAt(0);
-            } while (lastDotCrossing != null);
-            //add the StartDotPath
-            //_path.Add(lastDotCrossing.connectionDot);
-
+                //use the simply algorithm always take the first connectionDot in list
+                connectionDotEndPath = colectionPreviousConnectionDots.ElementAt(0);
+                _path.Add(connectionDotEndPath.baseDot);
+                colectionPreviousConnectionDots = connectionDotEndPath.prevConnectionDots;
+            } while (colectionPreviousConnectionDots.Count() != 0);
         }
 
-        internal static void SaveDataLastConnectionsWithEndPath(int numDotHaveCrossingwithEndPath, Vector2 endPointFindPath)
-        {
-            _endPointFindPath = endPointFindPath;
-            _numDotHaveCrossingwithEndPath = numDotHaveCrossingwithEndPath;
-        }
+        //internal static void SaveDataLastConnectionsWithEndPath(IEnumerable<ConnectionDot> connectionDotsHaveDirectLinkWithEndPath, Vector2 endPointFindPath)
+        //{
+        //    _endPointFindPath = endPointFindPath;
+        //    _connectionDotsHaveDirectLinkWithEndPath = connectionDotsHaveDirectLinkWithEndPath;
+        //    //_numDotHaveCrossingwithEndPath = numDotHaveCrossingwithEndPath;
+        //}
     }
 }

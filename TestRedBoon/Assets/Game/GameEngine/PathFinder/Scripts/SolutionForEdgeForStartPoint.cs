@@ -81,7 +81,7 @@ namespace GameEngine.PathFinder
                 {
                     foreach (Vector2 dotEdge in StoreInfoEdges.GetListDotsEdge(currentTestingNumEdge))
                     {
-                        (bool isPassedEdges, Line lineBTWBaseDotAndEdge, _) = Line.TryLinkTwoDotsThroughEdges(newBaseDotsSectorSolutions[numBaseDot], dotEdge,
+                        (bool isPassedEdges, Line lineBTWBaseDotAndEdge) = Line.TryLinkTwoDotsThroughEdges(newBaseDotsSectorSolutions[numBaseDot], dotEdge,
                             closestNumEdge, nextEdgeAfterCurrentWhereTakenDots);
                         if (isPassedEdges)
                         {
@@ -123,10 +123,8 @@ namespace GameEngine.PathFinder
         private static SolutionForEdgeForStartPoint CreateSolutionForEdge(int numRecBaseDot, List<Line>[] arrlistLines, Vector2[] newBaseDotsSectorSolutions,
             int currentTestingNumEdge)
         {
-            DebugFinder.DebugTurnOn(active: true);
             DebugFinder.DebugDrawLine(arrlistLines[0], $"Solution1 ForEdge[{currentTestingNumEdge}]");
             DebugFinder.DebugDrawLine(arrlistLines[1], $"Solution2 ForEdge[{currentTestingNumEdge}]");
-            DebugFinder.DebugTurnOn(active: false);
             SectorSolutions[] arrSectorSolutions = new SectorSolutions[]
             {
                             new SectorSolutions(arrlistLines[0], newBaseDotsSectorSolutions[0]),

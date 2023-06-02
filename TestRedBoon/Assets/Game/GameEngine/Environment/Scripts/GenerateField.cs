@@ -129,11 +129,11 @@ namespace GameEngine.Environment
             NumEdge = 0;
             EdgeType prevUsedEdgeType = EdgeType.Nothing;
 
-            while (!_wasOutFromFieldLimit && (_fieldSetting.IsLimitedMaxNumberEdge && ++NumEdge <= _fieldSetting.MaxNumberEdges))
+            while (!_wasOutFromFieldLimit && (_fieldSetting.IsLimitedMaxNumberEdge && NumEdge < _fieldSetting.MaxNumberEdges))
             {
                 CountFrame.DebugLogUpdate($"NumEdge={NumEdge}");
 
-                EdgeType edgeTypeWhereWillNextRect = (NumEdge == 1) ? SelectRandomAnyEdgeType() : SelectRandomEdgeType(prevUsedEdgeType);
+                EdgeType edgeTypeWhereWillNextRect = (NumEdge == 0) ? SelectRandomAnyEdgeType() : SelectRandomEdgeType(prevUsedEdgeType);
                 CountFrame.DebugLogUpdate($"Next Rec will at [{edgeTypeWhereWillNextRect}] Edge");
 
                 Vector2Int startPointOnEdge = GetRandomPointOnEdge(_firstRect, edgeTypeWhereWillNextRect);
@@ -150,10 +150,12 @@ namespace GameEngine.Environment
 
                 Vector2Int endPointEdge = FindEndPointEdge(startPointOnEdge, edgeTypeWhereWillNextRect, selectedAngleTypeBasePoint);
 
-                _pathFinderData.AddEdge(_firstRect, _secondRect, startPointOnEdge, endPointEdge);
+                Edge edge = _pathFinderData.AddEdge(_firstRect, _secondRect, startPointOnEdge, endPointEdge);
+                _pathFinderData.CreateDebugEdgePoints(edge, NumEdge);
 
                 _firstRect = _secondRect;
                 prevUsedEdgeType = edgeTypeWhereWillNextRect;
+                NumEdge++;
             }
         }
 

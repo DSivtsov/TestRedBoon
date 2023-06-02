@@ -79,10 +79,12 @@ namespace GameEngine.Environment
             }
         }
 
-        private void SetAndActivatePoint(Transform prefabPoint, Vector2 pointPosition)
+        private void SetAndActivatePoint(Transform prefabPoint, Vector2 pointPosition, string nameEdge="")
         {
             Transform transform = Instantiate<Transform>(prefabPoint, _parentTransformAllPoint);
             transform.position = pointPosition;
+            if (nameEdge != "")
+                transform.name = nameEdge;
         }
 
         public void Init(int minNumberEdges)
@@ -104,13 +106,13 @@ namespace GameEngine.Environment
                 UnityEngine.Object.Destroy(item.gameObject);
             }
         }
-        public void AddEdge(NormalizedRectangle firstRect, NormalizedRectangle secondRect, Vector2Int startPointOnEdge, Vector2Int endPointEdge)
+        public Edge AddEdge(NormalizedRectangle firstRect, NormalizedRectangle secondRect, Vector2Int startPointOnEdge, Vector2Int endPointEdge)
         {
             Rectangle first = new Rectangle(firstRect.BottomLeftAngel, firstRect.BottomLeftAngel + firstRect.SizeXY);
             Rectangle second = new Rectangle(secondRect.BottomLeftAngel, secondRect.BottomLeftAngel + secondRect.SizeXY);
             Edge edge = new Edge(first, second, startPointOnEdge, endPointEdge);
             _listEdges.Add(edge);
-            CreateEdgePoints(edge);
+            return edge;
         }
 
         public void ClearPreviousResults()
@@ -118,10 +120,10 @@ namespace GameEngine.Environment
             _listEdges.Clear();
         }
 
-        private void CreateEdgePoints(Edge edge)
+        public void CreateDebugEdgePoints(Edge edge, int numEdge)
         {
-            SetAndActivatePoint(_prefabStartEdge, (Vector2)edge.Start);
-            SetAndActivatePoint(_prefabEndEdge, edge.End);
+            SetAndActivatePoint(_prefabStartEdge, (Vector2)edge.Start, $"StartPointEdge{numEdge}");
+            SetAndActivatePoint(_prefabEndEdge, edge.End, $"EndPointEdge{numEdge}");
         }
     }
 }

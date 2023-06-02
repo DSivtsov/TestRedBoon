@@ -68,7 +68,7 @@ namespace GameEngine.PathFinder
                 {
                     //Test possibility to create line with baseDot and dot from other edge with can pass all edges between them
                     //int nextEdgeAftercurrent = currentTestingNumEdge + step;    will skip current edge fot testing pass
-                    (bool isPassedEdges, Line lineBTWBaseDotAndEdge, _) = Line.TryLinkTwoDotsThroughEdges(baseDotSolution, dotEdge, closestNumEdge,
+                    (bool isPassedEdges, Line lineBTWBaseDotAndEdge) = Line.TryLinkTwoDotsThroughEdges(baseDotSolution, dotEdge, closestNumEdge,
                         nextEdgeAftercurrent);
                     if (isPassedEdges)
                     {
@@ -99,8 +99,8 @@ namespace GameEngine.PathFinder
 
         private static SolutionForDot CreateSolutionForDot(Vector2 baseDotSolution, int numRecBaseDot, List<Line> listLines, int numLastTestedEdge, SolutionSide solutionSide)
         {
+            DebugFinder.DebugTurnOn(true);
             Debug.Log($"New SolutionForDot({solutionSide}) numRecBaseDot={numRecBaseDot} numLastTestedEdge={numLastTestedEdge}");
-            DebugFinder.DebugTurnOn(active: true);
             DebugFinder.DebugDrawLine(listLines, $"Solution ForEdge[{numLastTestedEdge}]");
             List<ConnectionDot> _initialPreviousConnectionDots = new List<ConnectionDot> { };
             ConnectionDot initialConnectionDot;
@@ -111,9 +111,9 @@ namespace GameEngine.PathFinder
                 DebugFinder.DebugDrawDot(baseDotSolution);
                 ListDotsPath.AddConnectionDot(initialConnectionDot); 
             }
-            else
-                DebugFinder.DebugDrawDot(baseDotSolution, "DotEnd");
-            DebugFinder.DebugTurnOn(active: false);
+            //else
+            //    DebugFinder.DebugDrawDot(baseDotSolution, "DotEnd");
+            DebugFinder.DebugTurnOn(false);
             return new SolutionForDot(new SectorSolutions(listLines, baseDotSolution), numLastTestedEdge, numRecBaseDot, initialConnectionDot);
         }
     }
