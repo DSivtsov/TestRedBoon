@@ -15,9 +15,11 @@ namespace GameEngine.PathFinder
         [SerializeField] private CheckerInitialData _checkerInitialData;
         [SerializeField] private ShowPath _showPath;
         [SerializeField] private GenerateField _generateField;
+        [SerializeField] private DebugPathFinderManager _debugPathFinderManager;
         [Header("DEBUG")]
         [SerializeField] private bool _createFieldAutoStart = false;
         [SerializeField] private bool _callGetPathAutoStart = false;
+        [SerializeField] private bool _turnOnDebugPathFinderManager = false;
 
 
         private List<Vector2> _pathFounded;
@@ -25,7 +27,12 @@ namespace GameEngine.PathFinder
 
         private void Awake()
         {
-                    _checkerInitialData.InitialData(_pathFinderData);
+            _checkerInitialData.InitialData(_pathFinderData);
+            FieldSettingSO fieldSetting = _generateField.FieldSetting;
+            if (fieldSetting)
+                _debugPathFinderManager.InitDebugPathFinderManager(fieldSetting.WidthField, fieldSetting.HeightField); 
+            else
+                throw new NotSupportedException("FieldSettingSO is Null");
         }
 
         private void Start()
@@ -39,6 +46,11 @@ namespace GameEngine.PathFinder
         [Button]
         public void CallGetPath()
         {
+            if (_turnOnDebugPathFinderManager)
+                DebugFinder.StartDebugFinder(_debugPathFinderManager);
+            else
+                DebugFinder.StartDebugFinder(_debugPathFinderManager,activateDebugPathFinder: false);
+
             if (_checkerInitialData.CheckData())
             {
                 _iFinder = new Finder();

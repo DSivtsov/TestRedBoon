@@ -32,6 +32,8 @@ namespace GameEngine.Environment
         private NormalizedRectangle _firstRect;
         private NormalizedRectangle _secondRect;
 
+        public FieldSettingSO FieldSetting => _fieldSetting;
+
         private void Injection()
         {
             CountFrame.DebugLogWarningUpdate("Injection()");

@@ -5,9 +5,8 @@ using System;
 
 namespace GameEngine.PathFinder
 {
-    public class DebugPathFinderMono : MonoBehaviour
+    public class DebugPathFinderManager : MonoBehaviour
     {
-        [SerializeField] private FieldSettingSO _fieldSetting;
         [SerializeField] private Transform _prefabLineDebug;
         [SerializeField] private Transform _prefabDotCrossDebug;
 
@@ -23,11 +22,13 @@ namespace GameEngine.PathFinder
         {
             _transforDebugFinder = transform;
             _positioZTransforDebugFinder = _transforDebugFinder.position.z;
-
-            _widthHalfField = _fieldSetting.WidthField / 2;
-            _heightHalfField = _fieldSetting.HeightField / 2;
-
             _countLine = 0;
+        }
+
+        public void InitDebugPathFinderManager(int fieldSettingWidthField, int fieldSettingHeightField)
+        {
+            _widthHalfField = fieldSettingWidthField / 2;
+            _heightHalfField = fieldSettingHeightField / 2;
         }
 
         public void ShowLine(List<Line> lines, string nameGroupLine)
@@ -36,22 +37,13 @@ namespace GameEngine.PathFinder
             for (int i = 0; i < lines.Count; i++)
             {
                 (Vector2 startDot, Vector2 endDot) = lines[i].GetDotsforScreen(_widthHalfField, _heightHalfField);
-                //Vector2 startDot = new Vector2(-_widthHalfField, (float)lines[i].FindYForX(-_widthHalfField));
-                //Vector2 endDot = new Vector2(_widthHalfField, (float)lines[i].FindYForX(_widthHalfField));
                 ShowLine(startDot, endDot, $"{nameGroup}_{i}");
             }
-        }
-
-        private void GetDotsforScreen(int widthHalfField, int heightHalfField)
-        {
-            throw new NotImplementedException();
         }
 
         public void ShowLine(Line line, string nameLine)
         {
             (Vector2 startDot, Vector2 endDot) = line.GetDotsforScreen(_widthHalfField, _heightHalfField);
-            //Vector2 startDot = new Vector2(-_widthHalfField, (float)line.FindYForX(-_widthHalfField));
-            //Vector2 endDot = new Vector2(_widthHalfField, (float)line.FindYForX(_widthHalfField));
             ShowLine(startDot, endDot, nameLine);
         }
 
@@ -71,6 +63,7 @@ namespace GameEngine.PathFinder
             {
                 UnityEngine.Object.Destroy(item.gameObject);
             }
+            _countLine = 0;
         }
 
         internal void ShowDotCross(Vector2 dot, string nameDot)

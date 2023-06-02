@@ -20,7 +20,7 @@ namespace GameEngine.PathFinder
         private Vector2 _endPointFindPath;
         IEnumerable<Vector2> IPathFinder.GetPath(Vector2 startPointFindPath, Vector2 endPointFindPath, IEnumerable<Edge> edges)
         {
-            DebugFinder.InitDebugFinder(active: false);
+            DebugFinder.DebugTurnOn(active: false);
 
             _arredges = edges.ToArray();
             _startPointFindPath = startPointFindPath;

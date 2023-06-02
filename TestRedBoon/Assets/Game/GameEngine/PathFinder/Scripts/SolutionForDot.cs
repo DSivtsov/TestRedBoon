@@ -50,7 +50,12 @@ namespace GameEngine.PathFinder
 
         IEnumerable<ConnectionDot> ISolution.GetListConnectionDotsSolution()
         {
-            yield return _connectionDot;
+            if (_connectionDot != null)
+            {
+                yield return _connectionDot;
+            }
+            else
+                throw new NotImplementedException("GetListConnectionDotsSolution for Solution (SolutionSide == End)");
         }
         
 
@@ -101,16 +106,18 @@ namespace GameEngine.PathFinder
         {
             DebugFinder.DebugTurnOn(true);
             Debug.Log($"New SolutionForDot({solutionSide}) numRecBaseDot={numRecBaseDot} numLastTestedEdge={numLastTestedEdge}");
-            DebugFinder.DebugDrawLine(listLines, $"Solution ForEdge[{numLastTestedEdge}]");
-            List<ConnectionDot> _initialPreviousConnectionDots = new List<ConnectionDot> { };
+            DebugFinder.DebugDrawLine(listLines, $"SolutionForDot{solutionSide}[{numLastTestedEdge}]");
             ConnectionDot initialConnectionDot;
-            initialConnectionDot = new ConnectionDot(baseDotSolution, _initialPreviousConnectionDots);
             if (solutionSide != SolutionSide.End)
             {
                 //To ListDotsPath will be added ConnectionDot only for Start, all other (include the ConnectionDot for End) will be added in procees of Path Finding
-                DebugFinder.DebugDrawDot(baseDotSolution);
-                ListDotsPath.AddConnectionDot(initialConnectionDot); 
+                //List<ConnectionDot> _initialPreviousConnectionDots = new List<ConnectionDot> { };
+                initialConnectionDot = new ConnectionDot(baseDotSolution, new List<ConnectionDot> { });
+                DebugFinder.DebugDrawDot(baseDotSolution, $"DotForSolution{solutionSide}");
+                ListDotsPath.AddConnectionDot(initialConnectionDot);
             }
+            else
+                initialConnectionDot = null;
             DebugFinder.DebugTurnOn(false);
             return new SolutionForDot(new SectorSolutions(listLines, baseDotSolution), numLastTestedEdge, numRecBaseDot, initialConnectionDot);
         }
